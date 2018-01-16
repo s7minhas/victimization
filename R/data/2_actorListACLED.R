@@ -26,4 +26,6 @@ actorDates = actorDates[actorDates$yrsActive > 2,] # only keep actors involved i
 
 # list of actors by country
 head(actorDates)
+
+save(actorDates, file=paste0(pathData, 'actorsByCountry.rda'))
 #################
