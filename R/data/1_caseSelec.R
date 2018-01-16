@@ -117,7 +117,9 @@ summStatsACLED$cntry = cntries
 # tmp = get_map('Nigeria a')
 
 
-toFocus = summStatsACLED$cntry[summStatsACLED$cntActors>100]
+toFocus=summStatsACLED[summStatsACLED$cntry %in% c('Sudan', 'South Sudan', 'Kenya', 'Somalia', 'Ethiopia'), 'cntry']
+
+# toFocus = summStatsACLED$cntry[summStatsACLED$cntActors>100]
 years = 2000:2016
 
 summStatsACLED_toFocus = data.frame(do.call('rbind', lapply(toFocus, function(c){
@@ -154,8 +156,8 @@ plotSumm = function(data, yVar, yLab, fName){
 	ggsave(g, file=paste0(pathDrop, fName), width=9, height=5)	
 }
 
-plotSumm(summStatsACLED_toFocus, 'cntConf', 'Number of conflicts', 'cntConf.pdf')
-plotSumm(summStatsACLED_toFocus, 'cntActors', 'Number of actors', 'cntActors.pdf')
-plotSumm(summStatsACLED_toFocus, 'cntDyads', 'Number of dyads', 'cntDyads.pdf')
-plotSumm(summStatsACLED_toFocus, 'cntCivEvents', 'Number of Violent Civilian Events', 'cntCivEvents.pdf')
-plotSumm(summStatsACLED_toFocus, 'cntCivFatals', 'Number of Civilian Fatalities', 'cntCivFatals.pdf')
+plotSumm(summStatsACLED_toFocus, 'cntConf', 'Number of conflicts', 'cntConf_horn.pdf')
+plotSumm(summStatsACLED_toFocus, 'cntActors', 'Number of actors', 'cntActors_horn.pdf')
+plotSumm(summStatsACLED_toFocus, 'cntDyads', 'Number of dyads', 'cntDyads_horn.pdf')
+plotSumm(summStatsACLED_toFocus, 'cntCivEvents', 'Number of Violent Civilian Events', 'cntCivEvents_horn.pdf')
+plotSumm(summStatsACLED_toFocus, 'cntCivFatals', 'Number of Civilian Fatalities', 'cntCivFatals_horn.pdf')
