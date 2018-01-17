@@ -79,13 +79,21 @@ plotSumm = function(data, yVar, yLab, fName){
 	ggsave(g, file=paste0(pathDrop, fName), width=9, height=5)	
 }
 
-plotSumm(summStatsACLED_toFocus, 'cntConf', 'Number of conflicts', 'cntConf_horn.pdf')
-plotSumm(summStatsACLED_toFocus, 'cntActors', 'Number of actors', 'cntActors_horn.pdf')
-plotSumm(summStatsACLED_toFocus, 'cntDyads', 'Number of dyads', 'cntDyads_horn.pdf')
-plotSumm(summStatsACLED_toFocus, 'cntCivEvents', 'Number of Violent Civilian Events', 'cntCivEvents_horn.pdf')
-plotSumm(summStatsACLED_toFocus, 'cntCivFatals', 'Number of Civilian Fatalities', 'cntCivFatals_horn.pdf')
+# plotSumm(summStatsACLED_toFocus, 'cntConf', 'Number of conflicts', 'cntConf_horn.pdf')
+# plotSumm(summStatsACLED_toFocus, 'cntActors', 'Number of actors', 'cntActors_horn.pdf')
+# plotSumm(summStatsACLED_toFocus, 'cntDyads', 'Number of dyads', 'cntDyads_horn.pdf')
+# plotSumm(summStatsACLED_toFocus, 'cntCivEvents', 'Number of Violent Civilian Events', 'cntCivEvents_horn.pdf')
+# plotSumm(summStatsACLED_toFocus, 'cntCivFatals', 'Number of Civilian Fatalities', 'cntCivFatals_horn.pdf')
 
 # determine most conflictual countries
+cntriesACLED=summStatsACLED[order(summStatsACLED$cntDyads, decreasing = TRUE),][1:20,'cntry']
+aData = data.frame(acled[which(acled$COUNTRY %in% cntriesACLED), ])
+save(aData, cntriesACLED, file=paste0(pathData, 'cntriesACLED_byDyads.rda'))
+
+cntriesACLED=summStatsACLED[order(summStatsACLED$cntActors, decreasing = TRUE),][1:20,'cntry']
+aData = data.frame(acled[which(acled$COUNTRY %in% cntriesACLED), ])
+save(aData, cntriesACLED, file=paste0(pathData, 'cntriesACLED_byActors.rda'))
+
 cntriesACLED=summStatsACLED[order(summStatsACLED$cntConf, decreasing = TRUE),][1:20,'cntry']
 aData = data.frame(acled[which(acled$COUNTRY %in% cntriesACLED), ])
-save(aData, cntriesACLED, file=paste0(pathData, 'cntriesACLED.rda'))
+save(aData, cntriesACLED, file=paste0(pathData, 'cntriesACLED_byConf.rda'))

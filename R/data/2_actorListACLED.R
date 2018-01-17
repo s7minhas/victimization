@@ -1,5 +1,7 @@
 if(Sys.info()['user'] %in% c('s7m', 'janus829')){ source('~/Research/intraConfNetDyn/R/setup.R') }
-load(paste0(pathData, 'cntriesACLED.rda'))
+load(paste0(pathData, 'cntriesACLED_byConf.rda'))
+# load(paste0(pathData, 'cntriesACLED_byActors.rda'))
+# load(paste0(pathData, 'cntriesACLED_byDyads.rda'))
 
 #################
 # clean actor names
@@ -27,5 +29,5 @@ actorDates = actorDates[actorDates$yrsActive > 2,] # only keep actors involved i
 # list of actors by country
 head(actorDates)
 
-save(actorDates, file=paste0(pathData, 'actorsByCountry.rda'))
+save(actorDates, file=paste0(pathData, 'actorsByCountry_topByConf.rda'))
 #################
