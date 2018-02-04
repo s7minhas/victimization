@@ -86,14 +86,19 @@ plotSumm = function(data, yVar, yLab, fName){
 # plotSumm(summStatsACLED_toFocus, 'cntCivFatals', 'Number of Civilian Fatalities', 'cntCivFatals_horn.pdf')
 
 # determine most conflictual countries
-cntriesACLED=summStatsACLED[order(summStatsACLED$cntDyads, decreasing = TRUE),][1:20,'cntry']
-aData = data.frame(acled[which(acled$COUNTRY %in% cntriesACLED), ])
-save(aData, cntriesACLED, file=paste0(pathData, 'cntriesACLED_byDyads.rda'))
+# cntriesACLED=summStatsACLED[order(summStatsACLED$cntDyads, decreasing = TRUE),][1:20,'cntry']
+# aData = data.frame(acled[which(acled$COUNTRY %in% cntriesACLED), ])
+# save(aData, cntriesACLED, file=paste0(pathData, 'cntriesACLED_byDyads.rda'))
 
-cntriesACLED=summStatsACLED[order(summStatsACLED$cntActors, decreasing = TRUE),][1:20,'cntry']
-aData = data.frame(acled[which(acled$COUNTRY %in% cntriesACLED), ])
-save(aData, cntriesACLED, file=paste0(pathData, 'cntriesACLED_byActors.rda'))
+# cntriesACLED=summStatsACLED[order(summStatsACLED$cntActors, decreasing = TRUE),][1:20,'cntry']
+# aData = data.frame(acled[which(acled$COUNTRY %in% cntriesACLED), ])
+# save(aData, cntriesACLED, file=paste0(pathData, 'cntriesACLED_byActors.rda'))
 
-cntriesACLED=summStatsACLED[order(summStatsACLED$cntConf, decreasing = TRUE),][1:20,'cntry']
-aData = data.frame(acled[which(acled$COUNTRY %in% cntriesACLED), ])
-save(aData, cntriesACLED, file=paste0(pathData, 'cntriesACLED_byConf.rda'))
+# cntriesACLED=summStatsACLED[order(summStatsACLED$cntConf, decreasing = TRUE),][1:20,'cntry']
+# aData = data.frame(acled[which(acled$COUNTRY %in% cntriesACLED), ])
+# save(aData, cntriesACLED, file=paste0(pathData, 'cntriesACLED_byConf.rda'))
+
+##
+cntriesACLED=summStatsACLED[order(summStatsACLED$cntDyads, decreasing = TRUE),][,'cntry']
+acled = data.frame(acled[which(acled$COUNTRY %in% cntriesACLED), ])
+save(aData, cntriesACLED, file=paste0(pathData, 'cntriesACLED_byAll.rda'))
