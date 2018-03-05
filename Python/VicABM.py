@@ -3,6 +3,7 @@ import numpy as np
 from string import *
 import operator
 import networkx as nx
+import copy
 ###Game Parameters, we Can Change These
 #How much less people like you when you kill your supporters
 VicPenalty = .05
@@ -60,6 +61,11 @@ class Territory(object):
         dist = max(self.country.dists[j][self] - 1, 0)
         exst += delta**dist*(CoerceMob*len(j.civilians) + (1 - CoerceMob)*j.exsupp)
       self.exstr[i] = exst
+  def Attack(self, target):
+    if target not in self.neighbors:
+      raise ValueError('This attack cant happen, water is too wet.')
+    self.attack.append(target)
+    target.attack.append(self)
 ##Resolve a battle involving this territory
   def Battle(self):
     rsrs = {}
@@ -89,7 +95,12 @@ class Territory(object):
     for i in range(len(probs.keys())):
       if outcome[i] == 1:
         winner = list(probs.keys())[i]
+        old = copy.deepcopy(self.control)
         self.control = list(probs.keys())[i]
+        newsupp = 0
+        if self.control != old:
+          for j in self.civilians:
+            newsupp += j.support == self.control
     #People died, it sucks
     battlefield = self.attack.append(self)
     for j in battlefield:
@@ -122,10 +133,12 @@ class Territory(object):
     if selective == 1:
       nosupp.pop()
       self.control.VioHist += 1
+      self.exsupp -= (1 + VicPenalty*len(nosupp))
 ##If it doesnt, you kill a supporter, man, supporting you seems like a bad idea
     if selective == 0:
       supp.pop()
       self.control.VioHist -= 1
+      self.exsupp += VicPenalty*len(nosupp)
     self.civilians = supps + nosupp
   def __repr__(self):
     return self.name
@@ -164,13 +177,43 @@ class Civilian(object):
     #Get a probability the other civilians are supporting the actor?
     for i in self.territory.civilians:
       if i != self:
-        IncSupp += 1 - abs(IncPref - i.preference) + self.territory.control.VioHist*VicPenalty
+        IncSupp += min(max(1 - abs(IncPref - i.preference) + self.territory.control.VioHist*VicPenalty,1),0)
     IncSupp /= len(self.territory.civilians)
     #Compare that to your ideological distance
     if IncSupp/2 > abs(IncPref - self.preference) - self.territory.control.VioHist*VicPenalty:
       self.support = self.territory.control
     else: 
       self.support = 0
+  def BattleSupport(self):
+    combatants = [self.territory.control]
+    for i in self.territory.attack:
+      combatants.append(i.control)
+    rsr = {}
+    for i in combatants:
+      res = 0
+      for j in i.territory:
+        if j not in self.territory.attack:
+          for k in j.civilians:
+            res += min(max(1 - abs(i.preference - k.preference) + i.VioHist*VicPenalty,1),0)*(1 - CoerceMob) + CoerceMob
+        if j in self.territory.attack:
+          for k in j.civilians:
+            diffs = 0
+            for l in combatants:
+              diffs += abs(k.preference - l.preference)
+            es = min(max(1 - abs(i.preference - k.preference)/diffs + i.VioHist*VicPenalty,1),0)
+            res += es - (CoerceMob -DisloayPenalty)*(1-es)
+      rsr[i] = res
+      utils = rsr
+    for c in combatants:
+      rsr[c] /= sum(rsr.values())
+      utils[c]  = rsr[c]*(1 - abs(c.preference - self.preference) + c.VioHist*VicPenalty)
+    max_key = max(utils, key=lambda k: utils[k])
+    max_value = max(utils.values()); 
+    choices = [key for key, value in stats.items() if value == max_value]
+    if self.territory.control in choices:
+      self.support = self.territory.control
+    else:
+      self.support = shuffle(choices)[0]
   #Civilians can leave... Might want to have a risk of it going really badly and them getting killed tho
   def Flee(self, target):
     self.territory.civilians.remove(self)
