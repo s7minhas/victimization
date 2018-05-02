@@ -24,11 +24,11 @@ yrs=seq(min(aData$YEAR), max(aData$YEAR), by=1)
 loadPkg('doBy') ; actorDates = doBy::summaryBy(YEAR ~ a1 + COUNTRY, data=tmp, FUN=c(min, max))
 actorDates$yrsActive = actorDates$YEAR.max - actorDates$YEAR.min # length of years active
 
-save(actorDates, file=paste0(pathData, 'actorDates_all.rda'))
-write.csv(actorDates, 
-	file=paste0(pathData, 'actorDates_toClean_all.csv'),
-	row.names=FALSE
-	)
+# save(actorDates, file=paste0(pathData, 'actorDates_all.rda'))
+# write.csv(actorDates, 
+# 	file=paste0(pathData, 'actorDates_toClean_all.csv'),
+# 	row.names=FALSE
+# 	)
 
 actorDates = actorDates[actorDates$yrsActive > 2,] # only keep actors involved in 3 yrs of conflict
 # actorDates = actorDates[actorDates$yrsActive > 4,] 
@@ -44,29 +44,45 @@ actorsCT = lapply(unique(actorDates$COUNTRY), function(cntry){
 	  return(actors)
 	}) ; names(actorsT) = yrs
 	return(actorsT) }) ; names(actorsCT) = unique(actorDates$COUNTRY)
-
-# clean up 
-slice = aData[which(aData$COUNTRY=='Madagascar' & aData$YEAR==2016),]
-slice[,c('a1','a2','EVENT_TYPE','YEAR')]
 #################
 
 #################
 # create list of adj mats
-# adj mats
-nData$dv = 1 ; yVar = 'dv'
-yList = lapply(1997:2016, function(ii){ 
-  actorSlice = actorsT[[char(ii)]]
-  slice = nData[ which( 
-      nData$YEAR==ii & 
-      nData$a1 %in% actorSlice &
-      nData$a2 %in% actorSlice
-      ), c('a1', 'a2', yVar) ]
-  adjMat = matrix(0, 
-    nrow=length(actorSlice), ncol=length(actorSlice),
-    dimnames=list(actorSlice,actorSlice) )
-  for(r in 1:nrow(slice)){ adjMat[slice$a1[r],slice$a2[r]]=1  }
-  return(adjMat)
-}) ; names(yList) = yrs
+yListAll = lapply(names(actorsCT), function(cntry){
+	nData = aData[aData$COUNTRY==cntry,]
+	nData$dv = 1 ; yVar = 'dv'
+	actorsT = actorsCT[[cntry]]
+	yList = lapply(yrs, function(ii){ 		
+		if(
+			is.null(actorsT[[char(ii)]]) | 
+			length(actorsT[[char(ii)]])<5){
+			return(NULL)
+		}
+		actorSlice = actorsT[[char(ii)]]
+		slice = nData[ which( 
+			nData$YEAR==ii & 
+			nData$a1 %in% actorSlice &
+			nData$a2 %in% actorSlice
+			), c('a1', 'a2', yVar) ]
+		if(nrow(slice)==0){return(NULL)}
+		adjMat = matrix(0, 
+			nrow=length(actorSlice), ncol=length(actorSlice),
+			dimnames=list(actorSlice,actorSlice) )
+		for(r in 1:nrow(slice)){ adjMat[slice$a1[r],slice$a2[r]]=1  }
+		return(adjMat)
+	}) ; names(yList) = yrs
+	return(yList)
+}) ; names(yListAll) = names(actorsCT)
+#################
+
+#################
+loadPkg('igraph')
+lapply(names(yListAll, function()){
+	lapply(yrs, function(t){
+
+	})
+})
+
 #################
 
 
