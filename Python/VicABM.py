@@ -33,6 +33,7 @@ class Territory(object):
     self.attack = []
     self.exsupp = 0
     self.exstr = {}
+    self.newterritory = 0
 ###Check whether each civilian in a territory supports the dominant group, then also get an expected level of support for future period calculations
   def SupportCheck(self):
     self.exsupp = 0
@@ -41,24 +42,33 @@ class Territory(object):
         i.InteriorSupport()
         self.exsupp += (i.support == i.territory.control)
 ###Get resources from a territory
+  def SupportDecisions(self):
+    for i in self.civilians:
+      if len(self.attack) == 0:
+        i.InteriorSupport()
+      else:
+        i.BattleSupport()
   def Mobilize(self):
+    self.SupportDecision()
     resources = 0
     for i in self.civilians:
       if i.support == self.control:
         resources += 1
-##Apply penalty to the territory if its part of the battlefield
-      elif len(self.attack) != 0 & i.support != self.control:
-        if i.support in self.attack.control:
-          resources -= DisloyalPenalty
-      else:
+      if len(self.attack) == 0 & i.support != self.control:
         resources += CoerceMob
+##Apply penalty to the territory if its part of the battlefield
+      if len(self.attack) != 0 & i.support != self.control:
+        if i.support in [j.control for j in self.attack]:
+          resources -= DisloyalPenalty
+        if i.support not in [j.control for j in self.attack]:
+          resources += CoerceMob
     self.resources = resources
 ##Calculate expected resources you could apply in this territory
   def ExpectedStrength(self):
     for i in self.country.armedactors:
       exst = 0
       for j in i.territory:
-        dist = max(self.country.dists[j][self] - 1, 0)
+        dist = max(self.country.dists[int(j.__repr__())][int(self.__repr__())] - 1, 0)
         exst += delta**dist*(CoerceMob*len(j.civilians) + (1 - CoerceMob)*j.exsupp)
       self.exstr[i] = exst
   def Attack(self, target):
@@ -77,10 +87,10 @@ class Territory(object):
       ##Calculate their resources
       for i in combatants:
         res = 0
-        trr = i.control.territory
+        trr = i.territory
         for j in trr:
           j.Mobilize()
-          dist = max(self.country.dists[j][self] - 1, 0)
+          dist = max(self.country.dists[int(j.__repr__())][int(self.__repr__())] - 1, 0)
           res += delta**dist*j.resources
         rsrs[i] = res
     #Transform to probability
@@ -99,15 +109,18 @@ class Territory(object):
         self.control = list(probs.keys())[i]
         newsupp = 0
         if self.control != old:
+          self.newterritory = 0 #cant victimize in the period you acquire a territory
           for j in self.civilians:
             newsupp += j.support == self.control
     #People died, it sucks
-    battlefield = self.attack.append(self)
-    for j in battlefield:
+    self.attack.append(self)
+    for j in self.attack:
       for i in range(battledeaths):
         shuffle(j.civilians)
         j.civilians.pop()
     #All these people dying, who are we gonna mobilize next time?
+    for i in self.attack:
+      i.attack = []
   def Growth(self,rate):
       add = round(len(self.civilians)*rate)
       for i in range(add):
@@ -127,7 +140,7 @@ class Territory(object):
       else:
         nosupp.append(i)
 #Based on how many supporters, you get a probability of selective vs indiscriminate violence
-    selectprob = 1 - e*((len(self.civilians) - len(supp) + 1))/len(self.civilians)
+    selectprob = 1 - victimerror*((len(self.civilians) - len(supps) + 1))/len(self.civilians)
     selective = np.random.binomial(1, selectprob, 1)
 ##If it works, you kill an opponent, everyone loves you!
     if selective == 1:
@@ -140,6 +153,59 @@ class Territory(object):
       self.control.VioHist -= 1
       self.exsupp += VicPenalty*len(nosupp)
     self.civilians = supps + nosupp
+  def ConsiderAttack(self, target):
+    if self.control == target.control:
+      return(False)
+    pwin = self.exstr/(self.exstr + target.extr)
+    R = length(target.civilians)
+    c = battledeaths
+    altruism = (.5 - abs(self.control.preference - target.control.preference))*2*self.control.ideo
+    return(altruism > (c*(1 - pwin))/(R*pwin - (1 - pwin)*c)
+  def BorderCheck(self):
+    for i in neighbors:
+      if i.ConsiderAttack(self):
+        self.borders = 1
+  def VicChoice(self):
+    self.BorderCheck()
+    if self.newterritory == 0:
+      return()
+    if self.borders == 0: 
+      suppnum = 0 
+      for i in self.civilians:
+        if i.support == 1:
+          suppnum += 1
+      nsuppnum = length(self.civilians) - suppnum
+      if suppnum == 0 | nsuppnum == 1:
+        return()
+      selectprob  = 1 - victimerror*((len(self.civilians) - len(supps) + 1))/len(self.civilians)
+      supprange = ((suppnum -1)/(suppnum + nsuppnum - 1) + self.control.VioHist*VicPenalty)*2
+      victUtility = selectprob*((2*VicPenalty/(1 - supprange)*nsuppnum)*(1 - CoerceMob) - CoerceMob) - (1 - selectprob)*(VicPenalty/supprange * suppnum * (1 - CoerceMob) - 1)
+      if victUtility > 0:
+        self.Victimize()
+    if self.borders == 1:
+      shouldVic = 0
+      for j in self.neighbors:
+        if j.ConsiderAttack(self):
+          suppnum = 0 
+          for i in self.civilians:
+            if i.support == 1:
+            suppnum += 1
+          nsuppnum = length(self.civilians) - suppnum
+          suppInt = ((suppnum -1)/(suppnum + nsuppnum - 1) + self.control.VioHist*VicPenalty)
+          pwin = self.exstr/(self.exstr + j.exstr)
+          suppborder = self.preference*pwin + j.preference*(1 - pwin)
+          if self.preference > j.preference:
+            loyalzone = 1 - suppborder
+          if self.preference <= j.preference:
+            loyalzone = suppborder
+          loyal = length(civilians)*loyalzone
+          nonloyal = length(civilians) - loyal
+          nsuppnum = length(civilians) - suppnum
+          selectprob  = 1 - victimerror*((len(self.civilians) - len(supps) + 1))/len(self.civilians)
+          lossFunction = selectprob*nonloyal*VicPenalty/(1 - loyalzone)*(CoerceMob - DisloyalPenalty) - (1 - selectprob)*loyal*VicPenalty/(loyalzone)*(CoerceMob - DisloyalPenalty)
+          if lossFunction > 0:
+            self.Victimize()
+            return("victimized")  
   def __repr__(self):
     return self.name
 
@@ -303,6 +369,17 @@ class Country(object):
 US = Country("USA", 10, .2, 5, 15)
 z = US.provinces[0].civilians[1]
 P0 = US.provinces[0]
+P1 = US.provinces[1]
 
 P0.SupportCheck()
 P0.Mobilize()
+P0.ExpectedStrength()
+P0.Victimize()
+
+PX = US.provinces[int(P1.neighbors[0].__repr__())]
+
+PX.Attack(P1)
+
+P1.Mobilize()
+
+P1.resources
