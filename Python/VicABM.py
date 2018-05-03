@@ -22,6 +22,7 @@ victimerror = .1
 
 
 
+###Create the Object Class Territory
 class Territory(object):
   def __init__(self, name):
     self.name = name
@@ -39,15 +40,17 @@ class Territory(object):
     self.exsupp = 0
     if self.attack == 0:
       for i in self.civilians:
-        i.InteriorSupport()
+        i.SupportDecisions()
+##Get expected support for future calculations
         self.exsupp += (i.support == i.territory.control)
-###Get resources from a territory
+###Wrapper that determines what type of decisions civilians are making
   def SupportDecisions(self):
     for i in self.civilians:
       if len(self.attack) == 0:
         i.InteriorSupport()
       else:
         i.BattleSupport()
+###Get resources from a territory
   def Mobilize(self):
     self.SupportDecision()
     resources = 0
@@ -56,7 +59,7 @@ class Territory(object):
         resources += 1
       if len(self.attack) == 0 & i.support != self.control:
         resources += CoerceMob
-##Apply penalty to the territory if its part of the battlefield
+##Apply penalty to the territory for supporters of the opposing groups its part of the battlefield
       if len(self.attack) != 0 & i.support != self.control:
         if i.support in [j.control for j in self.attack]:
           resources -= DisloyalPenalty
@@ -68,10 +71,13 @@ class Territory(object):
     for i in self.country.armedactors:
       exst = 0
       for j in i.territory:
+###Strength is discounted by distance
         dist = max(self.country.dists[int(j.__repr__())][int(self.__repr__())] - 1, 0)
         exst += delta**dist*(CoerceMob*len(j.civilians) + (1 - CoerceMob)*j.exsupp)
       self.exstr[i] = exst
+###Assign territories on the battlefield to fight eachother
   def Attack(self, target):
+###can only attack your neighbors
     if target not in self.neighbors:
       raise ValueError('This attack cant happen, water is too wet.')
     self.attack.append(target)
@@ -118,9 +124,10 @@ class Territory(object):
       for i in range(battledeaths):
         shuffle(j.civilians)
         j.civilians.pop()
-    #All these people dying, who are we gonna mobilize next time?
+###Ok, battle over, people not fighting anymore
     for i in self.attack:
       i.attack = []
+    #All these people dying, who are we gonna mobilize next time?
   def Growth(self,rate):
       add = round(len(self.civilians)*rate)
       for i in range(add):
@@ -153,37 +160,56 @@ class Territory(object):
       self.control.VioHist -= 1
       self.exsupp += VicPenalty*len(nosupp)
     self.civilians = supps + nosupp
+###Does it make sense for the controller of this territory to attack a neighbor
   def ConsiderAttack(self, target):
+###you dont attack yourself, thats stupid
     if self.control == target.control:
       return(False)
+###Given expected strength, what is the probability of victory
     pwin = self.exstr/(self.exstr + target.extr)
+###How many resources are at stake
     R = length(target.civilians)
+###What is the cost of war
     c = battledeaths
+###How much do you benefit from good things happening to the owner of the territory
     altruism = (.5 - abs(self.control.preference - target.control.preference))*2*self.control.ideo
+###Ok, is the cost of war higher than the benefit of war?
     return(altruism > (c*(1 - pwin))/(R*pwin - (1 - pwin)*c)
+###Do any of your neighbors want to attack you?
   def BorderCheck(self):
     for i in neighbors:
       if i.ConsiderAttack(self):
         self.borders = 1
+##Does the owner of the territory victimize
   def VicChoice(self):
     self.BorderCheck()
+###Cant do it when you just took over the territory, because you dont have supporters or opponents yet
     if self.newterritory == 0:
       return()
+###What if this is interior territory
     if self.borders == 0: 
+###Number of supporters and non-supporters
       suppnum = 0 
       for i in self.civilians:
         if i.support == 1:
           suppnum += 1
       nsuppnum = length(self.civilians) - suppnum
+###Can't victimize if one group is empty
       if suppnum == 0 | nsuppnum == 1:
         return()
+###How likely are you to kill the right people
       selectprob  = 1 - victimerror*((len(self.civilians) - len(supps) + 1))/len(self.civilians)
+###What are the ranges of preferences for which people will support or oppose you
       supprange = ((suppnum -1)/(suppnum + nsuppnum - 1) + self.control.VioHist*VicPenalty)*2
+###Ok, how does victimization help our ability to mobilize in the future? 
       victUtility = selectprob*((2*VicPenalty/(1 - supprange)*nsuppnum)*(1 - CoerceMob) - CoerceMob) - (1 - selectprob)*(VicPenalty/supprange * suppnum * (1 - CoerceMob) - 1)
+###If its a good idea, do it
       if victUtility > 0:
         self.Victimize()
+###What if we're in a border territory
     if self.borders == 1:
       shouldVic = 0
+###Look at all the potential threats
       for j in self.neighbors:
         if j.ConsiderAttack(self):
           suppnum = 0 
@@ -192,17 +218,24 @@ class Territory(object):
             suppnum += 1
           nsuppnum = length(self.civilians) - suppnum
           suppInt = ((suppnum -1)/(suppnum + nsuppnum - 1) + self.control.VioHist*VicPenalty)
+###Who's likely to win the fight
           pwin = self.exstr/(self.exstr + j.exstr)
+###Between you and the attacker, civilians choose based on who's likely to win, so this is the cutpoint
           suppborder = self.preference*pwin + j.preference*(1 - pwin)
+###Which side of the cutpoint depends on your orientation
           if self.preference > j.preference:
             loyalzone = 1 - suppborder
           if self.preference <= j.preference:
             loyalzone = suppborder
+###Number of loyal civilians
           loyal = length(civilians)*loyalzone
+###Opponent supporters
           nonloyal = length(civilians) - loyal
           nsuppnum = length(civilians) - suppnum
           selectprob  = 1 - victimerror*((len(self.civilians) - len(supps) + 1))/len(self.civilians)
+###How victimization effects the resource balance
           lossFunction = selectprob*nonloyal*VicPenalty/(1 - loyalzone)*(CoerceMob - DisloyalPenalty) - (1 - selectprob)*loyal*VicPenalty/(loyalzone)*(CoerceMob - DisloyalPenalty)
+###Do it if its a positive effect 
           if lossFunction > 0:
             self.Victimize()
             return("victimized")  
@@ -210,6 +243,7 @@ class Territory(object):
     return self.name
 
 
+##Create an armed actor object
 class ArmedActor(object):
   def __init__(self, name, gov):
     self.gov = gov
@@ -228,9 +262,10 @@ class ArmedActor(object):
     return self.name
 
 
-
+###Create a civilian object, note: I'm shitty at object oriented programming and have had no inheritances...
 class Civilian(object):
   def __init__(self, name, Territory):
+###Civilians have preferences and locations
     self.preference = uniform(0, 1)
     self.name = name
     self.support = 0
@@ -250,10 +285,13 @@ class Civilian(object):
       self.support = self.territory.control
     else: 
       self.support = 0
+##Who will civilians support during a battle
   def BattleSupport(self):
+##Enumerate the options
     combatants = [self.territory.control]
     for i in self.territory.attack:
       combatants.append(i.control)
+##What resources can each combatant bring to bear on the location
     rsr = {}
     for i in combatants:
       res = 0
@@ -270,9 +308,11 @@ class Civilian(object):
             res += es - (CoerceMob -DisloayPenalty)*(1-es)
       rsr[i] = res
       utils = rsr
+##Calculate combatants ideology*preference distance
     for c in combatants:
       rsr[c] /= sum(rsr.values())
       utils[c]  = rsr[c]*(1 - abs(c.preference - self.preference) + c.VioHist*VicPenalty)
+###Choose who to support
     max_key = max(utils, key=lambda k: utils[k])
     max_value = max(utils.values()); 
     choices = [key for key, value in stats.items() if value == max_value]
@@ -366,13 +406,18 @@ class Country(object):
 
 ##Playing around to see if stuff works
 
+
+##Create a country with 10 territories, average connectivity of .2, 5 armed actors, 15 civilians on average per territory
 US = Country("USA", 10, .2, 5, 15)
+###Look at territ
 z = US.provinces[0].civilians[1]
 P0 = US.provinces[0]
 P1 = US.provinces[1]
 
 P0.SupportCheck()
+###Get resources
 P0.Mobilize()
+###Get Expected Strength
 P0.ExpectedStrength()
 P0.Victimize()
 
