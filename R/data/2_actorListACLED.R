@@ -76,11 +76,50 @@ yListAll = lapply(names(actorsCT), function(cntry){
 #################
 
 #################
-loadPkg('igraph')
-lapply(names(yListAll, function()){
-	lapply(yrs, function(t){
+loadPkg(c('igraph', 'sna', 'network'))
+stat = function(expr, object){
+	x=try(expr(object),TRUE)
+	if(class(x)=='try-error'){x=NA}
+	return(x) }
 
-	})
+netStats = lapply(names(yListAll)[2], function(cntry){
+	cntryStats = lapply(yrs, function(t){
+# cntry = names(yListAll)[2]
+# t = yrs[7]
+		mat = yListAll[[cntry]][[char(t)]]
+		if(is.null(mat)){return(NULL)}
+		grph = graph_from_adjacency_matrix(mat, 
+			mode='directed', weighted=NULL )
+		sgrph = network::network(mat, matrix.type="adjacency",directed=TRUE)
+
+		inDegree = igraph::degree(grph, mode='in')
+		outDegree = igraph::degree(grph, mode='out')
+		totDegree = igraph::degree(grph, mode='total')
+		btwn = igraph::betweenness(grph)
+		power = stat(igraph::bonpow,grph) # bonaich 1987
+		inClose = igraph::closeness(grph, mode='in') 
+		outClose = igraph::closeness(grph, mode='out')
+		totClose = igraph::closeness(grph, mode='total')
+		eigenCent = igraph::evcent(grph)$vector # eigenvector centrality
+		flow = stat(sna::flowbet,sgrph) # flow betweenness
+		gcent = stat(sna::graphcent, sgrph) # graph centrality (harary)
+		icent = stat(sna::infocent, sgrph) # info centrality
+		if(sum(totDegree)<3){lcent = NA} else {
+			lcent = stat(sna::loadcent,sgrph) } # load centrality
+		prestige = stat(sna::prestige, sgrph) # prestige
+		graph_recip = stat(sna::grecip, sgrph)
+		graph_trans = stat(sna::gtrans, sgrph)
+		graph_dens = stat(sna::gden, sgrph)
+		out = data.frame(
+			inDegree, outDegree, totDegree, btwn, power, 
+			inClose, outClose, totClose, eigenCent, flow, gcent, 
+			icent, lcent, prestige, 
+			graph_recip, graph_trans, graph_dens,
+			year=t )
+		out$country = cntry ; out$actor = rownames(mat)
+		rownames(out) = NULL ; return(out) })
+	cntryDF = do.call('rbind', cntryStats)
+	return(cntryDF)
 })
 
 #################
