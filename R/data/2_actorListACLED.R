@@ -76,16 +76,19 @@ yListAll = lapply(names(actorsCT), function(cntry){
 #################
 
 #################
-loadPkg(c('igraph', 'sna', 'network'))
+loadPkg(c('igraph', 'sna', 'network', 'doParallel', 'foreach'))
 stat = function(expr, object){
 	x=try(expr(object),TRUE)
 	if(class(x)=='try-error'){x=NA}
 	return(x) }
 
-netStats = lapply(names(yListAll)[2], function(cntry){
+cl = makeCluster(3)
+registerDoParallel(cl)
+netStats <- foreach(
+	cntry = names(yListAll), 
+	.packages=c('igraph','sna','network')
+	) %dopar% {
 	cntryStats = lapply(yrs, function(t){
-# cntry = names(yListAll)[2]
-# t = yrs[7]
 		mat = yListAll[[cntry]][[char(t)]]
 		if(is.null(mat)){return(NULL)}
 		grph = graph_from_adjacency_matrix(mat, 
@@ -119,11 +122,8 @@ netStats = lapply(names(yListAll)[2], function(cntry){
 		out$country = cntry ; out$actor = rownames(mat)
 		rownames(out) = NULL ; return(out) })
 	cntryDF = do.call('rbind', cntryStats)
-	return(cntryDF)
-})
+	return(cntryDF)	
+}
 
-#################
-
-
-# save(actorDates, file=paste0(pathData, 'actorsByCountry_topByConf.rda'))
+save(netStats, file=paste0(pathData, 'netStats.rda'))
 #################
