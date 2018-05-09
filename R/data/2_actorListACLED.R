@@ -124,6 +124,7 @@ netStats <- foreach(
 	cntryDF = do.call('rbind', cntryStats)
 	return(cntryDF)	
 }
+names(netStats) = names(yListAll)
 
 save(netStats, file=paste0(pathData, 'netStats.rda'))
 #################
