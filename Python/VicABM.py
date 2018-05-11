@@ -19,7 +19,15 @@ battledeaths = 2
 growthrate = .1
 #How likely you are, with 1 supporter, to incorrectly kill a supporter
 victimerror = .1
+#If no one wins, how many turns should the game last
+turnlimit = 10
 
+def keywithmaxval(d):
+     """ a) create a list of the dict's keys and values; 
+         b) return the key with the max value"""  
+     v=list(d.values())
+     k=list(d.keys())
+     return k[v.index(max(v))]
 
 
 ###Create the Object Class Territory
@@ -258,6 +266,53 @@ class ArmedActor(object):
     self.territory = []
     self.VioHist = 0
     self.country = 0
+  def AttackChoice(self):
+    ###List of possible targets based on contiguity
+    targets = {}
+    for i in self.territory:
+      poss = self.territory.neighbors
+      for j in poss:
+    ###Cant attack yourself
+        if j.control != self:
+          targets[i] = j
+    ###Parameters
+    payoffs = []
+    phi = self.ideo
+    x1 = self.preference
+    ####Check the utility of not attacking
+    for i in targets.keys():
+      R = length(targets[i].civilians)
+      c = battledeaths
+      combatants = [targets[i], targets[i].attack]
+      caps = []
+      for q in combatants:
+        caps.append(q.exstr)
+      if length(targets[i].attack) == 0:
+        sq = (.5 - abs(x1 - targets[i].control.preference))*2*phi
+      else:
+        for j in targets[i].attack:
+          cap.append(j.exstr)
+        pwins = [x/sum(cap) for x in cap]
+        sq = 0
+        for k in range(combatants):
+          sq += (.5 - abs(x1 - combatants[k].preference))*2*phi*(R*pwins[k] -c)
+      ###Check the utility of attacking
+      for i in combatants:
+        caps.append(i.exstr)
+        pwins = [x/sum(cap) for x in cap]
+      attackUtil = 0
+      for k in range(combatants):
+        attackUtil += (.5 - abs(x1 - combatants[k].preference))*2*phi*(R*pwins[k] -c)*(k != length(combatants)) + (R*pwins[k] -c)*(k == length(combatants))
+      payoffs.append((i, target[i], attackUtil - sq))
+    ###Choose the best target
+    besttarget = max(payoffs, key = lambda x:x[2])
+    ###If attacking is better than doing nothing, attack
+    if besttarget[2] > 0:
+      i.Attack(target[i])
+ ###Go through all your territories deciding whether to victimize
+  def ChooseVictimize(self):
+    for i in self.territory:
+      i.VicChoice()
   def __repr__(self):
     return self.name
 
@@ -400,6 +455,39 @@ class Country(object):
         actrs[nactors - 1].territory.append(i)
     self.civilians = civs
     self.armedactors = actrs
+      ####run one turn of the game
+    def OneTurn(self):
+      ###Beliefs about the strength of each actor in each location
+      for i in self.provinces:
+        i.ExpectedStrength()
+      ###Actors go in a random order
+      self.armedactors = self.armedactors.shuffle()
+      ###Each armed actor chooses who to attack
+      for i in self.armedactors:
+        i.AttackChoice()
+      ###Civilians choose who to support
+      for i in self.provinces:
+        i.Mobilize()
+      ###Battles resolve
+      for i in self.provinces:
+        i.Battle()
+      ####Armed Actors choose who to victimize
+      for i in self.armedactors:
+        i.ChooseVictimize
+      ###Civilians choose whether to flee, and if so, where
+      for i in self.civilians:
+        i.CheckFlee
+      ####Game advances a turn
+      self.turn += 1
+    def Game(self):
+      ###Game stops if government wins (has all the territory), loses (has no territory), or stalemate (certain number of turns with no winner)
+      while turn <= turnlimit and govterr > 0 and govterr < lenth(self.provinces):
+      ###Check governments territory
+        govterr = 0
+        for i in self.territory:
+          govterr += i.control.gov
+      ###Run one turn of the game
+        self.OneTurn()
   def __repr__(self):
       return self.name
 
