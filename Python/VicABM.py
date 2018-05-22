@@ -22,13 +22,6 @@ victimerror = .1
 #If no one wins, how many turns should the game last
 turnlimit = 10
 
-def keywithmaxval(d):
-     """ a) create a list of the dict's keys and values; 
-         b) return the key with the max value"""  
-     v=list(d.values())
-     k=list(d.keys())
-     return k[v.index(max(v))]
-
 
 ###Create the Object Class Territory
 class Territory(object):
@@ -60,15 +53,15 @@ class Territory(object):
         i.BattleSupport()
 ###Get resources from a territory
   def Mobilize(self):
-    self.SupportDecision()
+    self.SupportDecisions()
     resources = 0
     for i in self.civilians:
       if i.support == self.control:
         resources += 1
-      if len(self.attack) == 0 & i.support != self.control:
+      if len(self.attack) == 0 and i.support != self.control:
         resources += CoerceMob
 ##Apply penalty to the territory for supporters of the opposing groups its part of the battlefield
-      if len(self.attack) != 0 & i.support != self.control:
+      if len(self.attack) != 0 and i.support != self.control:
         if i.support in [j.control for j in self.attack]:
           resources -= DisloyalPenalty
         if i.support not in [j.control for j in self.attack]:
@@ -80,8 +73,9 @@ class Territory(object):
       exst = 0
       for j in i.territory:
 ###Strength is discounted by distance
-        dist = max(self.country.dists[int(j.__repr__())][int(self.__repr__())] - 1, 0)
-        exst += delta**dist*(CoerceMob*len(j.civilians) + (1 - CoerceMob)*j.exsupp)
+        if int(self.__repr__()) in self.country.dists[int(j.__repr__())].keys():
+          dist = max(self.country.dists[int(j.__repr__())][int(self.__repr__())] - 1, 0)
+          exst += delta**dist*(CoerceMob*len(j.civilians) + (1 - CoerceMob)*j.exsupp)
       self.exstr[i] = exst
 ###Assign territories on the battlefield to fight eachother
   def Attack(self, target):
@@ -90,6 +84,7 @@ class Territory(object):
       raise ValueError('This attack cant happen, water is too wet.')
     self.attack.append(target)
     target.attack.append(self)
+    self.country.attackhist[self.country.turn].append((self.control, target.control))
 ##Resolve a battle involving this territory
   def Battle(self):
     rsrs = {}
@@ -104,8 +99,9 @@ class Territory(object):
         trr = i.territory
         for j in trr:
           j.Mobilize()
-          dist = max(self.country.dists[int(j.__repr__())][int(self.__repr__())] - 1, 0)
-          res += delta**dist*j.resources
+          if int(self.__repr__()) in self.country.dists[int(j.__repr__())].keys():
+            dist = max(self.country.dists[int(j.__repr__())][int(self.__repr__())] - 1, 0)
+            res += delta**dist*j.resources
         rsrs[i] = res
     #Transform to probability
     probs = rsrs
@@ -164,28 +160,30 @@ class Territory(object):
       self.exsupp -= (1 + VicPenalty*len(nosupp))
 ##If it doesnt, you kill a supporter, man, supporting you seems like a bad idea
     if selective == 0:
-      supp.pop()
+      supps.pop()
       self.control.VioHist -= 1
       self.exsupp += VicPenalty*len(nosupp)
     self.civilians = supps + nosupp
+    self.country.victimhist[self.country.turn].append(self.control)
 ###Does it make sense for the controller of this territory to attack a neighbor
   def ConsiderAttack(self, target):
 ###you dont attack yourself, thats stupid
     if self.control == target.control:
       return(False)
 ###Given expected strength, what is the probability of victory
-    pwin = self.exstr/(self.exstr + target.extr)
+    pwin = target.exstr[self.control]/(target.exstr[self.control] + target.exstr[target.control])
 ###How many resources are at stake
-    R = length(target.civilians)
+    R = len(target.civilians)
 ###What is the cost of war
     c = battledeaths
 ###How much do you benefit from good things happening to the owner of the territory
-    altruism = (.5 - abs(self.control.preference - target.control.preference))*2*self.control.ideo
+    sq = (.5 - abs(self.control.preference - target.control.preference))*2*self.control.ideo*R
+    attack = (.5 - abs(self.control.preference - target.control.preference))*2*self.control.ideo*(R - c)*(1 - pwin) + pwin*(R - c) - c 
 ###Ok, is the cost of war higher than the benefit of war?
-    return(altruism > (c*(1 - pwin))/(R*pwin - (1 - pwin)*c)
+    return(attack > sq)
 ###Do any of your neighbors want to attack you?
   def BorderCheck(self):
-    for i in neighbors:
+    for i in self.neighbors:
       if i.ConsiderAttack(self):
         self.borders = 1
 ##Does the owner of the territory victimize
@@ -201,7 +199,7 @@ class Territory(object):
       for i in self.civilians:
         if i.support == 1:
           suppnum += 1
-      nsuppnum = length(self.civilians) - suppnum
+      nsuppnum = len(self.civilians) - suppnum
 ###Can't victimize if one group is empty
       if suppnum == 0 | nsuppnum == 1:
         return()
@@ -223,11 +221,11 @@ class Territory(object):
           suppnum = 0 
           for i in self.civilians:
             if i.support == 1:
-            suppnum += 1
-          nsuppnum = length(self.civilians) - suppnum
+              suppnum += 1
+          nsuppnum = len(self.civilians) - suppnum
           suppInt = ((suppnum -1)/(suppnum + nsuppnum - 1) + self.control.VioHist*VicPenalty)
 ###Who's likely to win the fight
-          pwin = self.exstr/(self.exstr + j.exstr)
+          pwin = self.exstr[self.control]/(self.exstr[self.control] + self.exstr[j.control])
 ###Between you and the attacker, civilians choose based on who's likely to win, so this is the cutpoint
           suppborder = self.preference*pwin + j.preference*(1 - pwin)
 ###Which side of the cutpoint depends on your orientation
@@ -236,10 +234,10 @@ class Territory(object):
           if self.preference <= j.preference:
             loyalzone = suppborder
 ###Number of loyal civilians
-          loyal = length(civilians)*loyalzone
+          loyal = len(civilians)*loyalzone
 ###Opponent supporters
-          nonloyal = length(civilians) - loyal
-          nsuppnum = length(civilians) - suppnum
+          nonloyal = len(civilians) - loyal
+          nsuppnum = len(civilians) - suppnum
           selectprob  = 1 - victimerror*((len(self.civilians) - len(supps) + 1))/len(self.civilians)
 ###How victimization effects the resource balance
           lossFunction = selectprob*nonloyal*VicPenalty/(1 - loyalzone)*(CoerceMob - DisloyalPenalty) - (1 - selectprob)*loyal*VicPenalty/(loyalzone)*(CoerceMob - DisloyalPenalty)
@@ -270,7 +268,7 @@ class ArmedActor(object):
     ###List of possible targets based on contiguity
     targets = {}
     for i in self.territory:
-      poss = self.territory.neighbors
+      poss = i.neighbors
       for j in poss:
     ###Cant attack yourself
         if j.control != self:
@@ -281,34 +279,32 @@ class ArmedActor(object):
     x1 = self.preference
     ####Check the utility of not attacking
     for i in targets.keys():
-      R = length(targets[i].civilians)
+      R = len(targets[i].civilians)
       c = battledeaths
-      combatants = [targets[i], targets[i].attack]
+      combatants = [targets[i]] + targets[i].attack
       caps = []
       for q in combatants:
-        caps.append(q.exstr)
-      if length(targets[i].attack) == 0:
-        sq = (.5 - abs(x1 - targets[i].control.preference))*2*phi
+        caps.append(targets[i].exstr[q.control])
+      if len(combatants) == 1:
+        sq = (.5 - abs(x1 - targets[i].control.preference))*2*phi*R
       else:
-        for j in targets[i].attack:
-          cap.append(j.exstr)
-        pwins = [x/sum(cap) for x in cap]
+        pwins = [x/sum(caps) for x in caps]
         sq = 0
-        for k in range(combatants):
-          sq += (.5 - abs(x1 - combatants[k].preference))*2*phi*(R*pwins[k] -c)
+        for k in range(len(combatants)):
+          sq += (.5 - abs(x1 - combatants[k].control.preference))*2*phi*(R*pwins[k] -c)
       ###Check the utility of attacking
-      for i in combatants:
-        caps.append(i.exstr)
-        pwins = [x/sum(cap) for x in cap]
+      combatants.append(i)
+      caps.append(targets[i].exstr[self])
+      pwins = [x/sum(caps) for x in caps]
       attackUtil = 0
-      for k in range(combatants):
-        attackUtil += (.5 - abs(x1 - combatants[k].preference))*2*phi*(R*pwins[k] -c)*(k != length(combatants)) + (R*pwins[k] -c)*(k == length(combatants))
-      payoffs.append((i, target[i], attackUtil - sq))
+      for k in range(len(combatants)):
+        attackUtil += (.5 - abs(x1 - combatants[k].control.preference))*2*phi*(R*pwins[k] -c)*(k != len(combatants)) + (R*pwins[k] -c)*(k == len(combatants))
+      payoffs.append((i, targets[i], attackUtil - sq))
     ###Choose the best target
     besttarget = max(payoffs, key = lambda x:x[2])
     ###If attacking is better than doing nothing, attack
     if besttarget[2] > 0:
-      i.Attack(target[i])
+      i.Attack(targets[i])
  ###Go through all your territories deciding whether to victimize
   def ChooseVictimize(self):
     for i in self.territory:
@@ -360,7 +356,7 @@ class Civilian(object):
             for l in combatants:
               diffs += abs(k.preference - l.preference)
             es = min(max(1 - abs(i.preference - k.preference)/diffs + i.VioHist*VicPenalty,1),0)
-            res += es - (CoerceMob -DisloayPenalty)*(1-es)
+            res += es - (CoerceMob -DisloyalPenalty)*(1-es)
       rsr[i] = res
       utils = rsr
 ##Calculate combatants ideology*preference distance
@@ -369,15 +365,16 @@ class Civilian(object):
       utils[c]  = rsr[c]*(1 - abs(c.preference - self.preference) + c.VioHist*VicPenalty)
 ###Choose who to support
     max_key = max(utils, key=lambda k: utils[k])
-    max_value = max(utils.values()); 
-    choices = [key for key, value in stats.items() if value == max_value]
-    if self.territory.control in choices:
-      self.support = self.territory.control
+    max_value = max(utils.values()) 
+    choices = [key for key, value in utils.items() if value == max_value]
+    if len(choices) > 0:
+      self.support = 0
     else:
       self.support = shuffle(choices)[0]
   #Civilians can leave... Might want to have a risk of it going really badly and them getting killed tho
   def Flee(self, target):
-    self.territory.civilians.remove(self)
+    if self in self.territory.civilians:
+      self.territory.civilians.remove(self)
     self.territory = target
     target.civilians.append(self)
   #Calculate if civilians want to flee
@@ -401,6 +398,8 @@ class Civilian(object):
 #Size = number of provinces, connectedness is how dense the adjacency matrix is
 #Nactors is number of armed actors
 #Population is average population of a territory
+
+
 class Country(object):
   def __init__(self, name, size, connectedness, nactors, population):
     self.name = name
@@ -455,13 +454,24 @@ class Country(object):
         actrs[nactors - 1].territory.append(i)
     self.civilians = civs
     self.armedactors = actrs
+    self.actorlists = {}
+    self.activeactors = self.armedactors
+    self.turn = 0
+    self.victimhist = {0:[]}
+    self.attackhist = {0:[]}
+  def ActiveActors(self):
+      active = []
+      for i in self.armedactors:
+        if len(i.territory) > 0:
+          active.append(i)
+      self.activeactors = active
       ####run one turn of the game
-    def OneTurn(self):
+  def OneTurn(self):
       ###Beliefs about the strength of each actor in each location
       for i in self.provinces:
         i.ExpectedStrength()
       ###Actors go in a random order
-      self.armedactors = self.armedactors.shuffle()
+      shuffle(self.armedactors)
       ###Each armed actor chooses who to attack
       for i in self.armedactors:
         i.AttackChoice()
@@ -473,13 +483,17 @@ class Country(object):
         i.Battle()
       ####Armed Actors choose who to victimize
       for i in self.armedactors:
-        i.ChooseVictimize
+        i.ChooseVictimize()
       ###Civilians choose whether to flee, and if so, where
       for i in self.civilians:
-        i.CheckFlee
+        i.CheckFlee()
+      self.ActiveActors()
+      self.actorlists[self.turn] = self.activeactors
       ####Game advances a turn
       self.turn += 1
-    def Game(self):
+      self.victimhist[self.turn] = []
+      self.attackhist[self.turn] = []
+  def Game(self):
       ###Game stops if government wins (has all the territory), loses (has no territory), or stalemate (certain number of turns with no winner)
       while turn <= turnlimit and govterr > 0 and govterr < lenth(self.provinces):
       ###Check governments territory
@@ -516,3 +530,5 @@ PX.Attack(P1)
 P1.Mobilize()
 
 P1.resources
+
+US.OneTurn()
