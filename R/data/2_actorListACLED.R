@@ -1,4 +1,4 @@
-if(Sys.info()['user'] %in% c('s7m', 'janus829')){ source('~/Research/intraConfNetDyn/R/setup.R') }
+if(Sys.info()['user'] %in% c('s7m', 'janus829')){ source('~/Research/victimization/R/setup.R') }
 # load(paste0(pathData, 'cntriesACLED_byConf.rda'))
 # load(paste0(pathData, 'cntriesACLED_byActors.rda'))
 # load(paste0(pathData, 'cntriesACLED_byDyads.rda'))

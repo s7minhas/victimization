@@ -60,9 +60,39 @@ rm(worldBank)
 ####
 
 ####
+# cow cinc
+load(paste0(pathData, 'cow_cinc/cinc.rda'))
+cincVars = c('milex','milper','cinc')
+data = simpleMerge(data, cinc, cincVars, 'id', 'cnameYear')
+rm(cinc)
+####
+
+####
+# icrg
+load(paste0(pathData, 'icrg/icrg.rda'))
+icrgVars = c(
+	'govtStab', 'socEconCon', 'invProf', 'intConf', 
+	'extConf', 'corr', 'milPol', 'relPol', 'lawOrd', 
+	'ethTens', 'demAcct', 'burQual')
+data = simpleMerge(data, icrg, icrgVars, 'id', 'cnameYear')
+rm(icrg)
+####
+
+####
 # civ victimization
 acled = readr::read_csv(paste0(pathData, 'ACLED-Version-7-All-Africa-1997-2016_csv_dyadic-file.csv'))
 acledCiv = acled[which(acled$EVENT_TYPE=='Violence against civilians'),]
+####
+
+####
+# other country year variables...cassy help.
+### other regime stuff ... militarist or not regime ....
+### cinc scores from cow
+### regime involved in interstate conflicts
+### peacekeeper data
+### major power interventions ...
+### external support to rebels or country ... ucdp
+### 
 ####
 ############################
 
