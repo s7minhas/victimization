@@ -1,14 +1,14 @@
 ########
 rm(list=ls())
 if(Sys.info()['user'] %in% c('s7m', 'janus829')){
-	pathGit = '~/Research/intraConfNetDyn/'
-	pathDrop = '~/Dropbox/Research/intraConfNetDyn/'
+	pathGit = '~/Research/victimization/'
+	pathDrop = '~/Dropbox/Research/victimization/'
 	pathData = paste0(pathDrop, 'data/')
 }
 
 if(Sys.info()['user'] %in% c('cassydorff')){
-	pathGit = '~ProjectsGit/intraConfNetDyn/'
-	pathDrop = '~/Dropbox/Research/intraConfNetDyn/'
+	pathGit = '~ProjectsGit/victimization/'
+	pathDrop = '~/Dropbox/Research/victimization/'
 	pathData = paste0(pathDrop, 'data/')
 }
 ########
@@ -18,6 +18,19 @@ if(Sys.info()['user'] %in% c('cassydorff')){
 char = function(x){ as.character(x) }
 num = function(x){ as.numeric(char(x)) }
 trim = function (x) { gsub("^\\s+|\\s+$", "", x) }
+pasteMult = function(x,y,sepZ){
+	apply(expand.grid(x,y), 1, paste, collapse=sepZ) }
+cname = function(x) {countrycode(x,'country.name','country.name')}
+simpleMerge = function(toData, fromData, vars, toID, fromID){
+	for(v in vars){
+		toData$tmp = fromData[match(toData[,toID], fromData[,fromID]), v]
+		names(toData)[ncol(toData)] = v }
+	return(toData) }
+########
+
+########
+# load panel data
+load(paste0(pathData, 'panel.rda'))
 ########
 
 ########
@@ -33,7 +46,8 @@ loadPkg=function(toLoad){
 pkgs = c(
 	'dplyr', 'tidyr', 'magrittr',
 	'network', 'igraph', 
-	'ggplot2', 'RColorBrewer', 'latex2exp'
+	'ggplot2', 'RColorBrewer', 'latex2exp',
+	'countrycode'
 	)
 loadPkg(pkgs)
 

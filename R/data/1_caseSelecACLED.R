@@ -1,4 +1,4 @@
-if(Sys.info()['user'] %in% c('s7m', 'janus829')){ source('~/Research/intraConfNetDyn/R/setup.R') }
+if(Sys.info()['user'] %in% c('s7m', 'janus829')){ source('~/Research/victimization/R/setup.R') }
 
 loadPkg('readr')
 acled = read_csv('~/Dropbox/Research/conflictEvolution/data/ACLED-Version-7-All-Africa-1997-2016_csv_dyadic-file.csv')
