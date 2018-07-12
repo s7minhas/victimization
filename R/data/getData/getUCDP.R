@@ -16,8 +16,7 @@ ucdp.dyad = ucdp.dyad[ucdp.dyad$year>=1993,]
 # for UCDP we could count # of countries with "stake"
 # we could also take primary actor intensity score? not sure how to ID primary actor 
 # stdz country names
-ucdp.dyad$cname = countrycode(ucdp.dyad$gwnoa, 'cowc', 'country.name')
-
+ucdp.dyad$cname = countrycode(ucdp.dyad$sidea, 'country.name', 'country.name')
 
 ############################
 ############################

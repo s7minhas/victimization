@@ -88,7 +88,7 @@ acledCiv = acled[which(acled$EVENT_TYPE=='Violence against civilians'),]
 ####
 
 ####
-# ucdp dyadic
+# ucdp 
 
 
 ####
