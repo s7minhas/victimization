@@ -1,6 +1,9 @@
 ####
 if(Sys.info()['user'] %in% c('s7m', 'janus829')){ 
 	source('~/Research/victimization/R/setup.R') }
+if(Sys.info()['user'] %in% c('cassydorff')){ 
+	source('~/ProjectsGit/victimization/R/setup.R') }
+
 ####
 
 ############################
@@ -85,15 +88,19 @@ acledCiv = acled[which(acled$EVENT_TYPE=='Violence against civilians'),]
 ####
 
 ####
-# other country year variables...cassy help.
-### other regime stuff ... militarist or not regime ....
-### cinc scores from cow
-### regime involved in interstate conflicts
-### peacekeeper data
-### major power interventions ...
-### external support to rebels or country ... ucdp
-### 
+# ucdp dyadic
+
+
 ####
+# other country year variables...cassy help.
+### regime involved in interstate conflicts
+### peacekeeper data, note: only for subsaharan africa 
+### major power interventions ...
+### external support to rebels or country ... ucdp has this
+### # of foreign troops intervening each year
+### conflict Severity is operationalized as the natural log of 
+	## the number of total battlefield deaths in the conflict in 
+	## a given yea
 ############################
 
 ############################
