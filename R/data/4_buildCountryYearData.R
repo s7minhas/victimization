@@ -99,10 +99,15 @@ rm(epr)
 ####
 
 ####
-# other country year variables...cassy help.
+# add kathman cmps peacekeeper data at country-year level
+####
+
+####
+# add nsa data at country-year level
+####
+
+####
 ### regime involved in interstate conflicts
-### peacekeeper data, note: only for subsaharan africa 
-### major power interventions ...
 ### external support to rebels or country ... ucdp has this
 ### # of foreign troops intervening each year
 ### conflict Severity is operationalized as the natural log of 
