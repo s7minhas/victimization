@@ -83,13 +83,20 @@ rm(icrg)
 
 ####
 # civ victimization
+#### need to finish acled civ dv measure
 acled = readr::read_csv(paste0(pathData, 'ACLED-Version-7-All-Africa-1997-2016_csv_dyadic-file.csv'))
 acledCiv = acled[which(acled$EVENT_TYPE=='Violence against civilians'),]
 ####
 
 ####
-# ucdp 
-
+# epr 
+load(paste0(pathData, 'epr/epr.rda'))
+eprVars = c(
+	'ethfrac', 'exclgrps', 'exclpop'
+	)
+data = simpleMerge(data, epr, eprVars, 'id', 'cnameYear')
+rm(epr)
+####
 
 ####
 # other country year variables...cassy help.
