@@ -29,10 +29,10 @@ data$year = num(unlist(lapply(strsplit(data$id,'_'), function(x){x[2]})))
 ############################
 # merge graph level measures
 graphVars = c('graph_recip','graph_trans','graph_dens')
-data = simpleMerge(data, netDF, graphVars, 'id', 'id')
+data = simpleMerge(data, netDF, graphVars, 'id', 'id', lagVars=FALSE)
 
-# think about which actor level measures to add in...
-
+# think about which net actor level measures to add in...
+#.....
 rm(netDF)
 ############################
 
@@ -86,7 +86,10 @@ rm(icrg)
 #### need to finish acled civ dv measure
 acled = readr::read_csv(paste0(pathData, 'ACLED-Version-7-All-Africa-1997-2016_csv_dyadic-file.csv'))
 acledCiv = acled[which(acled$EVENT_TYPE=='Violence against civilians'),]
-
+acledCiv = acledCiv[acledCiv$YEAR>=1993,c('YEAR','COUNTRY','FATALITIES')]
+acledCiv$cname = cname(acledCiv$COUNTRY)
+acledCiv$cnameYear = with(acledCiv, paste0(cname, '_', YEAR))
+data$civVicCount = acledCiv$FATALITIES[match(data$id, acledCiv$cnameYear)]
 ####
 
 ####
@@ -124,11 +127,6 @@ nsaVars = names(nsa)[3:ncol(nsa)]
 data = simpleMerge(data, nsa, nsaVars, 'id', 'cnameYear')
 rm(nsa)
 ####
-
-####
-### conflict Severity is operationalized as the natural log of 
-	## the number of total battlefield deaths in the conflict in 
-	## a given yea
 ############################
 
 ############################
