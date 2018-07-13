@@ -100,6 +100,20 @@ rm(epr)
 
 ####
 # add kathman cmps peacekeeper data at country-year level
+load(paste0(pathData, 'kathman/kath.rda'))
+names(kath)[6] = 'totalPeacekeepers'
+kathVars = c(
+	'troop','police','militaryobservers', 'totalPeacekeepers'
+	)
+data = simpleMerge(data, kath, kathVars, 'id', 'cnameYear')
+rm(kath)
+
+# convert missing to zero
+for(v in kathVars){ data[is.na(data[,v]),v] = 0 }
+
+# create binary indicator for any intervention
+data$anyPeaceKeeper = 0
+data$anyPeaceKeeper[data$totalPeacekeepers>0] = 1
 ####
 
 ####
