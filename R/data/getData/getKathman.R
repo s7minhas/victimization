@@ -25,15 +25,12 @@ kath$cname=cname(kath$missioncountry)
 	tmp<-cbind(kath$missioncountry, kath$cname)
 	write.csv(tmp, file = paste0(pathData, 'kathman/tmp.csv'))
 
-
 # add in ccode
 kath$ccode=panel$ccode[match(kath$cname,panel$cname)]
+	#check 
+	tmp<-cbind(kath$cname, kath$ccode)
+	write.csv(tmp, file = paste0(pathData, 'kathman/tmp.csv'))
 
-write.csv(tmp, file = paste0(pathData, 'kathman/tmp.csv'))
-
-kath = kath[!is.na(kath$cname),]
-
-tmp<-cbind(kath$country, kath$cname)
 write.csv(tmp, file = paste0(pathData, 'kathman/tmp.csv'))
 
 
