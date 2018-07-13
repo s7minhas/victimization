@@ -108,6 +108,22 @@ save(nsa, file=paste0(pathData, 'nsa/nsa.rda'))
 ############################
 
 ##########################
+# Cassy's work on aggregation
+
 load(file=paste0(pathData, 'nsa/nsa.rda'))
 
-#vars of interest: fightcap, rebestimate, rebstrength, transconstsupp, rebextpart, rebel.support, govsupport
+### vars of interest: fightcap, rebestimate, rebstrength, 
+### transconstsupp, rebextpart, rebel.support, govsupport
+
+# for each country, take the mean rebestimate 
+# this doesn't work, it gives the same average for everything
+nsa <- nsa %>%
+  group_by(ccode) %>% mutate(rebEstMean = mean(rebestimate, na.rm=TRUE))
+head(nsa$rebEstMean)
+
+#this works, but does not add the info into the data
+aggregate(rebestimate ~ cname, data=nsa, mean)
+
+
+
+
