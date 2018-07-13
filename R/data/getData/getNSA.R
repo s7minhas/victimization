@@ -106,3 +106,8 @@ nsa$cyear=paste(nsa$ccode, nsa$year, sep='_')
 # Save cleaned nsa data
 save(nsa, file=paste0(pathData, 'nsa/nsa.rda'))
 ############################
+
+##########################
+load(file=paste0(pathData, 'nsa/nsa.rda'))
+
+#vars of interest: fightcap, rebestimate, rebstrength, transconstsupp, rebextpart, rebel.support, govsupport
