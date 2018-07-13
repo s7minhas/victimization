@@ -3,7 +3,6 @@ if(Sys.info()['user'] %in% c('s7m', 'janus829')){
 	source('~/Research/victimization/R/setup.R') }
 if(Sys.info()['user'] %in% c('cassydorff')){ 
 	source('~/ProjectsGit/victimization/R/setup.R') }
-
 ####
 
 ############################
