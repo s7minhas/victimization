@@ -116,9 +116,11 @@ load(file=paste0(pathData, 'nsa/nsa.rda'))
 ### transconstsupp, rebextpart, rebel.support, govsupport
 
 # for each country, take the mean rebestimate 
-# this doesn't work, it gives the same average for everything
 nsa <- nsa %>%
-  group_by(ccode) %>% mutate(rebEstMean = mean(rebestimate, na.rm=TRUE))
+  group_by(ccode, year) %>% 
+  summarize(
+  	rebEstMean = mean(rebestimate, na.rm=TRUE))
+  
 head(nsa$rebEstMean)
 
 #this works, but does not add the info into the data
