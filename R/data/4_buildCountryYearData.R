@@ -86,6 +86,7 @@ rm(icrg)
 #### need to finish acled civ dv measure
 acled = readr::read_csv(paste0(pathData, 'ACLED-Version-7-All-Africa-1997-2016_csv_dyadic-file.csv'))
 acledCiv = acled[which(acled$EVENT_TYPE=='Violence against civilians'),]
+
 ####
 
 ####
@@ -118,12 +119,13 @@ data$anyPeaceKeeper[data$totalPeacekeepers>0] = 1
 
 ####
 # add nsa data at country-year level
+load(paste0(pathData, 'nsa/nsa.rda'))
+nsaVars = names(nsa)[3:ncol(nsa)]
+data = simpleMerge(data, nsa, nsaVars, 'id', 'cnameYear')
+rm(nsa)
 ####
 
 ####
-### regime involved in interstate conflicts
-### external support to rebels or country ... ucdp has this
-### # of foreign troops intervening each year
 ### conflict Severity is operationalized as the natural log of 
 	## the number of total battlefield deaths in the conflict in 
 	## a given yea

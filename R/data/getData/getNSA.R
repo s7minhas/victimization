@@ -100,32 +100,51 @@ nsa$cyear=paste(nsa$ccode, nsa$year, sep='_')
 ############################
 ### now we have all this data on rebel groups in country years
 ### we need make a country year aggregation strategy
+
+# construct char vars of cats we want to summarise
+vars = c(
+	'rebel.support','gov.support',
+	'rebextpart','fightcap','rebstrength' )
+for(v in vars){ nsa[,v] = char(nsa[,v]) }
+
+# for each country, take the mean rebestimate 
+nsa <- nsa %>%
+  mutate(
+  	rebsMuchWeaker = ifelse(rebstrength=='much weaker', 1, 0),
+  	rebsWeaker = ifelse(rebstrength=='weaker', 1, 0),
+  	rebsParity = ifelse(rebstrength=='parity', 1, 0),
+  	rebsStronger = ifelse(rebstrength=='stronger', 1, 0),
+  	rebsFightCapHigh = ifelse(fightcap=='stronger', 1, 0),
+  	rebsFightCapLow = ifelse(fightcap %in% c('low','no'), 1, 0),  	
+  	rebExplicitSupportGov = ifelse(rebel.support=='explicit', 1, 0),
+  	rebSupportGov = ifelse(rebel.support %in% c('explicit','alleged'), 1, 0),
+  	govExplicitSupportGov = ifelse(gov.support=='explicit', 1, 0),
+  	govSupportGov = ifelse(gov.support %in% c('explicit','alleged'), 1, 0),  
+  	rebMajorSupportNonGov = ifelse(rebextpart=='major', 1, 0),  	  		
+  	rebSupportNonGov = ifelse(rebextpart %in% c('alleged','major','minor'), 1, 0)
+  	)
+
+# make sure NAs carry over
+nsa$rebsFightCapLow[is.na(nsa$rebsFightCapHigh)] = NA
+nsa$rebSupportGov[is.na(nsa$rebExplicitSupportGov)] = NA
+nsa$govSupportGov[is.na(nsa$govExplicitSupportGov)] = NA
+nsa$rebSupportNonGov[is.na(nsa$rebextpart)] = NA
+
+# now aggregate each to country year level
+vars = c(
+	'rebsMuchWeaker','rebsWeaker','rebsParity','rebsStronger',
+	'rebsFightCapHigh','rebsFightCapLow','rebExplicitSupportGov',
+	'rebSupportGov','govExplicitSupportGov','govSupportGov',
+	'rebMajorSupportNonGov','rebSupportNonGov'
+	)
+nsa = nsa[,c('cname','year',vars)] %>%
+	group_by(cname, year) %>%
+	summarize_all( mean, na.rm=TRUE ) %>% data.frame()
+nsa[is.na(nsa)] = 0
 ############################
 
 ############################
 # Save cleaned nsa data
+nsa$cnameYear = with(nsa, paste0(cname, '_', year))
 save(nsa, file=paste0(pathData, 'nsa/nsa.rda'))
 ############################
-
-##########################
-# Cassy's work on aggregation
-
-load(file=paste0(pathData, 'nsa/nsa.rda'))
-
-### vars of interest: fightcap, rebestimate, rebstrength, 
-### transconstsupp, rebextpart, rebel.support, govsupport
-
-# for each country, take the mean rebestimate 
-nsa <- nsa %>%
-  group_by(ccode, year) %>% 
-  summarize(
-  	rebEstMean = mean(rebestimate, na.rm=TRUE))
-  
-head(nsa$rebEstMean)
-
-#this works, but does not add the info into the data
-aggregate(rebestimate ~ cname, data=nsa, mean)
-
-
-
-
