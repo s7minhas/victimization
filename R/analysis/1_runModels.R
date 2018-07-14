@@ -36,3 +36,17 @@ mod = glm.nb(
 	)
 summary(mod)
 ####
+
+####
+cor(data[,c(dv,'graph_recip','graph_trans','graph_dens')], use='pairwise.complete.obs')[-1,1]
+
+cntries = unique(data$cname)
+corStats = lapply(cntries, function(x){
+	slice = data[which(data$cname==x),]
+	stats=cor(slice[,c(dv,'graph_recip','graph_trans','graph_dens')], use='pairwise.complete.obs')[-1,1]	
+	return(round(stats,3))
+})
+corDF = data.frame(do.call('rbind', corStats))
+corDF$cname = cntries
+corDF[order(corDF$graph_dens),]
+####
