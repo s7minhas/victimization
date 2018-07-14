@@ -2,7 +2,7 @@ if(Sys.info()['user'] %in% c('s7m', 'janus829')){ source('~/Research/victimizati
 if(Sys.info()['user'] %in% c('cassydorff')){ source('~/ProjectsGit/victimization/R/setup.R') }
 
 loadPkg('readr')
-acled = read_csv(paste0(pathData, "ACLED-Version-7-All-Africa-1997-2016_csv_dyadic-file.csv")
+acled = read_csv(paste0(pathData, "ACLED-Version-7-All-Africa-1997-2016_csv_dyadic-file.csv"))
 
 acledCiv = acled[which(acled$EVENT_TYPE=='Violence against civilians'),]
 
@@ -101,5 +101,5 @@ plotSumm = function(data, yVar, yLab, fName){
 
 ##
 cntriesACLED=summStatsACLED[order(summStatsACLED$cntDyads, decreasing = TRUE),][,'cntry']
-acled = data.frame(acled[which(acled$COUNTRY %in% cntriesACLED), ])
+aData = acled = data.frame(acled[which(acled$COUNTRY %in% cntriesACLED), ])
 save(aData, cntriesACLED, file=paste0(pathData, 'cntriesACLED_byAll.rda'))

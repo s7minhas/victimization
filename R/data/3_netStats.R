@@ -1,5 +1,5 @@
 if(Sys.info()['user'] %in% c('s7m', 'janus829')){ 
-	source('~/Research/intraConfNetDyn/R/setup.R') }
+	source('~/Research/victimization/R/setup.R') }
 pathGraphics = paste0(pathDrop, 'graphics/netStatsExplore/')
 
 # reorg to df

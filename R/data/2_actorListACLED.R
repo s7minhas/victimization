@@ -31,8 +31,8 @@ actorDates$yrsActive = actorDates$YEAR.max - actorDates$YEAR.min # length of yea
 # 	row.names=FALSE
 # 	)
 
-actorDates = actorDates[actorDates$yrsActive > 2,] # only keep actors involved in 3 yrs of conflict
-# actorDates = actorDates[actorDates$yrsActive > 4,] 
+actorDates = actorDates[actorDates$yrsActive > 0,] # keep any actor
+# actorDates = actorDates[actorDates$yrsActive > 4,]  # only keep actors involved in 4 yrs of conflict
 
 # list of actors by country-year
 actorsCT = lapply(unique(actorDates$COUNTRY), function(cntry){
@@ -83,7 +83,7 @@ stat = function(expr, object){
 	if(class(x)=='try-error'){x=NA}
 	return(x) }
 
-cl = makeCluster(3)
+cl = makeCluster(6)
 registerDoParallel(cl)
 netStats <- foreach(
 	cntry = names(yListAll), 
