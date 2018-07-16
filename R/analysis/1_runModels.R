@@ -17,12 +17,13 @@ load(paste0(pathData, 'data.rda'))
 # run models
 dv = 'civVicCount'
 vars = c(
-	'graph_trans', 'nActors', 
-	'polity2', 'rebsStronger',
-	'ethTens', 'anyPeaceKeeper', 
-	'rebSupportGov', 'govSupportGov'
+	'graph_dens', 'graph_recip', 'graph_trans', 'nActors', 
+	'polity2'
+	# 'rebsStronger',
+	# 'ethTens', 'anyPeaceKeeper'
+	# 'rebSupportGov', 'govSupportGov'
 	)
-modData = data[,c('cname','ccode','year',dv,vars)]
+modData = na.omit(data[,c('cname','ccode','year',dv,vars)])
 
 mod = glm.nb(
 	civVicCount ~  # dv
@@ -34,6 +35,23 @@ mod = glm.nb(
 		# + rebSupportGov + govSupportGov # external shit
 	, data=data
 	)
+summary(mod)
+
+library(glmmADMB)
+modData$cname = factor(modData$cname)
+mod = glmmadmb(
+	civVicCount ~  # dv
+		graph_dens # net measures
+		# polity2   # structural controls
+		# rebsStronger + # capabilities gov/rebels
+		# ethTens +
+		# anyPeaceKeeper 
+		# + rebSupportGov + govSupportGov # external shit
+		+ (1|cname)
+	, data=modData, 
+	family='nbinom1'	
+	)
+
 summary(mod)
 ####
 
