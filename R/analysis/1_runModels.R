@@ -25,6 +25,23 @@ vars = c(
 	)
 modData = na.omit(data[,c('cname','ccode','year',dv,vars)])
 
+# sample restriction
+toDrop = c(
+	'CONGO, REPUBLIC OF',
+	'GUINEA',
+	'GUINEA-BISSAU',
+	'MOZAMBIQUE',
+	'RWANDA',
+	'SIERRA LEONE',
+	'ZIMBABWE', 
+	'LIBERIA',
+	'CAMEROON',
+	'MADAGASCAR',
+	'TUNISIA'
+	)
+modData = modData[which(!modData$cname %in% c(toDrop)),]
+
+# run mod
 mod = glm.nb(
 	civVicCount ~  # dv
 		graph_dens*nActors + graph_dens + nActors + # net measures
