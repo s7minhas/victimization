@@ -20,10 +20,11 @@ vars = c(
 	'graph_dens', 'graph_recip', 'graph_trans', 'nActors', 
 	'polity2'
 	# 'rebsStronger',
-	# 'ethTens', 'anyPeaceKeeper'
+	,'ethTens', 'anyPeaceKeeper'
 	# 'rebSupportGov', 'govSupportGov'
 	)
-modData = na.omit(data[,c('cname','ccode','year',dv,vars)])
+# modData = na.omit(data[,c('cname','ccode','year',dv,vars)])
+modData=data
 
 # sample restriction
 toDrop = c(
@@ -39,21 +40,23 @@ toDrop = c(
 	'MADAGASCAR',
 	'TUNISIA'
 	)
-modData = modData[which(!modData$cname %in% c(toDrop)),]
+# modData = modData[which(!modData$cname %in% c(toDrop)),]
 
 # run mod
 mod = glm.nb(
 	civVicCount ~  # dv
-		graph_dens*nActors + graph_dens + nActors + # net measures
-		polity2 +   # structural controls
-		# rebsStronger + # capabilities gov/rebels
-		ethTens +
-		anyPeaceKeeper 
-		# + rebSupportGov + govSupportGov # external shit
-	, data=data
+		graph_dens
+		# + nActors # net measures
+		+ polity2   # structural controls
+		# # + rebsStronger # capabilities gov/rebels
+		# + ethTens
+		+ anyPeaceKeeper 
+		# # + rebSupportGov + govSupportGov # external shit
+	, data=modData
 	)
 summary(mod)
 
+# modData = na.omit(data[,c('cname','ccode','year',dv,vars)])
 library(glmmADMB)
 modData$cname = factor(modData$cname)
 mod = glmmadmb(
