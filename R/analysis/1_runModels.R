@@ -42,16 +42,22 @@ toDrop = c(
 	)
 # modData = modData[which(!modData$cname %in% c(toDrop)),]
 
+# naive just impute everything
+loadPkg('sbgcop')
+impData = data.matrix(modData[,c(5:7,11,19,20,23,24:36,44,48,49,52,54)])
+sbgData = sbgcop.mcmc(Y=impData, seed=6886, nsamp=1000, verb=FALSE)
+sbgFrom = sbgData$Y.pmean
+modData = cbind(modData[,c('cname','year','cnameYear','nActors')], sbgFrom)
+
 # run mod
 mod = glm.nb(
 	civVicCount ~  # dv
 		graph_dens
-		# + nActors # net measures
 		+ polity2   # structural controls
-		# # + rebsStronger # capabilities gov/rebels
-		# + ethTens
+		+ rebsStronger # capabilities gov/rebels
+		+ ethTens
 		+ anyPeaceKeeper 
-		# # + rebSupportGov + govSupportGov # external shit
+		+ rebSupportGov + govSupportGov # external shit
 	, data=modData
 	)
 summary(mod)
@@ -59,7 +65,7 @@ summary(mod)
 # cross val analysis
 cntries = unique(modData$cname)
 coefCross = lapply(cntries, function(c){
-	slice = modData[which(!modData$cname %in% c),]
+	slice = modData[which(modData$cname != c),]
 	sMod = glm.nb(civVicCount~graph_dens+polity2+anyPeaceKeeper,data=slice)
 	beta = data.frame(matrix(summary(sMod)$'coefficients'[2,],nrow=1))[1:2]
 	names(beta) = c('est','stdErr')
