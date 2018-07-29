@@ -108,6 +108,9 @@ class Territory(object):
     denom = sum(rsrs.values())
     for i in probs.keys():
       probs[i] /= denom
+      probs *= 10000
+      probs = floor(probs)
+      probs /= 10000
     #Who won?
     outcome = np.random.multinomial(1, list(probs.values()))
     winner = 0
@@ -125,17 +128,18 @@ class Territory(object):
     #People died, it sucks
     self.attack.append(self)
     for j in self.attack:
-      for i in range(battledeaths):
+      dmax = min(len(j.civilians), battledeaths)
+      for i in range(dmax):
         shuffle(j.civilians)
         j.civilians.pop()
 ###Ok, battle over, people not fighting anymore
     for i in self.attack:
       i.attack = []
     #All these people dying, who are we gonna mobilize next time?
-  def Growth(self,rate):
+  def Growth(self,rate = .1):
       add = round(len(self.civilians)*rate)
       for i in range(add):
-        newbie = Civilian(ascii_lowercase[len(self.civilians) + i + 1] + self.name, self)
+        newbie = Civilian(ascii_lowercase[int((len(self.civilians) + i + 1)/26)] + ascii_lowercase[(len(self.civilians) + i + 1)%26] + self.name, self)
         self.civilians.append(newbie)
         self.country.civilians.append(newbie)
   ##Some people arent supporting you, that also sucks, maybe we can kill them?
@@ -143,6 +147,8 @@ class Territory(object):
     supps = []
     nosupp = []
     number = 0 
+    if len(self.civilians) < 1:
+      return(False)
 ##List of supporters and opponents in the territory
     for i in self.civilians:
       if i.support == self.control:
@@ -301,10 +307,11 @@ class ArmedActor(object):
         attackUtil += (.5 - abs(x1 - combatants[k].control.preference))*2*phi*(R*pwins[k] -c)*(k != len(combatants)) + (R*pwins[k] -c)*(k == len(combatants))
       payoffs.append((i, targets[i], attackUtil - sq))
     ###Choose the best target
-    besttarget = max(payoffs, key = lambda x:x[2])
+    if len(payoffs) > 0:
+      besttarget = max(payoffs, key = lambda x:x[2])
     ###If attacking is better than doing nothing, attack
-    if besttarget[2] > 0:
-      i.Attack(targets[i])
+      if besttarget[2] > 0:
+        i.Attack(targets[i])
  ###Go through all your territories deciding whether to victimize
   def ChooseVictimize(self):
     for i in self.territory:
@@ -443,7 +450,7 @@ class Country(object):
     for i in terr:
       pop = np.random.poisson(population)
       for j in range(pop):
-        newbie = Civilian(ascii_lowercase[j] + i.name, i)
+        newbie = Civilian(ascii_lowercase[int(j/26)] + ascii_lowercase[j%26] + i.name, i)
         i.civilians.append(newbie)
         civs.append(newbie)
         ##Make sure civilians also have a country
@@ -485,8 +492,11 @@ class Country(object):
       for i in self.armedactors:
         i.ChooseVictimize()
       ###Civilians choose whether to flee, and if so, where
-      for i in self.civilians:
-        i.CheckFlee()
+      #for i in self.civilians:
+      #  i.CheckFlee()
+      for i in self.provinces:
+        if len(i.civilians) < 250:
+          i.Growth(rate = .1)
       self.ActiveActors()
       self.actorlists[self.turn] = self.activeactors
       ####Game advances a turn
@@ -494,11 +504,16 @@ class Country(object):
       self.victimhist[self.turn] = []
       self.attackhist[self.turn] = []
   def Game(self):
+      gov = 0
+      for i in self.armedactors:
+        if i.gov:
+          gov = i
+      govterr = len(gov.territory)
       ###Game stops if government wins (has all the territory), loses (has no territory), or stalemate (certain number of turns with no winner)
-      while turn <= turnlimit and govterr > 0 and govterr < lenth(self.provinces):
+      while self.turn <= turnlimit and govterr > 0 and govterr < len(self.provinces):
       ###Check governments territory
         govterr = 0
-        for i in self.territory:
+        for i in self.provinces:
           govterr += i.control.gov
       ###Run one turn of the game
         self.OneTurn()

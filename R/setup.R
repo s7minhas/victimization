@@ -11,6 +11,12 @@ if(Sys.info()['user'] %in% c('cassydorff')){
 	pathDrop = '~/Dropbox/Research/nothingbutnet/victimization/'
 	pathData = paste0(pathDrop, 'data/')
 }
+if(Sys.info()['user'] %in% c('maxgallop')){
+	pathGit = '~/Documents/victimization/'
+	pathDrop = '~/Dropbox/intraConfNetDyn/'
+	pathData = paste0(pathDrop, 'data/')
+}
+
 ########
 
 ########
