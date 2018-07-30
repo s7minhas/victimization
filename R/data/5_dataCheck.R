@@ -19,10 +19,13 @@ toKeep = c(
 acled = acled[which(acled$EVENT_TYPE %in% toKeep),]
 
 # stdz country names using panel
-acled$cname = cname(acled$COUNTRY) #FAIL
+acled$cname = cname(acled$COUNTRY) 
 acled$id = with(acled, paste0(cname, '_', YEAR))
 acled$ccode=panel$ccode[match(acled$cname,panel$cname)]
 acled$cyear=paste(acled$ccode, acled$YEAR, sep='')
+
+# check to make sure cname = COUNTRY
+cbind(unique(acled$cname), unique(acled$COUNTRY))
 
 ### UCDP DATA
 load(paste0(pathData, 'ged171.Rdata'))
@@ -54,9 +57,11 @@ gedCiv$ccode=panel$ccode[match(gedCiv$cname,panel$cname)]
 
 ### Compare acled and ucdp cases
 # acled unique country years (wrote this before fixing countries so need to update)
-acledCheck<-as.data.frame(acled[c("COUNTRY", "YEAR")])
+acledCheck<-as.data.frame(acled[c("cname", "YEAR")])
 acledCheck<- unique(acledCheck[order(acledCheck$YEAR),])
+dim(acledCheck)
 
-ucdpCheck<-as.data.frame(gedCiv[c("country", "year")])
+ucdpCheck<-as.data.frame(gedCiv[c("cname", "year")])
 ucdpCheck<- unique(ucdpCheck[order(ucdpCheck$year),])
+dim(ucdpCheck)
 
