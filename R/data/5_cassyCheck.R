@@ -25,8 +25,9 @@ gedCiv = ged[ged$type_of_vi==2,]
 gedCiv = gedCiv[gedCiv$year>=1997,]
 
 # acled unique country years
-df1<-as.data.frame(acled[c("COUNTRY", "YEAR")])
-df1<- unique(df1[order(df1$YEAR),])
+acledCheck<-as.data.frame(acled[c("COUNTRY", "YEAR")])
+acledCheck<- unique(df1[order(df1$YEAR),])
 
-df2<-as.data.frame(gedCiv[c("country", "year")])
-df2<- unique(df2[order(df2$year),])
+ucdpCheck<-as.data.frame(gedCiv[c("country", "year")])
+ucdpCheck<- unique(df2[order(df2$year),])
+
