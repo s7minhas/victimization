@@ -55,6 +55,6 @@ tmp=gedCiv[gedCiv$country=='Pakistan',]
 tmp$dyad_name <- char(tmp$dyad_name)
 cbind(table(tmp$dyad_name))
 
-cntriesUCDP=summStatsGED[order(summStatsGED$cntDyads, decreasing = TRUE),][,'cntry']
-cData = gedCiv = data.frame(ged[which(ged$COUNTRY %in% cntriesUCDP), ])
-save(cData, cntriesUCDP, file=paste0(pathData, 'cntriesACLED_byAll.rda'))
+cntriesGED=summStatsGED[order(summStatsGED$cntDyads, decreasing = TRUE),][,'cntry']
+cData = ged = data.frame(ged[which(ged$country %in% cntriesGED), ])
+save(cData, cntriesGED, file=paste0(pathData, 'cntriesGED_byAll.rda'))

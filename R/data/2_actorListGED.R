@@ -1,56 +1,53 @@
 if(Sys.info()['user'] %in% c('s7m', 'janus829')){ source('~/Research/victimization/R/setup.R') }
 if(Sys.info()['user'] %in% c('cassydorff')){ source('~/ProjectsGit/victimization/R/setup.R') }
-# load(paste0(pathData, 'cntriesACLED_byConf.rda'))
-# load(paste0(pathData, 'cntriesACLED_byActors.rda'))
-# load(paste0(pathData, 'cntriesACLED_byDyads.rda'))
-load(paste0(pathData, 'cntriesACLED_byAll.rda'))
+load(paste0(pathData, 'cntriesGED_byAll.rda'))
 
 #################
 # clean actor names
-aData$a1 = trim(aData$ACTOR1) ; aData$a2 = trim(aData$ACTOR2)
-aData$aa1 = trim(aData$ALLY_ACTOR_1) ; aData$aa2 = trim(aData$ALLY_ACTOR_2)
+cData$a1 = trim(cData$side_a) ; cData$a2 = trim(cData$side_b)
+# cData$aa1 = trim(cData$ALLY_ACTOR_1) ; cData$aa2 = trim(cData$ALLY_ACTOR_2)
 
 # remove unidentified groups
-ids = c('a1','a2','aa1','aa2')
-for(id in ids[1:2]){ aData = aData[which(!grepl('Unidentified', aData[,id])),] }
+ids = c('a1','a2')
+for(id in ids[1:2]){ cData = cData[which(!grepl('Unidentified', cData[,id])),] }
 #################
 
 #################
 # get dates actors were active
 # flip over dataset to get actor dates
-orig = aData ; revOrig = orig
+orig = cData ; revOrig = orig
 revOrig$a2 = orig$a1 ; revOrig$a1 = orig$a2
 tmp = rbind(orig, revOrig)
-yrs=seq(min(aData$YEAR), max(aData$YEAR), by=1)
-loadPkg('doBy') ; actorDates = doBy::summaryBy(YEAR ~ a1 + COUNTRY, data=tmp, FUN=c(min, max))
-actorDates$yrsActive = actorDates$YEAR.max - actorDates$YEAR.min # length of years active
+yrs=seq(min(cData$year), max(cData$year), by=1)
+loadPkg('doBy') ; actorDatesGED = doBy::summaryBy(year ~ a1 + country, data=tmp, FUN=c(min, max))
+actorDatesGED$yrsActive = actorDatesGED$year.max - actorDatesGED$year.min # length of years active
 
-# save(actorDates, file=paste0(pathData, 'actorDates_all.rda'))
-# write.csv(actorDates, 
-# 	file=paste0(pathData, 'actorDates_toClean_all.csv'),
+#save(actorDatesGED, file=paste0(pathData, 'actorDatesGED_all.rda'))
+#write.csv(actorDatesGED, 
+# 	file=paste0(pathData, 'actorDatesGED_toClean_allGED.csv'),
 # 	row.names=FALSE
 # 	)
 
-actorDates = actorDates[actorDates$yrsActive >= 0,] # keep any actor
-# actorDates = actorDates[actorDates$yrsActive > 4,]  # only keep actors involved in 4 yrs of conflict
+actorDatesGED = actorDatesGED[actorDatesGED$yrsActive >= 0,] # keep any actor
+# actorDatesGED = actorDatesGED[actorDatesGED$yrsActive > 4,]  # only keep actors involved in 4 yrs of conflict
 
 # list of actors by country-year
-actorsCT = lapply(unique(actorDates$COUNTRY), function(cntry){
-	aDateSlice = actorDates[which(actorDates$COUNTRY==cntry),]
+actorsCT = lapply(unique(actorDatesGED$country), function(cntry){
+	aDateSlice = actorDatesGED[which(actorDatesGED$country==cntry),]
 	actorsT = lapply( yrs, function(t){
 	  actors = NULL
 	  for( ii in 1:nrow(aDateSlice)){
-	     if( t %in% aDateSlice$YEAR.min[ii]:aDateSlice$YEAR.max[ii] ) { 
+	     if( t %in% aDateSlice$year.min[ii]:aDateSlice$year.max[ii] ) {  
 	      actors = append(actors, aDateSlice$a1[[ii]]) } }
 	  return(actors)
 	}) ; names(actorsT) = yrs
-	return(actorsT) }) ; names(actorsCT) = unique(actorDates$COUNTRY)
+	return(actorsT) }) ; names(actorsCT) = unique(actorDatesGED$country)
 #################
 
 #################
 # create list of adj mats
 yListAll = lapply(names(actorsCT), function(cntry){
-	nData = aData[aData$COUNTRY==cntry,]
+	nData = cData[cData$country==cntry,]
 	nData$dv = 1 ; yVar = 'dv'
 	actorsT = actorsCT[[cntry]]
 	yList = lapply(yrs, function(ii){ 		
@@ -61,7 +58,7 @@ yListAll = lapply(names(actorsCT), function(cntry){
 		}
 		actorSlice = actorsT[[char(ii)]]
 		slice = nData[ which( 
-			nData$YEAR==ii & 
+			nData$year==ii & 
 			nData$a1 %in% actorSlice &
 			nData$a2 %in% actorSlice
 			), c('a1', 'a2', yVar) ]
@@ -127,5 +124,9 @@ netStats <- foreach(
 }
 names(netStats) = names(yListAll)
 
-save(netStats, file=paste0(pathData, 'netStats.rda'))
-#################
+netStatsGED = netStats
+
+save(netStatsGED, file=paste0(pathData, 'netStatsGED.rda'))
+
+
+
