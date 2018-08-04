@@ -1,6 +1,7 @@
 if(Sys.info()['user'] %in% c('s7m', 'janus829')){
 	source('~/Research/victimization/R/setup.R') }
-
+if(Sys.info()['user'] %in% c('cassydorff')){ 
+	source('~/ProjectsGit/victimization/R/setup.R') }
 
 load(paste0(pathData, 'ged171.Rdata'))
 ged=data.frame(ged171, stringsAsFactors = FALSE) ; rm(ged171)
@@ -19,7 +20,7 @@ gedCiv = ged[ged$type_of_vi==2,]
 
 # 
 cntries = unique(gedCiv$country)
-summStats = data.frame(do.call('rbind', lapply(cntries, function(c){
+summStatsGED = data.frame(do.call('rbind', lapply(cntries, function(c){
 	slice = gedCiv[gedCiv$country==c,]
 
 	# number of conflicts
@@ -37,20 +38,23 @@ summStats = data.frame(do.call('rbind', lapply(cntries, function(c){
 	# org
 	c(cntConf=cntConf, yrCnt=yrCnt, cntActors=cntActors, cntDyads=cntDyads)
 	})))
-summStats$cntry = cntries
-
+summStatsGED$cntry = cntries
 
 gedOne = ged[ged$type_of_vi==3,]
 gedOne$country=char(gedOne$country)
 gedOne = gedOne[which(gedOne$country %in% cntries),]
 civCnt = gedOne %>% group_by(country) %>% summarize(civDeaths = sum(best, na.rm=TRUE))
 
-summStats$civDeaths = civCnt$civDeaths[match(summStats$cntry, civCnt$country)]
+summStatsGED$civDeaths = civCnt$civDeaths[match(summStatsGED$cntry, civCnt$country)]
 
-# save(summStats, file=paste0(pathDrop, 'summStats.rda'))
+# save(summStatsGED, file=paste0(pathDrop, 'summStatsGED.rda'))
 
-summStats[order(summStats$cntDyads, decreasing=TRUE),]
+summStatsGED[order(summStatsGED$cntDyads, decreasing=TRUE),]
 
 tmp=gedCiv[gedCiv$country=='Pakistan',]
 tmp$dyad_name <- char(tmp$dyad_name)
 cbind(table(tmp$dyad_name))
+
+cntriesUCDP=summStatsGED[order(summStatsGED$cntDyads, decreasing = TRUE),][,'cntry']
+cData = gedCiv = data.frame(ged[which(ged$COUNTRY %in% cntriesUCDP), ])
+save(cData, cntriesUCDP, file=paste0(pathData, 'cntriesACLED_byAll.rda'))
