@@ -4,6 +4,7 @@ from string import *
 import operator
 import networkx as nx
 import copy
+from math import exp, floor
 ###Game Parameters, we Can Change These
 #How much less people like you when you kill your supporters
 VicPenalty = .05
@@ -22,6 +23,14 @@ victimerror = .1
 #If no one wins, how many turns should the game last
 turnlimit = 10
 
+def sketchmultinom(probs):
+  try:
+    return(np.random.multinomial(1, list(probs)))
+  except ValueError:
+    for i in range(len(probs)):
+      probs[i] -= 1e-3
+    sketchmultinom(probs)
+
 
 ###Create the Object Class Territory
 class Territory(object):
@@ -35,7 +44,8 @@ class Territory(object):
     self.attack = []
     self.exsupp = 0
     self.exstr = {}
-    self.newterritory = 0
+    self.newterritory = 1
+    self.borders = 0
 ###Check whether each civilian in a territory supports the dominant group, then also get an expected level of support for future period calculations
   def SupportCheck(self):
     self.exsupp = 0
@@ -82,9 +92,10 @@ class Territory(object):
 ###can only attack your neighbors
     if target not in self.neighbors:
       raise ValueError('This attack cant happen, water is too wet.')
-    self.attack.append(target)
-    target.attack.append(self)
-    self.country.attackhist[self.country.turn].append((self.control, target.control))
+    if self.control != target.control:
+      self.attack.append(target)
+      target.attack.append(self)
+      self.country.attackhist[self.country.turn].append((self.control, target.control))
 ##Resolve a battle involving this territory
   def Battle(self):
     rsrs = {}
@@ -108,11 +119,8 @@ class Territory(object):
     denom = sum(rsrs.values())
     for i in probs.keys():
       probs[i] /= denom
-      probs *= 10000
-      probs = floor(probs)
-      probs /= 10000
     #Who won?
-    outcome = np.random.multinomial(1, list(probs.values()))
+    outcome = sketchmultinom(probs.values())
     winner = 0
     #Winner takes the territory
     for i in range(len(probs.keys())):
@@ -139,43 +147,45 @@ class Territory(object):
   def Growth(self,rate = .1):
       add = round(len(self.civilians)*rate)
       for i in range(add):
-        newbie = Civilian(ascii_lowercase[int((len(self.civilians) + i + 1)/26)] + ascii_lowercase[(len(self.civilians) + i + 1)%26] + self.name, self)
+        newbie = Civilian(ascii_lowercase[int((len(self.civilians) + i + 1)/26/26)] + ascii_lowercase[int((len(self.civilians) + i + 1)/26)%26] + ascii_lowercase[(len(self.civilians) + i + 1)%26] + self.name, self)
         self.civilians.append(newbie)
         self.country.civilians.append(newbie)
   ##Some people arent supporting you, that also sucks, maybe we can kill them?
   def Victimize(self):
-    supps = []
-    nosupp = []
-    number = 0 
-    if len(self.civilians) < 1:
-      return(False)
-##List of supporters and opponents in the territory
-    for i in self.civilians:
-      if i.support == self.control:
-        supps.append(i)
-        number += 1
-      else:
-        nosupp.append(i)
-#Based on how many supporters, you get a probability of selective vs indiscriminate violence
-    selectprob = 1 - victimerror*((len(self.civilians) - len(supps) + 1))/len(self.civilians)
-    selective = np.random.binomial(1, selectprob, 1)
-##If it works, you kill an opponent, everyone loves you!
-    if selective == 1:
-      nosupp.pop()
-      self.control.VioHist += 1
-      self.exsupp -= (1 + VicPenalty*len(nosupp))
-##If it doesnt, you kill a supporter, man, supporting you seems like a bad idea
-    if selective == 0:
-      supps.pop()
-      self.control.VioHist -= 1
-      self.exsupp += VicPenalty*len(nosupp)
-    self.civilians = supps + nosupp
-    self.country.victimhist[self.country.turn].append(self.control)
+    if len(self.civilians) > 0:
+      supps = []
+      nosupp = []
+      number = 0 
+  ##List of supporters and opponents in the territory
+      for i in self.civilians:
+        if i.support == self.control:
+          supps.append(i)
+          number += 1
+        else:
+          nosupp.append(i)
+      if len(nosupp) > 0:
+    #Based on how many supporters, you get a probability of selective vs indiscriminate violence
+        selectprob = 1 - victimerror*((len(self.civilians) - len(supps) + 1))/len(self.civilians)
+        selective = np.random.binomial(1, selectprob, 1)
+    ##If it works, you kill an opponent, everyone loves you!
+        if selective == 1:
+          nosupp.pop()
+          self.control.VioHist += 1
+          self.exsupp -= (1 + VicPenalty*len(nosupp))
+    ##If it doesnt, you kill a supporter, man, supporting you seems like a bad idea
+        if selective == 0 and len(supps) > 0:
+          supps.pop()
+          self.control.VioHist -= 1
+          self.exsupp += VicPenalty*len(nosupp)
+        self.civilians = supps + nosupp
+        self.country.victimhist[self.country.turn].append(self.control)
 ###Does it make sense for the controller of this territory to attack a neighbor
   def ConsiderAttack(self, target):
 ###you dont attack yourself, thats stupid
     if self.control == target.control:
       return(False)
+    self.ExpectedStrength()
+    target.ExpectedStrength()
 ###Given expected strength, what is the probability of victory
     pwin = target.exstr[self.control]/(target.exstr[self.control] + target.exstr[target.control])
 ###How many resources are at stake
@@ -194,63 +204,72 @@ class Territory(object):
         self.borders = 1
 ##Does the owner of the territory victimize
   def VicChoice(self):
-    self.BorderCheck()
-###Cant do it when you just took over the territory, because you dont have supporters or opponents yet
-    if self.newterritory == 0:
-      return()
-###What if this is interior territory
-    if self.borders == 0: 
-###Number of supporters and non-supporters
-      suppnum = 0 
-      for i in self.civilians:
-        if i.support == 1:
-          suppnum += 1
-      nsuppnum = len(self.civilians) - suppnum
-###Can't victimize if one group is empty
-      if suppnum == 0 | nsuppnum == 1:
+    if len(self.civilians) > 0:
+      self.BorderCheck()
+  ###Cant do it when you just took over the territory, because you dont have supporters or opponents yet
+      if self.newterritory == 0:
         return()
-###How likely are you to kill the right people
-      selectprob  = 1 - victimerror*((len(self.civilians) - len(supps) + 1))/len(self.civilians)
-###What are the ranges of preferences for which people will support or oppose you
-      supprange = ((suppnum -1)/(suppnum + nsuppnum - 1) + self.control.VioHist*VicPenalty)*2
-###Ok, how does victimization help our ability to mobilize in the future? 
-      victUtility = selectprob*((2*VicPenalty/(1 - supprange)*nsuppnum)*(1 - CoerceMob) - CoerceMob) - (1 - selectprob)*(VicPenalty/supprange * suppnum * (1 - CoerceMob) - 1)
-###If its a good idea, do it
-      if victUtility > 0:
-        self.Victimize()
-###What if we're in a border territory
-    if self.borders == 1:
-      shouldVic = 0
-###Look at all the potential threats
-      for j in self.neighbors:
-        if j.ConsiderAttack(self):
-          suppnum = 0 
-          for i in self.civilians:
-            if i.support == 1:
-              suppnum += 1
-          nsuppnum = len(self.civilians) - suppnum
-          suppInt = ((suppnum -1)/(suppnum + nsuppnum - 1) + self.control.VioHist*VicPenalty)
-###Who's likely to win the fight
-          pwin = self.exstr[self.control]/(self.exstr[self.control] + self.exstr[j.control])
-###Between you and the attacker, civilians choose based on who's likely to win, so this is the cutpoint
-          suppborder = self.preference*pwin + j.preference*(1 - pwin)
-###Which side of the cutpoint depends on your orientation
-          if self.preference > j.preference:
-            loyalzone = 1 - suppborder
-          if self.preference <= j.preference:
-            loyalzone = suppborder
-###Number of loyal civilians
-          loyal = len(civilians)*loyalzone
-###Opponent supporters
-          nonloyal = len(civilians) - loyal
-          nsuppnum = len(civilians) - suppnum
-          selectprob  = 1 - victimerror*((len(self.civilians) - len(supps) + 1))/len(self.civilians)
-###How victimization effects the resource balance
-          lossFunction = selectprob*nonloyal*VicPenalty/(1 - loyalzone)*(CoerceMob - DisloyalPenalty) - (1 - selectprob)*loyal*VicPenalty/(loyalzone)*(CoerceMob - DisloyalPenalty)
-###Do it if its a positive effect 
-          if lossFunction > 0:
+  ###What if this is interior territory
+      if self.borders == 0: 
+  ###Number of supporters and non-supporters
+        suppnum = 0 
+        for i in self.civilians:
+          if i.support == 1:
+            suppnum += 1
+        nsuppnum = len(self.civilians) - suppnum
+  ###How likely are you to kill the right people
+        selectprob  = 1 - victimerror*((len(self.civilians) - suppnum + 1))/len(self.civilians)
+        if nsuppnum > 0:
+    ###What are the ranges of preferences for which people will support or oppose you
+          if suppnum > 0:
+            supprange = ((suppnum -1)/(suppnum + nsuppnum - 1) + self.control.VioHist*VicPenalty)*2
+            victUtility = selectprob*((2*VicPenalty/(1 - supprange)*nsuppnum)*(1 - CoerceMob) - CoerceMob) - (1 - selectprob)*(VicPenalty/supprange * suppnum * (1 - CoerceMob) - 1)
+          if suppnum == 0:
+            victUtility = 2*VicPenalty*nsuppnum*(1 - CoerceMob) - CoerceMob         
+    ###Ok, how does victimization help our ability to mobilize in the future? 
+    ###If its a good idea, do it
+          if victUtility > 0:
             self.Victimize()
-            return("victimized")  
+  ###What if we're in a border territory
+      if self.borders == 1:
+        shouldVic = 0
+  ###Look at all the potential threats
+        for j in self.neighbors:
+          if j.ConsiderAttack(self):
+            suppnum = 0 
+            for i in self.civilians:
+              if i.support == 1:
+                suppnum += 1
+            nsuppnum = len(self.civilians) - suppnum
+            if nsuppnum > 0:
+              suppInt = ((suppnum -1)/(suppnum + nsuppnum - 1) + self.control.VioHist*VicPenalty)
+    ###Who's likely to win the fight
+              pwin = self.exstr[self.control]/(self.exstr[self.control] + self.exstr[j.control])
+    ###Between you and the attacker, civilians choose based on who's likely to win, so this is the cutpoint
+              suppborder = self.control.preference*pwin + j.control.preference*(1 - pwin)
+    ###Which side of the cutpoint depends on your orientation
+              if self.control.preference > j.control.preference:
+                loyalzone = 1 - suppborder
+              if self.control.preference <= j.control.preference:
+                loyalzone = suppborder
+    ###Number of loyal civilians
+              loyal = len(self.civilians)*loyalzone
+    ###Opponent supporters
+              nonloyal = len(self.civilians) - loyal
+              nsuppnum = len(self.civilians) - suppnum
+              selectprob  = 1 - victimerror*((len(self.civilians) - suppnum + 1))/len(self.civilians)
+    ###How victimization effects the resource balance
+              if loyalzone == 0:
+                lossFunction = selectprob*nonloyal*VicPenalty*(CoerceMob - DisloyalPenalty) 
+              elif loyalzone == 1:
+                lossFunction = -1
+              else:
+                lossFunction = selectprob*nonloyal*VicPenalty/(1 - loyalzone)*(CoerceMob - DisloyalPenalty) - (1 - selectprob)*loyal*VicPenalty/(loyalzone)*(CoerceMob - DisloyalPenalty)
+    ###Do it if its a positive effect 
+              #print(lossFunction)
+              if lossFunction > 0:
+                self.Victimize()
+                return("victimized")  
   def __repr__(self):
     return self.name
 
@@ -294,14 +313,14 @@ class ArmedActor(object):
       if len(combatants) == 1:
         sq = (.5 - abs(x1 - targets[i].control.preference))*2*phi*R
       else:
-        pwins = [x/sum(caps) for x in caps]
+        pwins = [x/(sum(caps) + 0.0000000000001) for x in caps]
         sq = 0
         for k in range(len(combatants)):
           sq += (.5 - abs(x1 - combatants[k].control.preference))*2*phi*(R*pwins[k] -c)
       ###Check the utility of attacking
       combatants.append(i)
       caps.append(targets[i].exstr[self])
-      pwins = [x/sum(caps) for x in caps]
+      pwins = [x/(sum(caps) + 0.00000000001) for x in caps]
       attackUtil = 0
       for k in range(len(combatants)):
         attackUtil += (.5 - abs(x1 - combatants[k].control.preference))*2*phi*(R*pwins[k] -c)*(k != len(combatants)) + (R*pwins[k] -c)*(k == len(combatants))
@@ -394,7 +413,11 @@ class Civilian(object):
       for i in self.territory.neighbors:
         opt[i] = abs(self.preference - i.control.preference) - i.control.VioHist*VicPenalty
       #Is the best alternative better than the SQ?
-      if min(opt.items(), key=operator.itemgetter(1))[1] < current:
+      try:
+        turn = self.country.turn
+      except AttributeError:
+        turn = 0
+      if (min(opt.items(), key=operator.itemgetter(1))[1]*exp(3 - turn*3/10)) < current:
         self.Flee(min(opt.items(), key = operator.itemgetter(1))[0])
   def __repr__(self):
     return self.name
@@ -450,7 +473,7 @@ class Country(object):
     for i in terr:
       pop = np.random.poisson(population)
       for j in range(pop):
-        newbie = Civilian(ascii_lowercase[int(j/26)] + ascii_lowercase[j%26] + i.name, i)
+        newbie = Civilian(ascii_lowercase[int(j/26/26)] + ascii_lowercase[int(j/26)%26] + ascii_lowercase[j%26] + i.name, i)
         i.civilians.append(newbie)
         civs.append(newbie)
         ##Make sure civilians also have a country
@@ -474,8 +497,14 @@ class Country(object):
       self.activeactors = active
       ####run one turn of the game
   def OneTurn(self):
+      self.turn += 1
+      self.victimhist[self.turn] = []
+      self.attackhist[self.turn] = []
+      self.ActiveActors()
+      self.actorlists[self.turn] = self.activeactors
       ###Beliefs about the strength of each actor in each location
       for i in self.provinces:
+        i.newterritory = 1
         i.ExpectedStrength()
       ###Actors go in a random order
       shuffle(self.armedactors)
@@ -492,17 +521,12 @@ class Country(object):
       for i in self.armedactors:
         i.ChooseVictimize()
       ###Civilians choose whether to flee, and if so, where
-      #for i in self.civilians:
-      #  i.CheckFlee()
+      for i in self.civilians:
+        i.CheckFlee()
       for i in self.provinces:
         if len(i.civilians) < 250:
           i.Growth(rate = .1)
-      self.ActiveActors()
-      self.actorlists[self.turn] = self.activeactors
       ####Game advances a turn
-      self.turn += 1
-      self.victimhist[self.turn] = []
-      self.attackhist[self.turn] = []
   def Game(self):
       gov = 0
       for i in self.armedactors:
@@ -525,25 +549,3 @@ class Country(object):
 
 
 ##Create a country with 10 territories, average connectivity of .2, 5 armed actors, 15 civilians on average per territory
-US = Country("USA", 10, .2, 5, 15)
-###Look at territ
-z = US.provinces[0].civilians[1]
-P0 = US.provinces[0]
-P1 = US.provinces[1]
-
-P0.SupportCheck()
-###Get resources
-P0.Mobilize()
-###Get Expected Strength
-P0.ExpectedStrength()
-P0.Victimize()
-
-PX = US.provinces[int(P1.neighbors[0].__repr__())]
-
-PX.Attack(P1)
-
-P1.Mobilize()
-
-P1.resources
-
-US.OneTurn()
