@@ -126,7 +126,7 @@ names(netStats) = names(yListAll)
 
 netStatsGED = netStats
 
-save(netStatsGED, file=paste0(pathData, 'netStatsGED.rda'))
+save(netStatsGED, file=paste0(pathData, 'netStatsGED.rda'))	
 
 
 
