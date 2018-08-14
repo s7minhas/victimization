@@ -3,9 +3,9 @@ import csv
 
 with open('abmresults.csv', 'w') as csvfile:
   abmwriter = csv.writer(csvfile, delimiter=',')
-  for i in range(100):
+  for i in range(10000):
     territory = np.random.poisson(20)
-    actors = min(np.random.poisson(10), territory - 1)
+    actors = min(np.random.poisson(10), territory - 2)
     conn = np.random.uniform(low = .2, high = .75)
     civ = np.random.poisson(45)
     VicPenalty = np.random.uniform(low = .05, high = .3)
@@ -15,7 +15,7 @@ with open('abmresults.csv', 'w') as csvfile:
     battledeaths = np.random.poisson(1) + 1
     growthrate = .1
     victimerror = np.random.uniform(low = 0, high = .15)
-    turnlimit = 10
+    turnlimit = np.random.poisson(10) + 1
     abm = Country("abm", territory, conn, actors, civ)
     abm.Game()
     print(i)

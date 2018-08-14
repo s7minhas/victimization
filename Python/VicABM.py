@@ -187,7 +187,7 @@ class Territory(object):
     self.ExpectedStrength()
     target.ExpectedStrength()
 ###Given expected strength, what is the probability of victory
-    pwin = target.exstr[self.control]/(target.exstr[self.control] + target.exstr[target.control])
+    pwin = target.exstr[self.control]/(target.exstr[self.control] + target.exstr[target.control] + 0.00000001)
 ###How many resources are at stake
     R = len(target.civilians)
 ###What is the cost of war
@@ -244,7 +244,7 @@ class Territory(object):
             if nsuppnum > 0:
               suppInt = ((suppnum -1)/(suppnum + nsuppnum - 1) + self.control.VioHist*VicPenalty)
     ###Who's likely to win the fight
-              pwin = self.exstr[self.control]/(self.exstr[self.control] + self.exstr[j.control])
+              pwin = self.exstr[self.control]/(self.exstr[self.control] + self.exstr[j.control] + 0.000001)
     ###Between you and the attacker, civilians choose based on who's likely to win, so this is the cutpoint
               suppborder = self.control.preference*pwin + j.control.preference*(1 - pwin)
     ###Which side of the cutpoint depends on your orientation
@@ -417,7 +417,7 @@ class Civilian(object):
         turn = self.country.turn
       except AttributeError:
         turn = 0
-      if (min(opt.items(), key=operator.itemgetter(1))[1]*exp(3 - turn*3/10)) < current:
+      if (min(opt.items(), key=operator.itemgetter(1))[1]*exp(3 - turn*3/turnlimit)) < current:
         self.Flee(min(opt.items(), key = operator.itemgetter(1))[0])
   def __repr__(self):
     return self.name
