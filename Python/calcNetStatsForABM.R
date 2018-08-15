@@ -70,3 +70,31 @@ dyadConf = do.call('rbind', lapply(1:length(out), function(gameIter){
 		if(length(z)==0){ zMat = NULL }		
 		return(zMat) })
 	return(do.call('rbind', gameSumm)) }) )
+
+# clean up edge list
+dyadConf = data.frame(dyadConf, stringsAsFactors = FALSE)
+dyadConf$gameIter = num(dyadConf$gameIter)
+dyadConf$turnIter = num(dyadConf$turnIter)
+dyadConf$V3 = char(dyadConf$V3)
+dyadConf$V4 = char(dyadConf$V4)
+rownames(dyadConf) = NULL
+
+# get actor list for each game iter
+abmData$V14 = char(abmData$V14)
+tmp = strsplit(abmData$V14, '],', fixed=TRUE)
+out = lapply(tmp, cleaner)
+actorSet = lapply(out, function(x){
+	lapply(x, function(turn){
+		actors=sort(trim(unlist(strsplit(turn, ','))))
+		n=length(actors)
+		adjMat=matrix(0,nrow=n,ncol=n,dimnames=list(actors,actors))
+	})	 })
+
+# fill in adjmat
+for(i in 1:nrow(dyadConf)){
+	game = dyadConf$gameIter[i]
+	turn = dyadConf$turnIter[i]
+	sender = dyadConf$V3[i]
+	receiver = dyadConf$V4[i]
+	actorSet[[game]][[turn]][sender,receiver] = 1 }
+
