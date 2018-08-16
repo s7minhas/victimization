@@ -153,3 +153,8 @@ netStats$vic = df$vicCount[match(netStats$id,df$id)]
 
 # 
 save(netStats, file=paste0(abmPath, 'abmResults.rda'))
+
+# basic look at results
+library(ggcorrplot)
+corr = round(cor(netStats[,-c(4:5,ncol(netStats))], use='pairwise.complete.obs'),3)
+ggcorrplot(corr, colors=c('red','white','blue'))
