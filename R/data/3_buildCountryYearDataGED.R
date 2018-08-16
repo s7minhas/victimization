@@ -25,6 +25,8 @@ data$country = char(unlist(lapply(strsplit(data$id,'_'), function(x){x[1]})))
 data$year = num(unlist(lapply(strsplit(data$id,'_'), function(x){x[2]})))
 ############################
 
+# here is where we could sort by # of actors (nactors)
+
 ############################
 # merge graph level measures
 graphVars = c('graph_recip','graph_trans','graph_dens')
@@ -36,13 +38,11 @@ rm(netDF)
 ############################
 
 ############################
-
 # fix country name
 data$country[data$country=='Serbia (Yugoslavia)'] = 'Serbia'
 
 # stdz country names using panel]
 data$cname = cname(data$country)
-
 data$id = with(data, paste0(cname, '_', year))
 data$ccode=panel$ccode[match(data$cname,panel$cname)]
 data$cyear=paste(data$ccode, data$year, sep='')
