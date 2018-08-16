@@ -3,14 +3,40 @@ if(Sys.info()['user'] %in% c('cassydorff')){ source('~/ProjectsGit/victimization
 load(paste0(pathData, 'cntriesGED_byAll.rda'))
 
 #################
-# clean actor names
+# clean actor names for ged
 cData$a1 = trim(cData$side_a) ; cData$a2 = trim(cData$side_b)
-# cData$aa1 = trim(cData$ALLY_ACTOR_1) ; cData$aa2 = trim(cData$ALLY_ACTOR_2)
 
 # remove unidentified groups
-ids = c('a1','a2')
-for(id in ids[1:2]){ cData = cData[which(!grepl('Unidentified', cData[,id])),] }
+# ids = c('a1','a2')
+# for(id in ids[1:2]){ cData = cData[which(!grepl('Unidentified', cData[,id])),] }
 #################
+
+# bring in acled data to subset countries for ged comparison
+# cData (GED) has 109 countries to start
+
+load(paste0(pathData,'actorDates_all.rda') #actorDates GED
+cntriesAcled = unique(actorDates$COUNTRY)
+cntriesGED = unique(cData$country)
+
+cntriesGED[!cntriesGED %in% cntriesAcled]
+cntriesAcled[!cntriesGED %in% cntriesAcled]
+cntriesAcled[!cntriesAcled  %in% cntriesGED]
+setdiff(cntriesAcled, cntriesGED)
+setdiff(cntriesGED, cntriesAcled)
+
+# subset ged data to match acled countries (48 cntries)
+cDataSubset = cData[which(cData$country %in% cntriesAcled),]
+length(unique(cDataSubset$country)) # goes down to 35
+
+foo = cntriesAcled[unique(cntriesAcled) %in% unique(cData$country)]
+foo2 = cData$country[unique(cData$country) %in% unique(cntriesAcled)]
+
+
+check = cData$country[!unique(cntriesAcled) %in% unique(cData$country)]
+unique(check)
+
+unique(cData$country) %in% unique(cntriesAcled)))
+x[!(x %in% y)]
 
 #################
 # get dates actors were active
