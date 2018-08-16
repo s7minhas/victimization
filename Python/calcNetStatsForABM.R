@@ -137,4 +137,19 @@ if(!file.exists(paste0(abmPath, 'abmNetStats.rda'))){
 	save(netStats, file=paste0(abmPath, 'abmNetStats.rda'))
 } else { load(paste0(abmPath, 'abmNetStats.rda')) }
 
+# merge in hyperparams
+netStats = data.frame(netStats)
+abmData$game = 1:nrow(abmData)
+hyperparams = paste0('V',1:11)
+for(v in hyperparams){
+	netStats$tmp = abmData[match(netStats$game,abmData$game),v]
+	names(netStats)[ncol(netStats)] = v }
+
+# merge in vic
+netStats$vic = 0
+netStats$id = with(netStats, paste(game, turn, sep='_'))
+df$id = with(df, paste(gameID, turnID, sep='_'))
+netStats$vic = df$vicCount[match(netStats$id,df$id)]
+
 # 
+save(netStats, file=paste0(abmPath, 'abmResults.rda'))
