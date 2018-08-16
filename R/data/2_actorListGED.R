@@ -11,32 +11,20 @@ cData$a1 = trim(cData$side_a) ; cData$a2 = trim(cData$side_b)
 # for(id in ids[1:2]){ cData = cData[which(!grepl('Unidentified', cData[,id])),] }
 #################
 
+#################
 # bring in acled data to subset countries for ged comparison
 # cData (GED) has 109 countries to start
-
 load(paste0(pathData,'actorDates_all.rda') #actorDates GED
 cntriesAcled = unique(actorDates$COUNTRY)
 cntriesGED = unique(cData$country)
 
-cntriesGED[!cntriesGED %in% cntriesAcled]
-cntriesAcled[!cntriesGED %in% cntriesAcled]
-cntriesAcled[!cntriesAcled  %in% cntriesGED]
 setdiff(cntriesAcled, cntriesGED)
 setdiff(cntriesGED, cntriesAcled)
 
 # subset ged data to match acled countries (48 cntries)
 cDataSubset = cData[which(cData$country %in% cntriesAcled),]
 length(unique(cDataSubset$country)) # goes down to 35
-
-foo = cntriesAcled[unique(cntriesAcled) %in% unique(cData$country)]
-foo2 = cData$country[unique(cData$country) %in% unique(cntriesAcled)]
-
-
-check = cData$country[!unique(cntriesAcled) %in% unique(cData$country)]
-unique(check)
-
-unique(cData$country) %in% unique(cntriesAcled)))
-x[!(x %in% y)]
+#################
 
 #################
 # get dates actors were active
@@ -100,7 +88,8 @@ yListAll = lapply(names(actorsCT), function(cntry){
 #################
 
 #################
-loadPkg(c('igraph', 'sna', 'network', 'doParallel', 'foreach'))
+
+names(netStats) = names(yListAllloadPkg(c('igraph', 'sna', 'network', 'doParallel', 'foreach'))
 stat = function(expr, object){
 	x=try(expr(object),TRUE)
 	if(class(x)=='try-error'){x=NA}
@@ -147,8 +136,7 @@ netStats <- foreach(
 		rownames(out) = NULL ; return(out) })
 	cntryDF = do.call('rbind', cntryStats)
 	return(cntryDF)	
-}
-names(netStats) = names(yListAll)
+})
 
 netStatsGED = netStats
 
