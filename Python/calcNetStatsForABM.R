@@ -6,9 +6,8 @@ abmPath = paste0(pathGit, 'Python/')
 # load in file
 abmData = read.csv(paste0(abmPath, 'abmresults1.csv'), header=FALSE)
 
-#
+# clean stuff up
 abmData$V12 = char(abmData$V12)
-
 tmp = strsplit(abmData$V12, '],', fixed=TRUE)
 cleaner = function(x){
 	out = trim(
@@ -88,13 +87,54 @@ actorSet = lapply(out, function(x){
 		actors=sort(trim(unlist(strsplit(turn, ','))))
 		n=length(actors)
 		adjMat=matrix(0,nrow=n,ncol=n,dimnames=list(actors,actors))
+		diag(adjMat) = NA
+		return(adjMat)
 	})	 })
 
 # fill in adjmat
+numGames = 1:length(actorSet)
+numTurns = lapply(actorSet, function(x){1:length(x)})
 for(i in 1:nrow(dyadConf)){
 	game = dyadConf$gameIter[i]
 	turn = dyadConf$turnIter[i]
 	sender = dyadConf$V3[i]
 	receiver = dyadConf$V4[i]
-	actorSet[[game]][[turn]][sender,receiver] = 1 }
+	if(game %in% numGames){
+		if(turn %in% numTurns[[game]]){
+			actorSet[[game]][[turn]][sender,receiver] = 1
+		}
+	}
+}
 
+# calc graph stats
+loadPkg(c('sna','igraph','network'))
+stat = function(expr, object){
+	x=try(expr(object),TRUE)
+	if(class(x)=='try-error'){x=NA}
+	return(x) }
+
+if(!file.exists(paste0(abmPath, 'abmNetStats.rda'))){
+	netStats = lapply(1:length(actorSet), function(game){
+		gameList = actorSet[[game]]
+		out = lapply(1:length(gameList), function(turn){
+			mat = gameList[[turn]]
+			grph = graph_from_adjacency_matrix(mat, 
+				mode='directed', weighted=NULL )
+			sgrph = network::network(mat, matrix.type="adjacency",directed=TRUE)
+			graph_recip = stat(sna::grecip, sgrph)
+			graph_trans = stat(sna::gtrans, sgrph)
+			graph_dens = stat(sna::gden, sgrph)
+			out = c(
+				graph_recip=graph_recip, 
+				graph_trans=graph_trans, 
+				graph_dens=graph_dens,
+				game=game, turn=turn
+				)		
+		})		
+		res = do.call('rbind', out)
+	})
+	netStats = do.call('rbind', netStats)
+	save(netStats, file=paste0(abmPath, 'abmNetStats.rda'))
+} else { load(paste0(abmPath, 'abmNetStats.rda')) }
+
+# 
