@@ -25,21 +25,18 @@ data$country = char(unlist(lapply(strsplit(data$id,'_'), function(x){x[1]})))
 data$year = num(unlist(lapply(strsplit(data$id,'_'), function(x){x[2]})))
 ############################
 
-# here is where we could sort by # of actors (nactors)
-
 ############################
 # merge graph level measures
 graphVars = c('graph_recip','graph_trans','graph_dens')
 data = simpleMerge(data, netDF, graphVars, 'id', 'id', lagVars=FALSE)
 
-# think about which net actor level measures to add in...
-#.....
 rm(netDF)
 ############################
 
 ############################
 # fix country name
 data$country[data$country=='Serbia (Yugoslavia)'] = 'Serbia'
+data$country[data$country=='DR Congo (Zaire)'] = 'Democratic Republic of Congo'
 
 # stdz country names using panel]
 data$cname = cname(data$country)
@@ -155,5 +152,6 @@ rm(nsa)
 
 ############################
 # save
+data=data[data$year>=1993,]
 save(data, file=paste0(pathData, 'GEDdata.rda'))
 ############################

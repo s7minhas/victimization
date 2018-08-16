@@ -12,18 +12,20 @@ cData$a1 = trim(cData$side_a) ; cData$a2 = trim(cData$side_b)
 #################
 
 #################
-# bring in acled data to subset countries for ged comparison
-# cData (GED) has 109 countries to start
-load(paste0(pathData,'actorDates_all.rda') #actorDates GED
+# bring in acled data to subset countries for quick ged comparison
+# cData (GED) has 63 countries to start with >=5 actors
+# Note one or two might be name format issues
+load(paste0(pathData,'actorDates_all.rda'))  #actorDates acled
 cntriesAcled = unique(actorDates$COUNTRY)
 cntriesGED = unique(cData$country)
 
-setdiff(cntriesAcled, cntriesGED)
-setdiff(cntriesGED, cntriesAcled)
+length(setdiff(cntriesAcled, cntriesGED)) #23
+length(setdiff(cntriesGED, cntriesAcled)) #38
 
-# subset ged data to match acled countries (48 cntries)
+# subset ged data to match acled countries if we ewant
 cDataSubset = cData[which(cData$country %in% cntriesAcled),]
-length(unique(cDataSubset$country)) # goes down to 35
+length(unique(cDataSubset$country)) 
+rm(cntriesAcled)
 #################
 
 #################
@@ -88,8 +90,9 @@ yListAll = lapply(names(actorsCT), function(cntry){
 #################
 
 #################
+#################
 
-names(netStats) = names(yListAllloadPkg(c('igraph', 'sna', 'network', 'doParallel', 'foreach'))
+loadPkg(c('igraph', 'sna', 'network', 'doParallel', 'foreach'))
 stat = function(expr, object){
 	x=try(expr(object),TRUE)
 	if(class(x)=='try-error'){x=NA}
@@ -136,7 +139,9 @@ netStats <- foreach(
 		rownames(out) = NULL ; return(out) })
 	cntryDF = do.call('rbind', cntryStats)
 	return(cntryDF)	
-})
+}
+
+names(netStats) = names(yListAll)
 
 netStatsGED = netStats
 

@@ -60,7 +60,9 @@ save(summStatsGED, file=paste0(pathDrop, 'summStatsGED.rda'))
 
 summStatsGED[order(summStatsGED$cntDyads, decreasing=TRUE),]
 
-cntriesGED=summStatsGED[order(summStatsGED$cntDyads, decreasing = TRUE),][,'cntry']
+#cntriesGED=summStatsGED[order(summStatsGED$cntDyads, decreasing = TRUE),][,'cntry']
+cntriesGED = summStatsGED[summStatsGED$cntActors >=5,]
+cntriesGED = cntriesGED[order(cntriesGED$cntActors, decreasing = TRUE),][,'cntry']
 cData = ged = data.frame(ged[which(ged$country %in% cntriesGED), ])
 save(cData, cntriesGED, file=paste0(pathData, 'cntriesGED_byAll.rda'))
 
