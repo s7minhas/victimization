@@ -86,7 +86,7 @@ rm(icrg)
 ####
 
 ####
-# civ victimization
+# civ victimization measure 1 - any civilian violence
 load(paste0(pathData, 'ged171.Rdata'))
 ged=data.frame(ged171, stringsAsFactors = FALSE) ; rm(ged171)
 ged = ged[,c(
@@ -94,15 +94,26 @@ ged = ged[,c(
 	'deaths_civ'
 	)]
 
-# subset to relev type
-gedCiv = ged[ged$type_of_vi %in% c(1:2),]
+# subset to relev type of conflict
+gedCiv = ged[ged$type_of_vi %in% c(1:3),]
 
 #names
-gedCiv$country[gedCiv$country=='Serbia (Yugoslavia)'] = 'Serbia'
 gedCiv$cname = cname(gedCiv$country)
-gedCiv$cnameYear = with(gedCiv, paste0(cname, '_', YEAR))
-data$gedCivCount = gedCiv$deaths_civ[match(data$id, gedCiv$cnameYear)]
-####
+gedCiv$cname[gedCiv$country=='Yugoslavia'] = 'SERBIA'
+gedCiv$cname[gedCiv$country=='DR Congo (Zaire)'] = cname('Democratic Republic of Congo')
+gedCiv$cnameYear = with(gedCiv, paste0(cname, '_', year))
+data$gedCivCountAny = gedCiv$deaths_civ[match(data$id, gedCiv$cnameYear)]
+
+#civ only one-sided
+# subset to relev type of conflict
+gedCiv2 = ged[ged$type_of_vi==3,]
+
+#names
+gedCiv2$cname = cname(gedCiv2$country)
+gedCiv2$cname[gedCiv2$country=='Yugoslavia'] = 'SERBIA'
+gedCiv2$cname[gedCiv2$country=='DR Congo (Zaire)'] = cname('Democratic Republic of Congo')
+gedCiv2$cnameYear = with(gedCiv2, paste0(cname, '_', year))
+data$gedCivOneSided = gedCiv2$deaths_civ[match(data$id, gedCiv2$cnameYear)]
 
 ####
 # epr 
@@ -127,7 +138,8 @@ rm(kath)
 # convert missing to zero
 for(v in kathVars){ data[is.na(data[,v]),v] = 0 }
 
-# create binary indicator for any intervention
+# create binary indicator for any intervention 
+#NOTE: this might not make sense with more cases?
 data$anyPeaceKeeper = 0
 data$anyPeaceKeeper[data$totalPeacekeepers>0] = 1
 ####
