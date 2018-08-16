@@ -1,7 +1,7 @@
 if(Sys.info()['user'] %in% c('s7m', 'janus829')){ source('~/Research/victimization/R/setup.R') }
 
 # abm path
-abmPath = paste0(pathGit, 'Python/')
+abmPath = paste0(pathDrop, 'abm/')
 
 # load in file
 abmData = read.csv(paste0(abmPath, 'abmresults1.csv'), header=FALSE)
