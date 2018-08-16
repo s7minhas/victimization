@@ -16,14 +16,16 @@ ged = ged[,c(
 	'country',
 	'best', 'deaths_a', 'deaths_b', 'deaths_civ'
 	)]
-
 #
-gedCiv = ged[ged$type_of_vi==2,]
+#gedCiv = ged[ged$type_of_vi==3,]
+
+# types other than one-sided violence bc of actor names
+ged = ged[ged$type_of_vi %in% c(1:2),]
 
 # 
-cntries = unique(gedCiv$country)
+cntries = unique(ged$country)
 summStatsGED = data.frame(do.call('rbind', lapply(cntries, function(c){
-	slice = gedCiv[gedCiv$country==c,]
+	slice = ged[ged$country==c,]
 
 	# number of conflicts
 	cntConf = nrow(slice)
@@ -42,21 +44,23 @@ summStatsGED = data.frame(do.call('rbind', lapply(cntries, function(c){
 	})))
 summStatsGED$cntry = cntries
 
-gedOne = ged[ged$type_of_vi==3,]
-gedOne$country=char(gedOne$country)
-gedOne = gedOne[which(gedOne$country %in% cntries),]
-civCnt = gedOne %>% group_by(country) %>% summarize(civDeaths = sum(best, na.rm=TRUE))
+#gedOne = ged[ged$type_of_vi==3,]
+gedCivD = ged
+gedCivD$country=char(gedCivD$country)
+gedCivD = gedCivD[which(gedCivD$country %in% cntries),]
+civCnt = gedCivD %>% group_by(country) %>% summarize(civDeaths = sum(best, na.rm=TRUE))
 
 summStatsGED$civDeaths = civCnt$civDeaths[match(summStatsGED$cntry, civCnt$country)]
 
-# save(summStatsGED, file=paste0(pathDrop, 'summStatsGED.rda'))
+#check to make sure civDeaths are counts in summStats
+head(summStatsGED)
+
+#save summary data
+save(summStatsGED, file=paste0(pathDrop, 'summStatsGED.rda'))
 
 summStatsGED[order(summStatsGED$cntDyads, decreasing=TRUE),]
-
-tmp=gedCiv[gedCiv$country=='Pakistan',]
-tmp$dyad_name <- char(tmp$dyad_name)
-cbind(table(tmp$dyad_name))
 
 cntriesGED=summStatsGED[order(summStatsGED$cntDyads, decreasing = TRUE),][,'cntry']
 cData = ged = data.frame(ged[which(ged$country %in% cntriesGED), ])
 save(cData, cntriesGED, file=paste0(pathData, 'cntriesGED_byAll.rda'))
+
