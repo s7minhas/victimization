@@ -17,7 +17,6 @@ ged = ged[,c(
 	'best', 'deaths_a', 'deaths_b', 'deaths_civ'
 	)]
 #
-#gedCiv = ged[ged$type_of_vi==3,]
 
 # types other than one-sided violence bc of actor names
 ged = ged[ged$type_of_vi %in% c(1:2),]
@@ -44,7 +43,7 @@ summStatsGED = data.frame(do.call('rbind', lapply(cntries, function(c){
 	})))
 summStatsGED$cntry = cntries
 
-#gedOne = ged[ged$type_of_vi==3,]
+#
 gedCivD = ged
 gedCivD$country=char(gedCivD$country)
 gedCivD = gedCivD[which(gedCivD$country %in% cntries),]
@@ -52,17 +51,11 @@ civCnt = gedCivD %>% group_by(country) %>% summarize(civDeaths = sum(best, na.rm
 
 summStatsGED$civDeaths = civCnt$civDeaths[match(summStatsGED$cntry, civCnt$country)]
 
-#check to make sure civDeaths are counts in summStats
-head(summStatsGED)
-
 #save summary data
 save(summStatsGED, file=paste0(pathDrop, 'summStatsGED.rda'))
 
-summStatsGED[order(summStatsGED$cntDyads, decreasing=TRUE),]
-
-#cntriesGED=summStatsGED[order(summStatsGED$cntDyads, decreasing = TRUE),][,'cntry']
+#
 cntriesGED = summStatsGED[summStatsGED$cntActors >=5,]
 cntriesGED = cntriesGED[order(cntriesGED$cntActors, decreasing = TRUE),][,'cntry']
 cData = ged = data.frame(ged[which(ged$country %in% cntriesGED), ])
 save(cData, cntriesGED, file=paste0(pathData, 'cntriesGED_byAll.rda'))
-

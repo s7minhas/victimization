@@ -24,7 +24,8 @@ vars = c(
 	'ethTens', 'anyPeaceKeeper',
 	 'rebSupportGov', 'govSupportGov'
 	)
- modData = na.omit(data[,c('cname','ccode','year',dv,vars)])
+ # modData = na.omit(data[,c('cname','ccode','year',dv,vars)])
+modData = data
 
 # modData=data
 # sample restriction
@@ -40,12 +41,12 @@ vars = c(
 #	'CAMEROON',
 #	'MADAGASCAR',
 #	'TUNISIA'
-	)
+	# )
 # modData = modData[which(!modData$cname %in% c(toDrop)),]
 
 # naive just impute everything
 loadPkg('sbgcop')
-impData = data.matrix(modData[,c(5:7,11,19,20,23,24:36,44,48,49,52,54)])
+impData = data.matrix(modData[,c(5:7,11,19,20,23,24:38,45,49,50,53,55)])
 sbgData = sbgcop.mcmc(Y=impData, seed=6886, nsamp=1000, verb=FALSE)
 sbgFrom = sbgData$Y.pmean
 modData = cbind(modData[,c('cname','year','cnameYear','nActors')], sbgFrom)

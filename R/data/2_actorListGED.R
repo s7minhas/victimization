@@ -5,10 +5,6 @@ load(paste0(pathData, 'cntriesGED_byAll.rda'))
 #################
 # clean actor names for ged
 cData$a1 = trim(cData$side_a) ; cData$a2 = trim(cData$side_b)
-
-# remove unidentified groups
-# ids = c('a1','a2')
-# for(id in ids[1:2]){ cData = cData[which(!grepl('Unidentified', cData[,id])),] }
 #################
 
 #################
@@ -38,14 +34,8 @@ yrs=seq(min(cData$year), max(cData$year), by=1)
 loadPkg('doBy') ; actorDatesGED = doBy::summaryBy(year ~ a1 + country, data=tmp, FUN=c(min, max))
 actorDatesGED$yrsActive = actorDatesGED$year.max - actorDatesGED$year.min # length of years active
 
-#save(actorDatesGED, file=paste0(pathData, 'actorDatesGED_all.rda'))
-#write.csv(actorDatesGED, 
-# 	file=paste0(pathData, 'actorDatesGED_toClean_allGED.csv'),
-# 	row.names=FALSE
-# 	)
-
+#
 actorDatesGED = actorDatesGED[actorDatesGED$yrsActive >= 0,] # keep any actor
-# actorDatesGED = actorDatesGED[actorDatesGED$yrsActive > 4,]  # only keep actors involved in 4 yrs of conflict
 
 # list of actors by country-year
 actorsCT = lapply(unique(actorDatesGED$country), function(cntry){
@@ -90,8 +80,6 @@ yListAll = lapply(names(actorsCT), function(cntry){
 #################
 
 #################
-#################
-
 loadPkg(c('igraph', 'sna', 'network', 'doParallel', 'foreach'))
 stat = function(expr, object){
 	x=try(expr(object),TRUE)
@@ -142,10 +130,6 @@ netStats <- foreach(
 }
 
 names(netStats) = names(yListAll)
-
 netStatsGED = netStats
-
 save(netStatsGED, file=paste0(pathData, 'netStatsGED.rda'))	
-
-
-
+#################

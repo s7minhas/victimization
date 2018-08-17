@@ -29,7 +29,6 @@ data$year = num(unlist(lapply(strsplit(data$id,'_'), function(x){x[2]})))
 # merge graph level measures
 graphVars = c('graph_recip','graph_trans','graph_dens')
 data = simpleMerge(data, netDF, graphVars, 'id', 'id', lagVars=FALSE)
-
 rm(netDF)
 ############################
 
@@ -95,6 +94,8 @@ ged = ged[,c(
 gedCiv = ged[ged$type_of_vi %in% c(1:3),]
 
 #names
+gedCiv$country = char(gedCiv$country)
+gedCiv$country[gedCiv$country=='Rumania'] = 'Romania'
 gedCiv$cname = cname(gedCiv$country)
 gedCiv$cname[gedCiv$country=='Yugoslavia'] = 'SERBIA'
 gedCiv$cname[gedCiv$country=='DR Congo (Zaire)'] = cname('Democratic Republic of Congo')
@@ -106,6 +107,8 @@ data$gedCivCountAny = gedCiv$deaths_civ[match(data$id, gedCiv$cnameYear)]
 gedCiv2 = ged[ged$type_of_vi==3,]
 
 #names
+gedCiv2$country = char(gedCiv2$country)
+gedCiv2$country[gedCiv2$country=='Rumania'] = 'Romania'
 gedCiv2$cname = cname(gedCiv2$country)
 gedCiv2$cname[gedCiv2$country=='Yugoslavia'] = 'SERBIA'
 gedCiv2$cname[gedCiv2$country=='DR Congo (Zaire)'] = cname('Democratic Republic of Congo')
