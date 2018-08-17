@@ -113,7 +113,7 @@ stat = function(expr, object){
 	if(class(x)=='try-error'){x=NA}
 	return(x) }
 
-if(!file.exists(paste0(abmPath, 'abmNetStats.rda'))){
+# if(!file.exists(paste0(abmPath, 'abmNetStats.rda'))){
 	netStats = lapply(1:length(actorSet), function(game){
 		gameList = actorSet[[game]]
 		out = lapply(1:length(gameList), function(turn){
@@ -124,10 +124,12 @@ if(!file.exists(paste0(abmPath, 'abmNetStats.rda'))){
 			graph_recip = stat(sna::grecip, sgrph)
 			graph_trans = stat(sna::gtrans, sgrph)
 			graph_dens = stat(sna::gden, sgrph)
+			n_actors = nrow(mat)
 			out = c(
 				graph_recip=graph_recip, 
 				graph_trans=graph_trans, 
 				graph_dens=graph_dens,
+				n_actors=n_actors,
 				game=game, turn=turn
 				)		
 		})		
@@ -135,7 +137,7 @@ if(!file.exists(paste0(abmPath, 'abmNetStats.rda'))){
 	})
 	netStats = do.call('rbind', netStats)
 	save(netStats, file=paste0(abmPath, 'abmNetStats.rda'))
-} else { load(paste0(abmPath, 'abmNetStats.rda')) }
+# } else { load(paste0(abmPath, 'abmNetStats.rda')) }
 
 # merge in hyperparams
 netStats = data.frame(netStats)
