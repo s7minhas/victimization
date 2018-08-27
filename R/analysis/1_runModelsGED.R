@@ -11,6 +11,16 @@ loadPkg('MASS')
 ####
 # load data
 load(paste0(pathData, 'GEDdata.rda'))
+load(paste0(pathData, 'cntriesGED_byAll.rda'))
+cData = cData[,c('country','year')]
+cData$cnt = 1
+cData = cData %>% group_by(country, year) %>%
+	summarize(nConf = sum(cnt)) %>%
+	data.frame()
+cData$cname = cname(cData$country)
+cData$id = with(cData, paste(cname, year, sep="_"))
+data$nConf = cData$nConf[match(data$id, cData$id)]
+data$nConf[is.na(data$nConf)] = 0
 ####
 
 ####
