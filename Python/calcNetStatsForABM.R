@@ -65,7 +65,8 @@ dyadConf = do.call('rbind', lapply(1:length(out), function(gameIter){
 		z = gsub(')','',gsub('(', '', z, fixed=TRUE),fixed=TRUE)
 		zMat = do.call('rbind', lapply(strsplit(z, ', ', z, fixed=TRUE), function(u){t(cbind(u))}))
 		zMat[,1] = trim(zMat[,1]) ; zMat[,2] = trim(zMat[,2])
-		zMat = cbind(gameIter, turnIter, zMat)
+		numConf = length(z)
+		zMat = cbind(gameIter, turnIter, zMat, numConf)
 		if(length(z)==0){ zMat = NULL }		
 		return(zMat) })
 	return(do.call('rbind', gameSumm)) }) )
@@ -76,6 +77,7 @@ dyadConf$gameIter = num(dyadConf$gameIter)
 dyadConf$turnIter = num(dyadConf$turnIter)
 dyadConf$V3 = char(dyadConf$V3)
 dyadConf$V4 = char(dyadConf$V4)
+dyadConf$numConf = num(dyadConf$numConf)
 rownames(dyadConf) = NULL
 
 # get actor list for each game iter
@@ -153,6 +155,11 @@ netStats$id = with(netStats, paste(game, turn, sep='_'))
 df$id = with(df, paste(gameID, turnID, sep='_'))
 netStats$vic = df$vicCount[match(netStats$id,df$id)]
 
+# merge in numConf
+dyadConf$id = with(dyadConf, paste(gameIter, turnIter, sep='_'))
+netStats$numConf = dyadConf$numConf[match(netStats$id, dyadConf$id)]
+netStats$numConf[is.na(netStats$numConf)] = 0
+
 # 
 save(netStats, file=paste0(abmPath, 'abmResults.rda'))
 
@@ -160,3 +167,17 @@ save(netStats, file=paste0(abmPath, 'abmResults.rda'))
 library(ggcorrplot)
 corr = round(cor(netStats[,-c(4:5,ncol(netStats))], use='pairwise.complete.obs'),3)
 ggcorrplot(corr, colors=c('red','white','blue'))
+
+# run quick pois
+mod = glm(vic ~ numConf + graph_dens + n_actors, family='poisson', data=netStats)
+summary(mod)
+
+# run quick logit
+netStats$vicBin = ifelse(netStats$vic > 0, 1, 0)
+mod = glm(vicBin ~ numConf + graph_dens + n_actors, family='binomial', data=netStats)
+summary(mod)
+
+# run neg binom
+loadPkg('MASS')
+mod = glm.nb(vic ~ numConf + graph_dens + n_actors, data=netStats)
+summary(mod)
