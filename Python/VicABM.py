@@ -417,7 +417,7 @@ class Civilian(object):
         turn = self.country.turn
       except AttributeError:
         turn = 0
-      if (opt.items(), key=operator.itemgetter(1))[1]*exp(3 - turn*3/turnlimit)) < current:
+      if min(opt.items(), key=operator.itemgetter(1))[1]*exp(3 - turn*3/turnlimit) < current:
         self.Flee(min(opt.items(), key = operator.itemgetter(1))[0])
   def __repr__(self):
     return self.name

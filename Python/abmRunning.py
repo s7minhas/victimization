@@ -1,7 +1,7 @@
 from VicABM import *
 import csv
 
-with open('abmresults.csv', 'w') as csvfile:
+with open('abmresults1.csv', 'w') as csvfile:
   abmwriter = csv.writer(csvfile, delimiter=',')
   for i in range(10000):
     territory = np.random.poisson(20)
@@ -18,5 +18,6 @@ with open('abmresults.csv', 'w') as csvfile:
     turnlimit = np.random.poisson(10) + 1
     abm = Country("abm", territory, conn, actors, civ)
     abm.Game()
-    print(i)
+    if i%1000 == 0:
+      print(i)
     abmwriter.writerow([actors, territory, conn, civ, VicPenalty, CoerceMob, delta, battledeaths, growthrate, victimerror, turnlimit, abm.victimhist, abm.attackhist, abm.actorlists])
