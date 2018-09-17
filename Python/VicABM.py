@@ -355,7 +355,7 @@ class Civilian(object):
     #Get a probability the other civilians are supporting the actor?
     for i in self.territory.civilians:
       if i != self:
-        IncSupp += min(max(1 - abs(IncPref - i.preference) + self.territory.control.VioHist*VicPenalty,1),0)
+        IncSupp += max(min(1 - abs(IncPref - i.preference) + self.territory.control.VioHist*VicPenalty,1),0)
     IncSupp /= len(self.territory.civilians)
     #Compare that to your ideological distance
     if IncSupp/2 > abs(IncPref - self.preference) - self.territory.control.VioHist*VicPenalty:
@@ -375,13 +375,13 @@ class Civilian(object):
       for j in i.territory:
         if j not in self.territory.attack:
           for k in j.civilians:
-            res += min(max(1 - abs(i.preference - k.preference) + i.VioHist*VicPenalty,1),0)*(1 - CoerceMob) + CoerceMob
+            res += max(min(1 - abs(i.preference - k.preference) + i.VioHist*VicPenalty,1),0)*(1 - CoerceMob) + CoerceMob
         if j in self.territory.attack:
           for k in j.civilians:
             diffs = 0
             for l in combatants:
               diffs += abs(k.preference - l.preference)
-            es = min(max(1 - abs(i.preference - k.preference)/diffs + i.VioHist*VicPenalty,1),0)
+            es = max(min(1 - abs(i.preference - k.preference)/diffs + i.VioHist*VicPenalty,1),0)
             res += es - (CoerceMob -DisloyalPenalty)*(1-es)
       rsr[i] = res
       utils = rsr
@@ -417,7 +417,7 @@ class Civilian(object):
         turn = self.country.turn
       except AttributeError:
         turn = 0
-      if (min(opt.items(), key=operator.itemgetter(1))[1]*exp(3 - turn*3/turnlimit)) < current:
+      if (opt.items(), key=operator.itemgetter(1))[1]*exp(3 - turn*3/turnlimit)) < current:
         self.Flee(min(opt.items(), key = operator.itemgetter(1))[0])
   def __repr__(self):
     return self.name
