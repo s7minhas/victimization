@@ -1,10 +1,12 @@
 if(Sys.info()['user'] %in% c('s7m', 'janus829')){ source('~/Research/victimization/R/setup.R') }
+if(Sys.info()['user'] %in% c('maxgallop')){ source('~/Documents/victimization/R/setup.R') }
 
 # abm path
 abmPath = paste0(pathDrop, 'abm/')
-
+abmPath = paste0(pathGit, "python/")
 # load in file
-abmData = read.csv(paste0(abmPath, 'abmresults1.csv'), header=FALSE)
+abmData2 = read.csv(paste0(abmPath, 'abmresults.csv'), header=FALSE)
+abmData = read.csv(paste0(abmPath, 'abmresultsFinal.csv'), header=FALSE)
 
 # clean stuff up
 abmData$V12 = char(abmData$V12)
@@ -161,11 +163,12 @@ netStats$numConf = dyadConf$numConf[match(netStats$id, dyadConf$id)]
 netStats$numConf[is.na(netStats$numConf)] = 0
 
 # 
+abmPath = paste0(pathDrop, 'abm/')
 save(netStats, file=paste0(abmPath, 'abmResults.rda'))
 
 # basic look at results
 library(ggcorrplot)
-corr = round(cor(netStats[,-c(4:5,ncol(netStats))], use='pairwise.complete.obs'),3)
+corr = round(cor(netStats[,-c(5:6,ncol(netStats)-1)], use='pairwise.complete.obs'),3)
 ggcorrplot(corr, colors=c('red','white','blue'))
 
 # run quick pois
@@ -174,7 +177,7 @@ summary(mod)
 
 # run quick logit
 netStats$vicBin = ifelse(netStats$vic > 0, 1, 0)
-mod = glm(vicBin ~ numConf + graph_dens + n_actors, family='binomial', data=netStats)
+mod = glm(vicBin ~ numConf + n_actors + graph_dens, family='binomial', data=netStats)
 summary(mod)
 
 # run neg binom

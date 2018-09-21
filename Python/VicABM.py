@@ -222,7 +222,7 @@ class Territory(object):
         if nsuppnum > 0:
     ###What are the ranges of preferences for which people will support or oppose you
           if suppnum > 0:
-            supprange = ((suppnum -1)/(suppnum + nsuppnum - 1) + self.control.VioHist*VicPenalty)*2
+            supprange = ((suppnum -1)/(suppnum + nsuppnum - 1 ) + self.control.VioHist*VicPenalty)*2
             victUtility = selectprob*((2*VicPenalty/(1 - supprange)*nsuppnum)*(1 - CoerceMob) - CoerceMob) - (1 - selectprob)*(VicPenalty/supprange * suppnum * (1 - CoerceMob) - 1)
           if suppnum == 0:
             victUtility = 2*VicPenalty*nsuppnum*(1 - CoerceMob) - CoerceMob         
@@ -242,7 +242,7 @@ class Territory(object):
                 suppnum += 1
             nsuppnum = len(self.civilians) - suppnum
             if nsuppnum > 0:
-              suppInt = ((suppnum -1)/(suppnum + nsuppnum - 1) + self.control.VioHist*VicPenalty)
+              suppInt = ((suppnum -1 + 0.0001)/(suppnum + nsuppnum - 1+ 0.0001) + self.control.VioHist*VicPenalty)
     ###Who's likely to win the fight
               pwin = self.exstr[self.control]/(self.exstr[self.control] + self.exstr[j.control] + 0.000001)
     ###Between you and the attacker, civilians choose based on who's likely to win, so this is the cutpoint
@@ -260,11 +260,11 @@ class Territory(object):
               selectprob  = 1 - victimerror*((len(self.civilians) - suppnum + 1))/len(self.civilians)
     ###How victimization effects the resource balance
               if loyalzone == 0:
-                lossFunction = selectprob*nonloyal*VicPenalty*(CoerceMob - DisloyalPenalty) 
+                lossFunction = selectprob*nonloyal*VicPenalty*(1 + DisloyalPenalty) 
               elif loyalzone == 1:
                 lossFunction = -1
               else:
-                lossFunction = selectprob*nonloyal*VicPenalty/(1 - loyalzone)*(CoerceMob - DisloyalPenalty) - (1 - selectprob)*loyal*VicPenalty/(loyalzone)*(CoerceMob - DisloyalPenalty)
+                lossFunction = selectprob*(nonloyal*VicPenalty/(1 - loyalzone)*(1 + DisloyalPenalty) + DisloyalPenalty) - (1 - selectprob)*(loyal*VicPenalty/(loyalzone)*(1 + DisloyalPenalty) - 1)
     ###Do it if its a positive effect 
               #print(lossFunction)
               if lossFunction > 0:
