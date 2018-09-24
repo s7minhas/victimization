@@ -27,7 +27,18 @@ data$nConf[is.na(data$nConf)] = 0
 # run models
 dv = 'gedCivCountAny'
 
-#rebstronger seem to be all 0s..
+# model spec
+#### graph_dens + nConf + nActors + 
+# polity2 + logPop + logGDP + ethTens + anyPeaceKeeper + 
+# duration_conflict + loot_goods
+
+###### spec with nsa, pre 2012
+#### graph_dens + nConf + nActors + 
+# polity2 + logPop + logGDP + ethTens + anyPeaceKeeper + 
+# duration_conflict + loot_goods +
+# rebsStronger + rebSupportGov + govSupportGov
+### loot_goods = 1 if any gems, diamonds, or drugs
+
 vars = c(
 	'graph_dens', 'graph_recip', 'graph_trans', 'nActors', 
 	'polity2',
