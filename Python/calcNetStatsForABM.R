@@ -5,8 +5,7 @@ if(Sys.info()['user'] %in% c('maxgallop')){ source('~/Documents/victimization/R/
 abmPath = paste0(pathDrop, 'abm/')
 abmPath = paste0(pathGit, "python/")
 # load in file
-abmData2 = read.csv(paste0(abmPath, 'abmresults.csv'), header=FALSE)
-abmData = read.csv(paste0(abmPath, 'abmresultsFinal.csv'), header=FALSE)
+abmData = read.csv(paste0(abmPath, 'abmresultsBigRun.csv'), header=FALSE)
 
 # clean stuff up
 abmData$V12 = char(abmData$V12)
