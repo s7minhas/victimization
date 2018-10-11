@@ -147,9 +147,20 @@ data$anyPeaceKeeper[data$totalPeacekeepers>0] = 1
 ####
 # add nsa data at country-year level
 load(paste0(pathData, 'nsa/nsa.rda'))
-nsaVars = names(nsa)[3:ncol(nsa)]
+nsaVars = names(nsa)[3:(ncol(nsa)-1)]
 data = simpleMerge(data, nsa, nsaVars, 'id', 'cnameYear')
 rm(nsa)
+####
+
+####
+# add wood 2010
+load(paste0(pathData, 'wood2010/wood.rda'))
+woodVars = names(wood)[3:5]
+data = simpleMerge(data, wood, woodVars, 'cname', 'cname', lagVars=FALSE)
+for(v in woodVars){data[is.na(data[,v]),] = 0}
+data$loot_goods_sum = apply(data[,woodVars],1,sum)
+data$loot_goods = ifelse(data$loot_goods_sum>1,1,0) 
+rm(wood)
 ####
 ############################
 
