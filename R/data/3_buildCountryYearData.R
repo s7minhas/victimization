@@ -3,6 +3,9 @@ if(Sys.info()['user'] %in% c('s7m', 'janus829')){
 	source('~/Research/victimization/R/setup.R') }
 if(Sys.info()['user'] %in% c('cassydorff')){ 
 	source('~/ProjectsGit/victimization/R/setup.R') }
+if(Sys.info()['user'] %in% c('maxgallop')){ 
+  source('~/documents/victimization/R/setup.R') }
+
 ####
 
 ############################
@@ -127,6 +130,15 @@ data = simpleMerge(data, nsa, nsaVars, 'id', 'cnameYear')
 rm(nsa)
 ####
 ############################
+###Add conflict length to data
+data$confDur = 0
+for(i in 1:dim(data)[1]){
+c = data$country[i]
+ys = min(data$year[data$country == c])
+if(data$year[i] == ys){data$confDur[i] = 0}
+if(data$year[i] != ys){if(data$year[i] != (1 + data$year[i - 1])){data$confDur[i] = 0}
+if(data$year[i] == (1 + data$year[i - 1])){data$confDur[i] = (data$confDur[i-1] + 1) }}
+}
 
 ############################
 # save
