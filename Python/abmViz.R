@@ -6,6 +6,7 @@ abmPath = paste0(pathDrop, 'abm/')
 abmPath = paste0(pathGit, "python/")
 # load in file
 abmData = read.csv(paste0(abmPath, 'abmViz.csv'), header=FALSE)
-# V12: actors that have victimized
-# V13: which actor is fighting whom, directed
-# V14: actual actors in the game
+# V12: who victimized and where
+# V13 is what attacks took place
+# V14 is groups + their territory per period
+# V15 = adjacency matrix
