@@ -40,15 +40,16 @@ dv = 'gedCivCountAny'
 ### loot_goods = 1 if any gems, diamonds, or drugs
 
 vars = c(
-	'graph_dens', 'nConf', 'nActors', 
+	'graph_dens', 'nConf', 
+	'nActors', 
 	'polity2',
 	'popLog', 'gdpLog',
 	'ethTens',
 	'anyPeaceKeeper',
 	'loot_goods'
 	)
- modData = na.omit(data[,c('cname','ccode','year',dv,vars)])
-# modData = data[,c('cname','ccode','year',dv,vars)]
+ # modData = na.omit(data[,c('cname','ccode','year',dv,vars)])
+modData = data[,c('cname','ccode','year',dv,vars)]
 
 # naive just impute everything
 loadPkg('sbgcop')
