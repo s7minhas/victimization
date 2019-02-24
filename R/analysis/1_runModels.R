@@ -27,11 +27,12 @@ data$nConf[is.na(data$nConf)] = 0
 # run models
 dv = 'civVicCount'
 vars = c(
-	'graph_dens', 'graph_recip', 'graph_trans', 'nActors', 
+	'graph_dens', 'graph_recip', 'graph_trans', 
+	'nConf', 'nActors', 
 	'polity2'
 	# 'rebsStronger',
 	,'ethTens', 'anyPeaceKeeper'
-	# 'rebSupportGov', 'govSupportGov'
+	# 'rebSupportGov', 'govSupportGov'	
 	)
 # modData = na.omit(data[,c('cname','ccode','year',dv,vars)])
 modData=data
@@ -57,12 +58,15 @@ loadPkg('sbgcop')
 impData = data.matrix(modData[,c(5:7,11,19,20,23,24:36,44,48,49,52,54)])
 sbgData = sbgcop.mcmc(Y=impData, seed=6886, nsamp=1000, verb=FALSE)
 sbgFrom = sbgData$Y.pmean
-modData = cbind(modData[,c('cname','year','cnameYear','nActors')], sbgFrom)
+modData = cbind(
+	modData[,c('cname','year','cnameYear','nActors','nConf')], 
+	sbgFrom
+	)
 
 # run mod
 mod = glm.nb(
 	civVicCount ~  # dv
-		graph_dens
+		graph_dens + nConf
 		+ polity2   # structural controls
 		+ rebsStronger # capabilities gov/rebels
 		+ ethTens
@@ -72,3 +76,21 @@ mod = glm.nb(
 	)
 summary(mod)
 ####
+
+library(brms)
+modData$cname = factor(modData$cname)
+modData$civVicCount = as.integer(modData$civVicCount)
+fit3 <- brm(
+	formula = 
+		civVicCount ~  # dv
+			graph_dens + nConf
+			+ polity2   # structural controls
+			+ rebsStronger # capabilities gov/rebels
+			+ ethTens
+			+ anyPeaceKeeper 
+			+ rebSupportGov + govSupportGov # external shit
+			+ (1|cname),
+	data = modData,
+	family = negbinomial
+	)
+summary(fit3)
