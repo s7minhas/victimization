@@ -3,7 +3,7 @@ import csv
 
 with open('abmViz.csv', 'w') as csvfile:
   abmwriter = csv.writer(csvfile, delimiter=',')
-  for i in range(5000):
+  for i in range(500):
     actors = 10
     territory = max(np.random.poisson(13), actors + 1)
     conn = np.random.uniform(low = .2, high = .75)
