@@ -45,6 +45,8 @@ for(i in 1:nrow(abmData)){
 		actors = regmatches(z, gregexpr("[[:alpha:]]+", z))[[1]]
 		names(terrs) = actors
 		return(sort(terrs)) })
+	# this basically checks to see if the terr by actor vector
+	# ever changes during the turns of the game
 	out = ifelse(length(unique(x))==1, 'no territory change', 'woohoo')
 	terrChange[i] = out }
 unique(terrChange)
