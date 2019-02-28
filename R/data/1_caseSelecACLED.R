@@ -1,10 +1,17 @@
-if(Sys.info()['user'] %in% c('s7m', 'janus829')){ source('~/Research/victimization/R/setup.R') }
-if(Sys.info()['user'] %in% c('cassydorff')){ source('~/ProjectsGit/victimization/R/setup.R') }
+if(Sys.info()['user'] %in% c('s7m', 'janus829')){
+	source('~/Research/victimization/R/setup.R') }
+if(Sys.info()['user'] %in% c('cassydorff')){
+	source('~/ProjectsGit/victimization/R/setup.R') }
 
 loadPkg('readr')
-acled = read_csv(paste0(pathData, "ACLED-Version-7-All-Africa-1997-2016_csv_dyadic-file.csv"))
+acled = read_csv(
+	paste0(
+		pathData,
+		"ACLED-Version-7-All-Africa-1997-2016_csv_dyadic-file.csv"))
 
-acledCiv = acled[which(acled$EVENT_TYPE=='Violence against civilians'),]
+acledCiv = acled[
+	which(
+		acled$EVENT_TYPE=='Violence against civilians'),]
 
 toKeep = c(
 	# 'Remote violence', 'Headquarters or base established', 
@@ -17,23 +24,31 @@ acled$dyad_name = paste0(acled$ACTOR1, '_', acled$ACTOR2)
 
 # 
 cntries = unique(acled$COUNTRY)
-summStatsACLED = data.frame(do.call('rbind', lapply(cntries, function(c){
-	slice = acled[acled$COUNTRY==c,]
+summStatsACLED = data.frame(
+	do.call(
+		'rbind', lapply(
+			cntries, function(c){
+		slice = acled[acled$COUNTRY==c,]
 
-	# number of conflicts
-	cntConf = nrow(slice)
+		# number of conflicts
+		cntConf = nrow(slice)
 
-	# length of conflict
-	yrCnt = max(slice$YEAR) - min(slice$YEAR)
+		# length of conflict
+		yrCnt = max(slice$YEAR) - min(slice$YEAR)
 
-	# number of actors
-	cntActors = length(unique(c(slice$ACTOR1, slice$ACTOR2)))
+		# number of actors
+		cntActors = length(unique(c(slice$ACTOR1, slice$ACTOR2)))
 
-	# number of dyads
-	cntDyads = length(unique(slice$dyad_name))
+		# number of dyads
+		cntDyads = length(unique(slice$dyad_name))
 
-	# org
-	c(cntConf=cntConf, yrCnt=yrCnt, cntActors=cntActors, cntDyads=cntDyads)
+		# org
+		c(
+			cntConf=cntConf, 
+			yrCnt=yrCnt, 
+			cntActors=cntActors, 
+			cntDyads=cntDyads
+			)
 	})))
 summStatsACLED$cntry = cntries
 
@@ -43,10 +58,14 @@ t(apply(summStatsACLED[,-ncol(summStatsACLED)], 2, getSumm))
 getSumm(acledCiv$FATALITIES)
 
 # peer into horn of africa
-toFocus=summStatsACLED[summStatsACLED$cntry %in% c('Sudan', 'South Sudan', 'Kenya', 'Somalia', 'Ethiopia'), 'cntry']
+toFocus=summStatsACLED[
+	summStatsACLED$cntry %in% c(
+		'Sudan', 'South Sudan', 'Kenya', 'Somalia', 'Ethiopia'
+		), 'cntry']
 years = 2000:2016
 
-summStatsACLED_toFocus = data.frame(do.call('rbind', lapply(toFocus, function(c){
+summStatsACLED_toFocus = data.frame(
+	do.call('rbind', lapply(toFocus, function(c){
 	do.call('rbind', lapply(years, function(t){
 		slice = acled[acled$COUNTRY==c & acled$YEAR==t,]
 		cntConf = nrow(slice)
@@ -61,7 +80,8 @@ summStatsACLED_toFocus = data.frame(do.call('rbind', lapply(toFocus, function(c)
 	}) )
 })), stringsAsFactors=FALSE)
 
-for(v in setdiff(names(summStatsACLED_toFocus), 'cntry')){ summStatsACLED_toFocus[,v]=num(summStatsACLED_toFocus[,v])}
+for(v in setdiff(names(summStatsACLED_toFocus), 'cntry')){
+	summStatsACLED_toFocus[,v]=num(summStatsACLED_toFocus[,v])}
 
 plotSumm = function(data, yVar, yLab, fName){
 	data$ggY = data[,yVar]
@@ -80,26 +100,37 @@ plotSumm = function(data, yVar, yLab, fName){
 	ggsave(g, file=paste0(pathDrop, fName), width=9, height=5)	
 }
 
-# plotSumm(summStatsACLED_toFocus, 'cntConf', 'Number of conflicts', 'cntConf_horn.pdf')
-# plotSumm(summStatsACLED_toFocus, 'cntActors', 'Number of actors', 'cntActors_horn.pdf')
-# plotSumm(summStatsACLED_toFocus, 'cntDyads', 'Number of dyads', 'cntDyads_horn.pdf')
-# plotSumm(summStatsACLED_toFocus, 'cntCivEvents', 'Number of Violent Civilian Events', 'cntCivEvents_horn.pdf')
-# plotSumm(summStatsACLED_toFocus, 'cntCivFatals', 'Number of Civilian Fatalities', 'cntCivFatals_horn.pdf')
+# plotSumm(
+# 	summStatsACLED_toFocus, 'cntConf', 'Number of conflicts', 'cntConf_horn.pdf')
+# plotSumm(
+# 	summStatsACLED_toFocus, 'cntActors', 'Number of actors', 'cntActors_horn.pdf')
+# plotSumm(
+# 	summStatsACLED_toFocus, 'cntDyads', 'Number of dyads', 'cntDyads_horn.pdf')
+# plotSumm(
+# 	summStatsACLED_toFocus, 'cntCivEvents', 
+# 	'Number of Violent Civilian Events', 'cntCivEvents_horn.pdf')
+# plotSumm(
+# 	summStatsACLED_toFocus, 'cntCivFatals', 
+# 	'Number of Civilian Fatalities', 'cntCivFatals_horn.pdf')
 
 # determine most conflictual countries
-# cntriesACLED=summStatsACLED[order(summStatsACLED$cntDyads, decreasing = TRUE),][1:20,'cntry']
+# cntriesACLED=summStatsACLED[order(
+# 	summStatsACLED$cntDyads, decreasing = TRUE),][1:20,'cntry']
 # aData = data.frame(acled[which(acled$COUNTRY %in% cntriesACLED), ])
 # save(aData, cntriesACLED, file=paste0(pathData, 'cntriesACLED_byDyads.rda'))
 
-# cntriesACLED=summStatsACLED[order(summStatsACLED$cntActors, decreasing = TRUE),][1:20,'cntry']
+# cntriesACLED=summStatsACLED[order(
+# 	summStatsACLED$cntActors, decreasing = TRUE),][1:20,'cntry']
 # aData = data.frame(acled[which(acled$COUNTRY %in% cntriesACLED), ])
 # save(aData, cntriesACLED, file=paste0(pathData, 'cntriesACLED_byActors.rda'))
 
-# cntriesACLED=summStatsACLED[order(summStatsACLED$cntConf, decreasing = TRUE),][1:20,'cntry']
+# cntriesACLED=summStatsACLED[order(
+# 	summStatsACLED$cntConf, decreasing = TRUE),][1:20,'cntry']
 # aData = data.frame(acled[which(acled$COUNTRY %in% cntriesACLED), ])
 # save(aData, cntriesACLED, file=paste0(pathData, 'cntriesACLED_byConf.rda'))
 
 ##
-cntriesACLED=summStatsACLED[order(summStatsACLED$cntDyads, decreasing = TRUE),][,'cntry']
+cntriesACLED=summStatsACLED[order(
+	summStatsACLED$cntDyads, decreasing = TRUE),][,'cntry']
 aData = acled = data.frame(acled[which(acled$COUNTRY %in% cntriesACLED), ])
 save(aData, cntriesACLED, file=paste0(pathData, 'cntriesACLED_byAll.rda'))
