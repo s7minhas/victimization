@@ -87,7 +87,15 @@ acledActors$actor_level_1_txt[
 # unique(acledActors$base.categories[acledActors$actor_level_1_txt=='government'])
 
 #### needs manual check
-# unique(acledActors$base.categories[acledActors$actor_level_1_txt=='violent groups'])	
+write.csv(
+	unique(acledActors$base.categories[acledActors$actor_level_1_txt=='violent groups']),
+	file=paste0(pathData, 'sillyActorGroupingCheck.csv')
+	)
+
+cleaned = read.csv(
+	paste0(pathData, 'sillyActorGroupingCheck.csv'), 
+	stringsAsFactors=FALSE
+	)
 
 # construct ged actor taxonomy
 ged$side_a = char(ged$side_a) ; ged$side_b = char(ged$side_b)
@@ -156,9 +164,11 @@ ged = ged %>%
 
 ########################################################
 # meltt data
-combo = meltt(acled,ged,
+combo = meltt(
+	acled,ged,
 	taxonomies = taxonomy,
-	twindow = 1,spatwindow = 3)
+	twindow = 1,spatwindow = 3
+	)
 
 # Summary of the integration reported in the paper
 summary(combo)
