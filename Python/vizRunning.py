@@ -3,19 +3,19 @@ import csv
 
 with open('abmViz.csv', 'w') as csvfile:
   abmwriter = csv.writer(csvfile, delimiter=',')
-  for i in range(100):
+  for i in range(500):
     actors = 10
     territory = max(np.random.poisson(13), actors + 1)
     conn = np.random.uniform(low = .2, high = .75)
-    civ = np.random.poisson(45)
+    civ = np.random.poisson(75)
     VicPenalty = np.random.uniform(low = .05, high = .3)
     CoerceMob = np.random.uniform(low = .1, high = .5)
     DisloyalPenalty = np.random.uniform(low = .25, high = .75)
-    delta = np.random.uniform(low = .1, high = .5)
+    delta = np.random.uniform(low = .1, high = .3)
     battledeaths = np.random.poisson(1) + 1
     growthrate = .1
     victimerror = np.random.uniform(low = 0, high = .5)
-    turnlimit = np.random.poisson(10) + 1
+    turnlimit = np.random.poisson(15) + 1
     abm = Country("abm", territory, conn, actors, civ)
     try:
       abm.Game()

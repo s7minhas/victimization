@@ -130,6 +130,10 @@ class Territory(object):
         self.control = list(probs.keys())[i]
         newsupp = 0
         if self.control != old:
+          if self in old.territory:
+            old.territory.remove(self)
+          if self not in self.control.territory:
+            self.control.territory.append(self)
           self.newterritory = 0 #cant victimize in the period you acquire a territory
           for j in self.civilians:
             newsupp += j.support == self.control
