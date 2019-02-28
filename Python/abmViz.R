@@ -16,8 +16,7 @@ abmData = read.csv(paste0(abmPath, 'abmViz.csv'), header=FALSE)
 ###hmmmm, dont see any territory turnover, lets make a fn to check
 abmData$V14 = char(abmData$V14)
 terrChange = rep(NA, nrow(abmData))
-# for(i in 1:nrow(abmData)){
-i=1
+for(i in 1:nrow(abmData)){
 	# split string element into a vector using turn ids
 	# that come at beginning of string
 	x = strsplit(abmData[i,'V14'], '[0:9]*: ')
