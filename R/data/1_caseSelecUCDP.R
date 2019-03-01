@@ -9,11 +9,12 @@ load(paste0(pathData, 'ged171.Rdata'))
 ged=data.frame(ged171, stringsAsFactors = FALSE) ; rm(ged171)
 
 ged = ged[,c(
-	'id','year','type_of_vi','conflict_n',
+	'id','year','date_start','date_end',
+	'type_of_vi','conflict_n',
 	'dyad_new_i','dyad_name',
 	'side_a_new','side_a',
 	'side_b_new','side_b',
-	'country',
+	'country', 'longitude', 'latitude','where_prec',
 	'best', 'deaths_a', 'deaths_b', 'deaths_civ'
 	)]
 #
@@ -47,15 +48,20 @@ summStatsGED$cntry = cntries
 gedCivD = ged
 gedCivD$country=char(gedCivD$country)
 gedCivD = gedCivD[which(gedCivD$country %in% cntries),]
-civCnt = gedCivD %>% group_by(country) %>% summarize(civDeaths = sum(best, na.rm=TRUE))
+civCnt = gedCivD %>%
+	group_by(country) %>%
+	summarize(civDeaths = sum(best, na.rm=TRUE))
 
-summStatsGED$civDeaths = civCnt$civDeaths[match(summStatsGED$cntry, civCnt$country)]
+summStatsGED$civDeaths = civCnt$civDeaths[
+	match(
+		summStatsGED$cntry, civCnt$country)]
 
 #save summary data
 save(summStatsGED, file=paste0(pathDrop, 'summStatsGED.rda'))
 
 #
 cntriesGED = summStatsGED[summStatsGED$cntActors >=5,]
-cntriesGED = cntriesGED[order(cntriesGED$cntActors, decreasing = TRUE),][,'cntry']
+cntriesGED = cntriesGED[order(
+	cntriesGED$cntActors, decreasing = TRUE),][,'cntry']
 cData = ged = data.frame(ged[which(ged$country %in% cntriesGED), ])
 save(cData, cntriesGED, file=paste0(pathData, 'cntriesGED_byAll.rda'))
