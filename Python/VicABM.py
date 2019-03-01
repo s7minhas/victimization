@@ -31,6 +31,12 @@ def sketchmultinom(probs):
       probs[i] -= 1e-3
     sketchmultinom(probs)
 
+def terrin(prov, list):
+  for i in list:
+    if i.__repr__ == prov.__repr__:
+      return(True)
+  return(False)
+
 
 ###Create the Object Class Territory
 class Territory(object):
@@ -130,8 +136,11 @@ class Territory(object):
         self.control = list(probs.keys())[i]
         newsupp = 0
         if self.control != old:
+#          print("terr change")
+          if terrin(self, old.territory):
             old.territory.remove(self)
-                self.control.territory.append(self)
+          if not terrin(self, self.control.territory):
+            self.control.territory.append(self)
           self.newterritory = 0 #cant victimize in the period you acquire a territory
           for j in self.civilians:
             newsupp += j.support == self.control
