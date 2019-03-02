@@ -1,7 +1,7 @@
 from VicForViz import *
 import csv
 
-with open('abmViz.csv', 'w') as csvfile:
+with open('viztry.csv', 'w') as csvfile:
   abmwriter = csv.writer(csvfile, delimiter=',')
   for i in range(500):
     actors = 10

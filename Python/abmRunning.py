@@ -1,9 +1,9 @@
 from VicForViz import *
 import csv
 
-with open('abmresultsBigRun.csv', 'w') as csvfile:
+with open('abmTerritoryRun.csv', 'w') as csvfile:
   abmwriter = csv.writer(csvfile, delimiter=',')
-  for i in range(100):
+  for i in range(3000):
     actors = 10
     territory = min(np.random.poisson(13), actors + 1)
     conn = np.random.uniform(low = .2, high = .75)
