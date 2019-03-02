@@ -87,11 +87,14 @@ acledActors$actor_level_1_txt[
 # unique(acledActors$base.categories[acledActors$actor_level_1_txt=='government'])
 
 #### needs manual check
+if(!file.exists(paste0(pathData, 'sillyActorGroupingCheck.csv'))){
 write.csv(
-	unique(acledActors$base.categories[acledActors$actor_level_1_txt=='violent groups']),
-	file=paste0(pathData, 'sillyActorGroupingCheck.csv')
-	)
+	unique(
+		acledActors$base.categories[
+			acledActors$actor_level_1_txt=='violent groups']),
+	file=paste0(pathData, 'sillyActorGroupingCheck.csv') ) }	
 
+# load in cleaned file
 cleaned = read.csv(
 	paste0(pathData, 'sillyActorGroupingCheck.csv'), 
 	stringsAsFactors=FALSE
