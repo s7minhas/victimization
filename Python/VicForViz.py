@@ -52,6 +52,7 @@ class Territory(object):
     self.exstr = {}
     self.newterritory = 1
     self.borders = 0
+    self.target = 0
 ###Check whether each civilian in a territory supports the dominant group, then also get an expected level of support for future period calculations
   def SupportCheck(self):
     self.exsupp = 0
@@ -102,6 +103,7 @@ class Territory(object):
       self.attack.append(target)
       target.attack.append(self)
       self.country.attackhist[self.country.turn].append((self.control, target.control))
+      target.target = 1
 ##Resolve a battle involving this territory
   def Battle(self):
     rsrs = {}
@@ -133,9 +135,10 @@ class Territory(object):
       if outcome[i] == 1:
         winner = list(probs.keys())[i]
         old = copy.deepcopy(self.control)
-        self.control = list(probs.keys())[i]
-        newsupp = 0
+        if self.target == 1:
+          self.control = list(probs.keys())[i]
         if self.control != old:
+          newsupp = 0
           for i in self.country.armedactors:
             i.territory = []
           for i in self.country.provinces:
@@ -144,6 +147,7 @@ class Territory(object):
           for j in self.civilians:
             newsupp += j.support == self.control
     #People died, it sucks
+    self.target = 0 
     self.attack.append(self)
     for j in self.attack:
       dmax = min(len(j.civilians), battledeaths)

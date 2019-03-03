@@ -3,7 +3,7 @@ import csv
 
 with open('terrBigRun.csv', 'w') as csvfile:
   abmwriter = csv.writer(csvfile, delimiter=',')
-  for i in range(1000):
+  for i in range(3000):
     actors = 10
     territory = max(np.random.poisson(13), actors + 1)
     conn = np.random.uniform(low = .2, high = .75)
@@ -22,5 +22,5 @@ with open('terrBigRun.csv', 'w') as csvfile:
       abmwriter.writerow([actors, territory, conn, civ, VicPenalty, CoerceMob, delta, battledeaths, growthrate, victimerror, turnlimit, abm.victimhist, abm.attackhist, abm.actorlists, abm.adj])
     except ZeroDivisionError:
       print("next one")
-    if i%100 == 0:
+    if i%50 == 0:
       print(i)
