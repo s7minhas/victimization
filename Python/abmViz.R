@@ -7,7 +7,8 @@ if(Sys.info()['user'] %in% c('maxgallop')){
 abmPath = paste0(pathDrop, 'abm/')
 abmPath = paste0(pathGit, "python/")
 # load in file
-abmData = read.csv(paste0(abmPath, 'abmViz.csv'), header=FALSE)
+# abmData = read.csv(paste0(abmPath, 'abmViz.csv'), header=FALSE)
+abmData = read.csv(paste0(abmPath, 'viztry.csv'), header=FALSE)
 # V12: who victimized and where
 # V13 is what attacks took place
 # V14 is groups + their territory per period

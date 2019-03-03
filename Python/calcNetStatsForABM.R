@@ -5,7 +5,8 @@ if(Sys.info()['user'] %in% c('maxgallop')){ source('~/Documents/victimization/R/
 abmPath = paste0(pathDrop, 'abm/')
 abmPath = paste0(pathGit, "python/")
 # load in file
-abmData = read.csv(paste0(abmPath, 'abmresultsBigRun.csv'), header=FALSE)
+# abmData = read.csv(paste0(abmPath, 'abmresultsBigRun.csv'), header=FALSE)
+abmData = read.csv(paste0(abmPath, 'abmTerritoryRun.csv'), header=FALSE)
 # V12: actors that have victimized
 # V13: which actor is fighting whom, directed
 # V14: actual actors in the game
@@ -46,7 +47,7 @@ names(df) = c('gameID', 'turnID')
 # sapply(x, getCount)
 
 # overall count of vic per turn
-if(!file.exists(paste0(abmPath, 'df_withVicCount.rda'))){
+if(!file.exists(paste0(abmPath, 'df_withVicCount_v2.rda'))){
 	df$vicCount = 0
 	for(i in 1:nrow(df)){
 		turnResults = out[[ df$gameID[i] ]][ df$turnID[i] ]
@@ -54,8 +55,8 @@ if(!file.exists(paste0(abmPath, 'df_withVicCount.rda'))){
 			concatResult=trim(gsub(', ', '', turnResults, fixed=TRUE))
 			vicCount = nchar(concatResult) } else { vicCount=0 }
 		df$vicCount[i] = vicCount }
-	save(df, file=paste0(abmPath, 'df_withVicCount.rda'))
-} else { load(paste0(abmPath, 'df_withVicCount.rda')) }
+	save(df, file=paste0(abmPath, 'df_withVicCount_v2.rda'))
+} else { load(paste0(abmPath, 'df_withVicCount_v2.rda')) }
 
 # net stats
 abmData$V13 = char(abmData$V13)
@@ -119,7 +120,7 @@ stat = function(expr, object){
 	if(class(x)=='try-error'){x=NA}
 	return(x) }
 
-# if(!file.exists(paste0(abmPath, 'abmNetStats.rda'))){
+# if(!file.exists(paste0(abmPath, 'abmNetStats_v2.rda'))){
 	netStats = lapply(1:length(actorSet), function(game){
 		gameList = actorSet[[game]]
 		out = lapply(1:length(gameList), function(turn){
@@ -142,7 +143,7 @@ stat = function(expr, object){
 		res = do.call('rbind', out)
 	})
 	netStats = do.call('rbind', netStats)
-	save(netStats, file=paste0(abmPath, 'abmNetStats.rda'))
+	save(netStats, file=paste0(abmPath, 'abmNetStats_v2.rda'))
 # } else { load(paste0(abmPath, 'abmNetStats.rda')) }
 
 # merge in hyperparams
@@ -166,7 +167,7 @@ netStats$numConf[is.na(netStats$numConf)] = 0
 
 # 
 abmPath = paste0(pathDrop, 'abm/')
-save(netStats, file=paste0(abmPath, 'abmResults.rda'))
+save(netStats, file=paste0(abmPath, 'abmResults_v2.rda'))
 
 # basic look at results
 library(ggcorrplot)
