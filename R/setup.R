@@ -68,3 +68,17 @@ loadPkg(pkgs)
 # Set a theme for gg
 theme_set(theme_bw())
 ########
+
+########
+# combine model results from imputed data using 
+# rubin's rules
+rubinCoef = function (coefMatrix, seMatrix){
+    numMods = nrow(coefMatrix)
+    ones = matrix(1, nrow = 1, ncol = numMods)
+    coefMelt = (ones %*% coefMatrix)/numMods
+    se2 = (ones %*% (seMatrix^2))/numMods
+    diff = coefMatrix - matrix(1, nrow = numMods, ncol = 1) %*% coefMelt
+    sq2 = (ones %*% (diff^2))/(numMods - 1)
+    seMelt = sqrt(se2 + sq2 * (1 + 1/numMods))
+    return(list(beta = coefMelt, se = seMelt)) }
+########
