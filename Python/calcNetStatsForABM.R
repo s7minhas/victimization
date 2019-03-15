@@ -5,7 +5,9 @@ if(Sys.info()['user'] %in% c('maxgallop')){ source('~/Documents/victimization/R/
 abmPath = paste0(pathDrop, 'abm/')
 abmPath = paste0(pathGit, "python/")
 # load in file
-abmData = read.csv(paste0(abmPath, 'viztry.csv'), header=FALSE)
+abmData = read.csv(paste0(abmPath, 'terrBigRun.csv'), header=FALSE)
+add = read.csv(paste0(abmPath, 'terrBigRun2.csv'), header=FALSE)
+abmData = rbind(abmData,add)
 # V12: actors that have victimized
 # V13: which actor is fighting whom, directed
 # V14: actual actors in the game
@@ -46,14 +48,16 @@ names(df) = c('gameID', 'turnID')
 # sapply(x, getCount)
 
 # overall count of vic per turn
-df$vicCount = 0
-for(i in 1:nrow(df)){
-	turnResults = out[[ df$gameID[i] ]][ df$turnID[i] ]
-	if(nchar(turnResults)!=0){
-		concatResult=trim(gsub(', ', '', turnResults, fixed=TRUE))
-		vicCount = nchar(concatResult) } else { vicCount=0 }
-	df$vicCount[i] = vicCount }
-save(df, file=paste0(abmPath, 'df_withVicCount.rda'))
+#if(!file.exists(paste0(abmPath, 'df_withVicCount.rda'))){
+	df$vicCount = 0
+	for(i in 1:nrow(df)){
+		turnResults = out[[ df$gameID[i] ]][ df$turnID[i] ]
+		if(nchar(turnResults)!=0){
+			concatResult=trim(gsub(', ', '', turnResults, fixed=TRUE))
+			vicCount = nchar(concatResult) } else { vicCount=0 }
+		df$vicCount[i] = vicCount }
+	save(df, file=paste0(abmPath, 'df_withVicCount.rda'))
+} #else { load(paste0(abmPath, 'df_withVicCount.rda')) }
 
 # net stats
 abmData$V13 = char(abmData$V13)
@@ -89,7 +93,10 @@ out = lapply(tmp, cleaner)
 actorSet = lapply(out, function(x){
 	lapply(x, function(turn){
 		actors=sort(trim(unlist(strsplit(turn, '),'))))
-		actors=trim(gsub('\\(|\\)| ,|,','',actors))
+		actors = gsub(" ,", "", actors)
+		actors = gsub(" )", "", actors, fixed = T)
+		actors = gsub("(", "", actors, fixed = T)
+		actors = gsub(",", "", actors, fixed = T)
 		n=length(actors)
 		adjMat=matrix(0,nrow=n,ncol=n,dimnames=list(actors,actors))
 		diag(adjMat) = NA
@@ -118,31 +125,33 @@ stat = function(expr, object){
 	if(class(x)=='try-error'){x=NA}
 	return(x) }
 
-netStats = lapply(1:length(actorSet), function(game){
-	gameList = actorSet[[game]]
-	out = lapply(1:length(gameList), function(turn){
-		mat = gameList[[turn]]
-		grph = graph_from_adjacency_matrix(mat, 
-			mode='directed', weighted=NULL )
-		sgrph = network::network(mat, matrix.type="adjacency",directed=TRUE)
-		graph_recip = stat(sna::grecip, sgrph)
-		graph_trans = stat(sna::gtrans, sgrph)
-		graph_dens = stat(sna::gden, sgrph)
-		n_actors = nrow(mat)
-		out = c(
-			graph_recip=graph_recip, 
-			graph_trans=graph_trans, 
-			graph_dens=graph_dens,
-			n_actors=n_actors,
-			game=game, turn=turn
-			)		
-	})		
-	res = do.call('rbind', out)
-})
-netStats = do.call('rbind', netStats)
-netStats[,"turn"] = netStats[,"turn"] + 1
-netStats = netStats[!is.nan(netStats[,"graph_dens"]),]
-save(netStats, file=paste0(abmPath, 'abmNetStats.rda'))
+# if(!file.exists(paste0(abmPath, 'abmNetStats.rda'))){
+	netStats = lapply(1:length(actorSet), function(game){
+		gameList = actorSet[[game]]
+		out = lapply(1:length(gameList), function(turn){
+			mat = gameList[[turn]]
+			grph = graph_from_adjacency_matrix(mat, 
+				mode='directed', weighted=NULL )
+			sgrph = network::network(mat, matrix.type="adjacency",directed=TRUE)
+			graph_recip = stat(sna::grecip, sgrph)
+			graph_trans = stat(sna::gtrans, sgrph)
+			graph_dens = stat(sna::gden, sgrph)
+			n_actors = nrow(mat)
+			out = c(
+				graph_recip=graph_recip, 
+				graph_trans=graph_trans, 
+				graph_dens=graph_dens,
+				n_actors=n_actors,
+				game=game, turn=turn
+				)		
+		})		
+		res = do.call('rbind', out)
+	})
+	netStats = do.call('rbind', netStats)
+	netStats[,"turn"] = netStats[,"turn"] + 1
+	netStats = netStats[!is.nan(netStats[,"graph_dens"]),]
+	save(netStats, file=paste0(abmPath, 'abmNetStats.rda'))
+# } else { load(paste0(abmPath, 'abmNetStats.rda')) }
 
 # merge in hyperparams
 netStats = data.frame(netStats)
@@ -176,10 +185,6 @@ ggcorrplot(corr, colors=c('red','white','blue'))
 mod = glm(vic ~ numConf + graph_dens + n_actors, family='poisson', data=netStats)
 summary(mod)
 
-# run quick logit
-netStats$vicBin = ifelse(netStats$vic > 0, 1, 0)
-mod = glm(vicBin ~ n_actors + graph_dens, family='binomial', data=netStats)
-summary(mod)
 
 # run neg binom
 loadPkg('MASS')
