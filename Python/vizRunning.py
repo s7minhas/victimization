@@ -1,10 +1,10 @@
 from VicForViz import *
 import csv
 
-with open('ActorVarRun.csv', 'w') as csvfile:
+with open('ActorVarRun3.csv', 'w') as csvfile:
   abmwriter = csv.writer(csvfile, delimiter=',')
-  for i in range(5000):
-    actors = np.random.poisson(10)
+  for i in range(3500):
+    actors = max(np.random.poisson(10),3)
     territory = max(np.random.poisson(13), actors + 1)
     conn = np.random.uniform(low = .2, high = .75)
     civ = 75

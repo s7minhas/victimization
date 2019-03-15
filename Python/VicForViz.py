@@ -56,9 +56,8 @@ class Territory(object):
 ###Check whether each civilian in a territory supports the dominant group, then also get an expected level of support for future period calculations
   def SupportCheck(self):
     self.exsupp = 0
-    if self.attack == 0:
-      for i in self.civilians:
-        i.SupportDecisions()
+    for i in self.civilians:
+      i.SupportDecisions()
 ##Get expected support for future calculations
         self.exsupp += (i.support == i.territory.control)
 ###Wrapper that determines what type of decisions civilians are making
@@ -86,6 +85,8 @@ class Territory(object):
     self.resources = resources
 ##Calculate expected resources you could apply in this territory
   def ExpectedStrength(self):
+    if self.exsupp == 0:
+      self.exsupp = (1 - self.control.ideo**2/2 - (1 - self.control.ideo)**2/2)*len(self.civilians)
     for i in self.country.armedactors:
       exst = 0
       for j in i.territory:

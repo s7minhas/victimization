@@ -5,9 +5,9 @@ if(Sys.info()['user'] %in% c('maxgallop')){ source('~/Documents/victimization/R/
 abmPath = paste0(pathDrop, 'abm/')
 abmPath = paste0(pathGit, "python/")
 # load in file
-abmData = read.csv(paste0(abmPath, 'terrBigRun.csv'), header=FALSE)
-add = read.csv(paste0(abmPath, 'terrBigRun2.csv'), header=FALSE)
-abmData = rbind(abmData,add)
+abmData = read.csv(paste0(abmPath, 'ActorVarRun.csv'), header=FALSE)
+#add = read.csv(paste0(abmPath, 'terrBigRun2.csv'), header=FALSE)
+#abmData = rbind(abmData,add)
 # V12: actors that have victimized
 # V13: which actor is fighting whom, directed
 # V14: actual actors in the game
@@ -185,6 +185,9 @@ ggcorrplot(corr, colors=c('red','white','blue'))
 mod = glm(vic ~ numConf + graph_dens + n_actors, family='poisson', data=netStats)
 summary(mod)
 
+netStats$vicBin = netStats$vic > 0
+mod = glm(vicBin ~ numConf + graph_dens + n_actors, family='binomial', data=netStats)
+summary(mod)
 
 # run neg binom
 loadPkg('MASS')
