@@ -76,21 +76,3 @@ mod = glm.nb(
 	)
 summary(mod)
 ####
-
-library(brms)
-modData$cname = factor(modData$cname)
-modData$civVicCount = as.integer(modData$civVicCount)
-fit3 <- brm(
-	formula = 
-		civVicCount ~  # dv
-			graph_dens + nConf
-			+ polity2   # structural controls
-			+ rebsStronger # capabilities gov/rebels
-			+ ethTens
-			+ anyPeaceKeeper 
-			+ rebSupportGov + govSupportGov # external shit
-			+ (1|cname),
-	data = modData,
-	family = negbinomial
-	)
-summary(fit3)
