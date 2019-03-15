@@ -45,17 +45,8 @@ taxonomy = lapply(taxonomy, function(x){
 # actor taxonomy
 aAvT = taxonomy$actor_tax[
 	taxonomy$actor_tax$data.source=='acled',]
-# > unique(aAvT$actor_level_1_txt)
-# [1] "violent groups"  "government"      "movement groups" "civilian groups"
-# [5] "civilians"      
-# > unique(aAvT$actor_level_2_txt)
-# [1] "violent groups"    "nonviolent groups"		
 gAvT = taxonomy$actor_tax[
 	taxonomy$actor_tax$data.source=='ged',]	
-# > unique(gAvT$actor_level_1_txt)
-# [1] "violent groups" "government"    
-# > unique(gAvT$actor_level_2_txt)
-# [1] "violent groups"	
 
 # construct acled actor taxonomy
 acledActors = data.frame(

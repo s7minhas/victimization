@@ -1,16 +1,15 @@
-####
+############################
 if(Sys.info()['user'] %in% c('s7m', 'janus829')){ 
 	source('~/Research/victimization/R/setup.R') }
 if(Sys.info()['user'] %in% c('cassydorff')){ 
 	source('~/ProjectsGit/victimization/R/setup.R') }
 if(Sys.info()['user'] %in% c('maxgallop')){ 
   source('~/documents/victimization/R/setup.R') }
-
-####
+############################
 
 ############################
 # reorg to df
-load(paste0(pathData, 'netStats.rda'))
+load(paste0(pathData, 'netStats_acled.rda'))
 netDF = do.call('rbind', netStats)
 rownames(netDF) = NULL
 
@@ -30,12 +29,8 @@ data$year = num(unlist(lapply(strsplit(data$id,'_'), function(x){x[2]})))
 
 ############################
 # merge graph level measures
-graphVars = c('graph_recip','graph_trans','graph_dens')
+graphVars = c('graph_trans','graph_dens')
 data = simpleMerge(data, netDF, graphVars, 'id', 'id', lagVars=FALSE)
-
-# think about which net actor level measures to add in...
-#.....
-rm(netDF)
 ############################
 
 ############################
@@ -128,19 +123,9 @@ load(paste0(pathData, 'nsa/nsa.rda'))
 nsaVars = names(nsa)[3:ncol(nsa)]
 data = simpleMerge(data, nsa, nsaVars, 'id', 'cnameYear')
 rm(nsa)
-####
 ############################
-###Add conflict length to data
-data$confDur = 0
-for(i in 1:dim(data)[1]){
-c = data$country[i]
-ys = min(data$year[data$country == c])
-if(data$year[i] == ys){data$confDur[i] = 0}
-if(data$year[i] != ys){if(data$year[i] != (1 + data$year[i - 1])){data$confDur[i] = 0}
-if(data$year[i] == (1 + data$year[i - 1])){data$confDur[i] = (data$confDur[i-1] + 1) }}
-}
 
 ############################
 # save
-save(data, file=paste0(pathData, 'data.rda'))
+save(data, file=paste0(pathData, 'data_acled.rda'))
 ############################

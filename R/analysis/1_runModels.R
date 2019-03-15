@@ -10,7 +10,7 @@ loadPkg('MASS')
 
 ########################################################
 # load data
-load(paste0(pathData, 'data.rda'))
+load(paste0(pathData, 'data_acled.rda'))
 load(paste0(pathData, 'cntriesGED_byAll.rda'))
 cData = cData[,c('country','year')]
 cData$cnt = 1
@@ -41,7 +41,7 @@ modData=data
 # naive just impute everything
 loadPkg('sbgcop')
 if(!file.exists(paste0(pathData, 'imputedData.rda'))){
-	impData = data.matrix(modData[,c(5:7,11,19,20,23,24:36,44,48,49,52,54)])
+	impData = data.matrix(modData[,c(5:6,10,18:19,22:38,42:43,47:48,51,53)])
 	sbgData = sbgcop.mcmc(Y=impData, seed=6886, nsamp=1000, verb=FALSE)
 	dimnames(sbgData$Y.impute)[[2]] = colnames(sbgData$Y.pmean)
 	save(sbgData, file=paste0(pathData, 'imputedData.rda'))

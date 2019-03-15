@@ -31,10 +31,13 @@ pasteMult = function(x,y,sepZ){
 cname = function(x) {countrycode(x,'country.name','country.name')}
 simpleMerge = function(toData, fromData, vars, toID, fromID, lagVars=TRUE){
 	if(lagVars){
-		fromData$yrForMerge = unlist(lapply(strsplit(fromData[,fromID],'_'),function(x){x[2]}))
-		fromData$unitForMerge = unlist(lapply(strsplit(fromData[,fromID],'_'),function(x){x[1]}))
+		fromData$yrForMerge = unlist(
+			lapply(strsplit(fromData[,fromID],'_'),function(x){x[2]}))
+		fromData$unitForMerge = unlist(
+			lapply(strsplit(fromData[,fromID],'_'),function(x){x[1]}))
 		fromData$yrForMerge = num(fromData$yrForMerge) + 1
-		fromData[,fromID] = with(fromData, paste0(unitForMerge, '_', yrForMerge))
+		fromData[,fromID] = with(fromData, 
+			paste0(unitForMerge, '_', yrForMerge))
 	}
 	for(v in vars){
 		toData$tmp = fromData[match(toData[,toID], fromData[,fromID]), v]
