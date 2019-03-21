@@ -27,7 +27,7 @@ data$nConf[is.na(data$nConf)] = 0
 # naive just impute everything
 loadPkg('sbgcop')
 if(!file.exists(paste0(pathData, 'imputedData_acledUndirected.rda'))){
-	impData = data.matrix(modData[,c(5:6,10,18:19,22:38,42:43,47:48,51,53)])
+	impData = data.matrix(data[,c(5:6,10,18:19,22:38,42:43,47:48,51,53)])
 	sbgData = sbgcop.mcmc(Y=impData, seed=6886, nsamp=1000, verb=FALSE)
 	dimnames(sbgData$Y.impute)[[2]] = colnames(sbgData$Y.pmean)
 	save(sbgData, file=paste0(pathData, 'imputedData_acledUndirected.rda'))
@@ -38,11 +38,11 @@ set.seed(6886)
 # sbgToUse = sample(500:1000, 150, replace=FALSE)
 iData = lapply(500:1000, function(i){
 	sbgFrom = sbgData$Y.impute[,,i]
-	modData = cbind(
-		modData[,c('cname','year','cnameYear','nActors','nConf')], 
+	data = cbind(
+		data[,c('cname','year','cnameYear','nActors','nConf')], 
 		sbgFrom
 		)
-	return(modData)	})
+	return(data)	})
 ########################################################
 
 ########################################################
@@ -54,6 +54,19 @@ modBase_noImp = glm.nb(
 	)
 summBase_noImp = summary(modBase_noImp)$'coefficients'
 round(summBase_noImp[!grepl('factor',rownames(summBase_noImp)),], 3)
+
+
+# check against random effect
+# loadPkg('lme4')
+# toKeep = names(table(data$cname)[table(data$cname)>5])
+# slice = data[data$cname %in% toKeep,]
+# slice$ccode = factor(slice$ccode)
+# modBase_noImp_RE = glmer.nb(
+# 	civVicCount ~  # dv
+# 		graph_dens + nConf + nActors + (1|ccode)
+# 	, data=slice
+# 	)
+# summary(modBase_noImp_RE)$'coefficients'
 
 
 # out of sample cross-val
@@ -105,6 +118,7 @@ for(f in 1:nFolds){
 	# generate predictions
 	yhat1 = exp(beta1 %*% t(testData1))
 	rmseVec1 = c(rmseVec1, (yhat1 - yObs)^2)
+
 	yhat2 = exp(beta2 %*% t(testData2))
 	rmseVec2 = c(rmseVec2, (yhat2 - yObs)^2)
 }
@@ -112,17 +126,17 @@ for(f in 1:nFolds){
 sqrt(mean(rmseVec1, na.rm=TRUE))
 sqrt(mean(rmseVec2, na.rm=TRUE))
 
-modsBase = lapply(iData, function(modData){
+modsBase = lapply(iData, function(data){
 	mod = glm.nb(
 		civVicCount ~  # dv
 			graph_dens + nConf + nActors + factor(cname) -1 
-		, data=modData
+		, data=data
 		)
 	summary(mod)
 	return(mod) })
 
 # run mod with controls
-modsCntrls = lapply(iData, function(modData){
+modsCntrls = lapply(iData, function(data){
 	mod = glm.nb(
 		civVicCount ~  # dv
 			graph_dens + nConf + nActors
@@ -132,7 +146,7 @@ modsCntrls = lapply(iData, function(modData){
 			+ ethTens
 			+ anyPeaceKeeper 
 			+ rebSupportGov + govSupportGov # external shit
-		, data=modData
+		, data=data
 		)
 	summary(mod)
 	return(mod) })
