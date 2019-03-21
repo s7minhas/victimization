@@ -64,7 +64,8 @@ iData = lapply(500:1000, function(i){
 mods = lapply(iData, function(modData){
 	mod = glm.nb(
 		civVicCount ~  # dv
-			graph_dens + nConf + nActors + 
+			graph_dens + nConf + nActors
+			+ factor(cname) -1 
 			+ polity2   # structural controls
 			+ rebsStronger # capabilities gov/rebels
 			+ ethTens
@@ -75,7 +76,6 @@ mods = lapply(iData, function(modData){
 	summary(mod)
 	return(mod) })
 
-library(Amelia)
 rubinCoef = function(mod, matrixFormat=FALSE){
   modCoef = lapply(mod, function(x){
     beta = coef(x)
@@ -83,7 +83,7 @@ rubinCoef = function(mod, matrixFormat=FALSE){
     return( cbind(beta, se) )
     }) %>% do.call('rbind',.) 
 
-  modSumm = mi.meld(
+  modSumm = Amelia::mi.meld(
     q=matrix(modCoef[,1],ncol=length(unique(rownames(modCoef))), byrow=TRUE), 
     se=matrix(modCoef[,2],ncol=length(unique(rownames(modCoef))), byrow=TRUE), 
     byrow=TRUE) %>% lapply(., t) %>% do.call('cbind',.) %>% data.frame(.)
@@ -100,5 +100,5 @@ rubinCoef = function(mod, matrixFormat=FALSE){
   return(modSumm)
 }
 
-rubinCoef(mods)
+rubinCoef(mods, TRUE)
 ########################################################
