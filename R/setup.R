@@ -75,13 +75,27 @@ theme_set(theme_bw())
 ########
 # combine model results from imputed data using 
 # rubin's rules
-rubinCoef = function (coefMatrix, seMatrix){
-    numMods = nrow(coefMatrix)
-    ones = matrix(1, nrow = 1, ncol = numMods)
-    coefMelt = (ones %*% coefMatrix)/numMods
-    se2 = (ones %*% (seMatrix^2))/numMods
-    diff = coefMatrix - matrix(1, nrow = numMods, ncol = 1) %*% coefMelt
-    sq2 = (ones %*% (diff^2))/(numMods - 1)
-    seMelt = sqrt(se2 + sq2 * (1 + 1/numMods))
-    return(list(beta = coefMelt, se = seMelt)) }
+rubinCoef = function(mod, matrixFormat=FALSE){
+  modCoef = lapply(mod, function(x){
+    beta = coef(x)
+    se = sqrt(diag(vcov(x)))
+    return( cbind(beta, se) )
+    }) %>% do.call('rbind',.) 
+
+  modSumm = Amelia::mi.meld(
+    q=matrix(modCoef[,1],ncol=length(unique(rownames(modCoef))), byrow=TRUE), 
+    se=matrix(modCoef[,2],ncol=length(unique(rownames(modCoef))), byrow=TRUE), 
+    byrow=TRUE) %>% lapply(., t) %>% do.call('cbind',.) %>% data.frame(.)
+
+  names(modSumm) = c('beta', 'se')
+  modSumm$t = modSumm$beta/modSumm$se
+  modSumm$var = unique(rownames(modCoef))
+
+  if(matrixFormat){
+    names(modSumm) = c('Estimate', 'Std. Error', 't value', 'var')
+    rownames(modSumm) = modSumm$var
+    modSumm = data.matrix(modSumm[,-ncol(modSumm)]) }
+
+  return(modSumm)
+}
 ########
