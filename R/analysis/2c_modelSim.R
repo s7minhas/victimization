@@ -40,7 +40,7 @@ modsCntrls_noImp_RE = glmer.nb(
 		+ anyPeaceKeeper 
 	, data=slice
 	)
-modsCntrls = list(modsCntrls_noImp_RE)
+modsCntrls = list(modBase_noImp_RE)
 ########################################################
 
 ########################################################
@@ -78,10 +78,10 @@ meaNA = function(x){mean(x,na.rm=TRUE)}
 scen = cbind(
 	1, 
 	densRange,
-	medNA(data$nConf), medNA(data$nActors),
-	meaNA(data$polity2), meaNA(data$popLog),
-	meaNA(data$gdpCapLog), meaNA(data$ethfrac),
-	medNA(data$anyPeaceKeeper)
+	medNA(data$nConf), medNA(data$nActors)
+	# ,meaNA(data$polity2), meaNA(data$popLog),
+	# meaNA(data$gdpCapLog), meaNA(data$ethfrac),
+	# medNA(data$anyPeaceKeeper)
 	)
 
 # generate predicted values
@@ -89,18 +89,24 @@ preds = scen %*% t(draws)
 yHat = apply(preds, 2, exp)
 colnames(yHat) = paste0('scen',1:ncol(yHat))
 yHat = data.frame(cbind(densRange, yHat))
-
-# org data for plotting
-ggData = melt(yHat, id='densRange')
-
-agg = ggData %>% group_by(densRange) %>% summarize(mu=mean(value))
-ggplot(agg, aes(x=densRange,y=mu)) + geom_line()
 ########################################################
 
 ########################################################
 # viz
-ggplot(ggData, 
-	aes(x=densRange, y=value, group=variable)
-	) +
-	geom_line()
+# ggData = melt(yHat, id='densRange')
+# ggplot(ggData, 
+# 	aes(x=densRange, y=value, group=variable)
+# 	) +
+# 	geom_line()
+
+agg = ggData %>% 
+	group_by(densRange) %>%
+	summarize(
+		med=median(value),
+		hi95=quantile(value,.975),
+		hi90=quantile(value,.95),
+		lo95=quantile(value,.025),
+		lo90=quantile(value,.05)		
+		)
+ggplot(agg, aes(x=densRange,y=mu)) + geom_line()
 ########################################################
