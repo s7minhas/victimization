@@ -8,9 +8,6 @@ abmPath = paste0(pathGit, "python/")
 abmData = read.csv(paste0(abmPath, 'terrBigRun.csv'), header=FALSE)
 add = read.csv(paste0(abmPath, 'terrBigRun2.csv'), header=FALSE)
 abmData = rbind(abmData,add)
-# V12: actors that have victimized
-# V13: which actor is fighting whom, directed
-# V14: actual actors in the game
 
 # clean stuff up
 abmData$V12 = char(abmData$V12)
@@ -36,19 +33,8 @@ df = lapply(1:numGames, function(i){
 df = data.frame(df, stringsAsFactors = FALSE)
 names(df) = c('gameID', 'turnID')
 
-# if you want counts of vic by actor
-# then finish organizing this code
-# getCount = function(x){
-# 	res = table(trim(unlist(strsplit(x,','))))
-# 	if(length(res)==0){return(0)}
-# 	actors = names(res)
-
-# }
-
-# sapply(x, getCount)
-
 # overall count of vic per turn
-#if(!file.exists(paste0(abmPath, 'df_withVicCount.rda'))){
+if(!file.exists(paste0(abmPath, 'df_withVicCount.rda'))){
 	df$vicCount = 0
 	for(i in 1:nrow(df)){
 		turnResults = out[[ df$gameID[i] ]][ df$turnID[i] ]
@@ -57,7 +43,7 @@ names(df) = c('gameID', 'turnID')
 			vicCount = nchar(concatResult) } else { vicCount=0 }
 		df$vicCount[i] = vicCount }
 	save(df, file=paste0(abmPath, 'df_withVicCount.rda'))
-} #else { load(paste0(abmPath, 'df_withVicCount.rda')) }
+} else { load(paste0(abmPath, 'df_withVicCount.rda')) }
 
 # net stats
 abmData$V13 = char(abmData$V13)
@@ -125,7 +111,7 @@ stat = function(expr, object){
 	if(class(x)=='try-error'){x=NA}
 	return(x) }
 
-# if(!file.exists(paste0(abmPath, 'abmNetStats.rda'))){
+if(!file.exists(paste0(abmPath, 'abmNetStats.rda'))){
 	netStats = lapply(1:length(actorSet), function(game){
 		gameList = actorSet[[game]]
 		out = lapply(1:length(gameList), function(turn){
@@ -151,7 +137,7 @@ stat = function(expr, object){
 	netStats[,"turn"] = netStats[,"turn"] + 1
 	netStats = netStats[!is.nan(netStats[,"graph_dens"]),]
 	save(netStats, file=paste0(abmPath, 'abmNetStats.rda'))
-# } else { load(paste0(abmPath, 'abmNetStats.rda')) }
+} else { load(paste0(abmPath, 'abmNetStats.rda')) }
 
 # merge in hyperparams
 netStats = data.frame(netStats)
@@ -175,18 +161,69 @@ netStats$numConf[is.na(netStats$numConf)] = 0
 # 
 abmPath = paste0(pathDrop, 'abm/')
 save(netStats, file=paste0(abmPath, 'abmResults.rda'))
+########################################################
 
+########################################################
 # basic look at results
 library(ggcorrplot)
 corr = round(cor(netStats[,-c(5:6,ncol(netStats)-1)], use='pairwise.complete.obs'),3)
 ggcorrplot(corr, colors=c('red','white','blue'))
+########################################################
 
-# run quick pois
-mod = glm(vic ~ numConf + graph_dens + n_actors, family='poisson', data=netStats)
-summary(mod)
-
-
+########################################################
 # run neg binom
 loadPkg('MASS')
-mod = glm.nb(vic ~ numConf + graph_dens + n_actors, data=netStats)
-summary(mod)
+mod = glm.nb(
+	vic ~ graph_dens + numConf + n_actors, 
+	data=netStats)
+
+# viz of results
+raw = summary(mod)$'coefficients'[-1,]
+coefData = raw %>%
+		data.frame(.,stringsAsFactors=FALSE) %>%
+		setNames(c('mean','sd','zstat','pval')) %>%
+		mutate(
+			var=rownames(.),
+			varName=c(
+				'Graph Density',
+				'Number of\nConflicts',
+				'Number of\nActors'				
+				),
+			model='ABM Simulation Model'
+			) %>%
+		getCIVecs(.) %>%
+		getSigVec(.)
+
+# org for plotting
+coefData$varName = factor(
+	coefData$varName,
+	levels=varKey$clean
+	)
+########################################################
+
+########################################################
+# viz
+ggCoef = ggplot(coefData, aes(x=varName, y=mean, color=sig)) +
+	geom_hline(aes(yintercept=0), linetype=2, color = "black") + 
+	geom_point(size=4) + 
+	geom_linerange(aes(ymin=lo90, ymax=hi90),alpha = 1, size = 1) + 
+	geom_linerange(aes(ymin=lo95,ymax=hi95),alpha = 1, size = .5) +		
+	scale_colour_manual(values = coefp_colors, guide=FALSE) +
+	ylab('') + xlab('') +
+	facet_wrap(~model) +
+	coord_flip() +	
+	theme_light(base_family="Source Sans Pro") +
+	theme(
+		legend.position='top', legend.title=element_blank(),
+		panel.border=element_blank(),
+		axis.ticks=element_blank(),
+		axis.text.y=element_text(hjust=0),
+		strip.text.x = element_text(size = 9, color='white'),
+		strip.background = element_rect(fill = "#525252", color='#525252')		
+	)
+ggsave(ggCoef, 
+	width=7, height=4,
+	file=paste0(pathGraphics, 'abm_coefPlot.pdf'),
+	device=cairo_pdf
+	)
+########################################################

@@ -29,30 +29,36 @@ modsBase = lapply(iData, function(data){
 			graph_dens + nConf + nActors + factor(cname) -1 
 		, data=data
 		)
-	summary(mod)
 	return(mod) })
 
 # run mod with controls
+# toKeep = names(
+# 	table(iData[[1]]$cname)[
+# 	table(iData[[1]]$cname)>10] ) # check to make sure results consistent
 modsCntrls = lapply(iData, function(data){
 	mod = glm.nb(
 		civVicCount ~  # dv
 			graph_dens + nConf + nActors
 			+ factor(cname) -1 
-			+ polity2   # structural controls
-			+ rebsStronger # capabilities gov/rebels
-			+ ethTens
+			+ polity2 + popLog + gdpCapLog   # structural controls
+			+ ethfrac
 			+ anyPeaceKeeper 
-			+ rebSupportGov + govSupportGov # external shit
 		, data=data
 		)
-	summary(mod)
 	return(mod) })
 
 # summarize
 summBase = rubinCoef(modsBase, TRUE)
 summCntrls = rubinCoef(modsCntrls, TRUE)
 
-#
-round(summBase[!grepl('factor',rownames(summBase)),], 3)
-round(summCntrls[!grepl('factor',rownames(summCntrls)),], 3)
+# quick glimpse
+# round(summCntrls[!grepl('factor',rownames(summCntrls)),],3)
+
+# save
+save(
+	modBase_noImp,
+	modsBase, summBase,
+	modsCntrls, summCntrls,
+	file=paste0(pathResults, 'nbMods_acled.rda')
+	)
 ########################################################

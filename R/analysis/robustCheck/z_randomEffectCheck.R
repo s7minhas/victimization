@@ -28,4 +28,15 @@ modBase_noImp_RE = glmer.nb(
 	, data=slice
 	)
 summary(modBase_noImp_RE)$'coefficients'
+
+modsCntrls_noImp_RE = glmer.nb(
+	civVicCount ~  # dv
+		graph_dens + nConf + nActors
+		+ (1|ccode)
+		+ polity2 + popLog + gdpCapLog   # structural controls
+		+ ethfrac
+		+ anyPeaceKeeper 
+	, data=slice
+	)
+summary(modsCntrls_noImp_RE)$'coefficients'
 ########################################################
