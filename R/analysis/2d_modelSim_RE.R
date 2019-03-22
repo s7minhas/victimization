@@ -55,14 +55,14 @@ set.seed(6886)
 draws = mvrnorm(1000, beta, varCov)
 
 # set up scenario matrix
-densRange = sort(unique(data$graph_dens))
-densRange = quantile(data$graph_dens, probs=c(0.25,0.75))
+densRange = sort(unique(slice$graph_dens))
+densRange = quantile(slice$graph_dens, probs=c(0.25,0.75))
 medNA = function(x){median(x,na.rm=TRUE)}
 meaNA = function(x){mean(x,na.rm=TRUE)}
 scen = cbind(
 	1, 
 	densRange,
-	medNA(data$nConf), medNA(data$nActors)
+	medNA(slice$nConf), medNA(slice$nActors)
 	# ,meaNA(data$polity2), meaNA(data$popLog),
 	# meaNA(data$gdpCapLog), meaNA(data$ethfrac),
 	# medNA(data$anyPeaceKeeper)
