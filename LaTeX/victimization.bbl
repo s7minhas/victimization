@@ -33,6 +33,12 @@ Bellows, John \harvardand\ Edward Miguel. 2009.
 \newblock ``War and local collective action in Sierra Leone.'' {\em Journal of
   Public Economics} 93(11):1144--1157.
 
+\harvarditem[Cunningham, Gleditsch \harvardand\ Salehyan]{Cunningham, Gleditsch
+  \harvardand\ Salehyan}{2013}{cunningham:etal:2013}
+Cunningham, David, Kristian~Skrede Gleditsch \harvardand\ Idean Salehyan. 2013.
+\newblock ``Non-State Actors in Civil Wars: {A} New Dataset.'' {\em Conflict
+  Management and Peace Science} 30(5):516--531.
+
 \harvarditem{Dorff}{2017}{dorff:2017}
 Dorff, Cassy. 2017.
 \newblock ``Violence, Kinship Networks, and Political Resilience: {E}vidence
@@ -65,6 +71,17 @@ Gallop, Max, Shahryar Minhas \harvardand\ Cassy Dorff. Forthcoming.
 \newblock ``Networks of violence: Predicting Conflict in Nigeria.'' {\em
   Journal of Politics} .
 
+\harvarditem{Hoff}{2007}{hoff:2007}
+Hoff, Peter~D. 2007.
+\newblock ``{Extending the Rank Likelihood for Semiparametric {Copula}
+  Estimation}.'' {\em Annals of Applied Statistics} 1(1):265--283.
+
+\harvarditem{Hollenbach}{2014}{hollenbach:2014}
+Hollenbach, Florian~M. 2014.
+\newblock ``Raising Robinhood: {T}he Political Economy of Tax Capacity
+  Investments in Authoritarian Regimes.'' Dissertation Chapter.
+  \url{http://sites.duke.edu/fmh3/research/}.
+
 \harvarditem{Idean~Salehyan \harvardand\ Wood}{2015}{salehyan:etal:2014}
 Idean~Salehyan, David~Siroky \harvardand\ Reed~M. Wood. 2015.
 \newblock ``External rebel sponsorship and civilian abuse: {A} principal-agent
@@ -87,6 +104,11 @@ Kasfir, Nelson. 2015.
   scope, patterns, order, causes.'' {\em Rebel governance in civil war}
   pp.~21--46.
 
+\harvarditem{Kathman}{2013}{kathman:2013}
+Kathman, Jacob~D. 2013.
+\newblock ``United Nations peacekeeping personnel commitments, 1990--2011.''
+  {\em Conflict Management and Peace Science} 30(5):532--549.
+
 \harvarditem{Kathman \harvardand\ Wood}{2015}{kathman:wood:2015}
 Kathman, Jacob~D. \harvardand\ Reed~M. Wood. 2015.
 \newblock ``Competing for the crown: {I}nter-rebel competition and civilian
@@ -104,6 +126,12 @@ Mampilly, Zachariah~Cherian. 2011.
   war}.
 \newblock Cornell University Press.
 
+\harvarditem[Marshall, Jaggers \harvardand\ Gurr]{Marshall, Jaggers
+  \harvardand\ Gurr}{2009}{marshall:etal:2009}
+Marshall, Monty~G., Keith Jaggers \harvardand\ Ted~Robert Gurr. 2009.
+\newblock ``Polity {IV} Project: {P}olitical Regime Characteristics and
+  Transition 1800-2007.'' CIDCM: {U}niversity of Maryland, MD.
+
 \harvarditem{Nyg{\aa}rd \harvardand\ Weintraub}{2015}{nygaard:weintraub:2015}
 Nyg{\aa}rd, H{\aa}vard~Mokleiv \harvardand\ Michael Weintraub. 2015.
 \newblock ``Bargaining between rebel groups and the outside option of
@@ -113,6 +141,13 @@ Nyg{\aa}rd, H{\aa}vard~Mokleiv \harvardand\ Michael Weintraub. 2015.
 Oppenheim, Ben \harvardand\ Michael Weintraub. 2017.
 \newblock ``Doctrine and violence: The impact of combatant training on civilian
   killings.'' {\em Terrorism and Political Violence} 29(6):1126--1148.
+
+\harvarditem[Raleigh et~al.]{Raleigh, Linke, Hegre \harvardand\
+  Karlsen}{2010}{raleigh:etal:2010}
+Raleigh, Clionadh, Andrew Linke, H{\aa}vard Hegre \harvardand\ Joakim Karlsen.
+  2010.
+\newblock ``Introducing {ACLED}: {A}n Armed Conflict Location and Event Dataset
+  Special Data Feature.'' {\em Journal of Peace Research} 47(5):651--660.
 
 \harvarditem{Steele}{2011}{steele:2011}
 Steele, Abbey. 2011.
@@ -124,6 +159,14 @@ Valentino, Benjamin~A. 2014.
 \newblock ``Why we kill: {T}he political science of political violence against
   civilians.'' {\em Annual Review of Political Science} 17:89--103.
 
+\harvarditem[Vogt et~al.]{Vogt, Bormann, R{\"u}egger, Cederman, Hunziker
+  \harvardand\ Girardin}{2015}{vogt:etal:2015}
+Vogt, Manuel, Nils-Christian Bormann, Seraina R{\"u}egger, Lars-Erik Cederman,
+  Philipp Hunziker \harvardand\ Luc Girardin. 2015.
+\newblock ``Integrating Data on Ethnicity, Geography, and Conflict: The Ethnic
+  Power Relations Data Set Family.'' {\em Journal of Conflict Resolution}
+  59(7):1327--1342.
+
 \harvarditem{Wood}{2010}{wood:2010}
 Wood, Reed~M. 2010.
 \newblock ``Rebel capability and strategic violence against civilians.'' {\em
@@ -133,5 +176,10 @@ Wood, Reed~M. 2010.
 Wood, Reed~M. 2014.
 \newblock ``From loss to looting? {B}attlefield costs and rebel incentives for
   violence.'' {\em International Organization} 68(4):979--999.
+
+\harvarditem{{World Bank Group}}{2016}{wbg:2016}
+{World Bank Group}. 2016.
+\newblock {\em World Development Indicators 2016}.
+\newblock World Bank Publications.
 
 \end{thebibliography}

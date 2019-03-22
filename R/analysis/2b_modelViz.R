@@ -46,7 +46,10 @@ varKey$clean = c(
 	'Polity', 'Log(Population)',
 	'Log(GDP per Capita)',
 	'Ethnic\nFractionalization',
-	'Peacekeepers'
+	'Presence of\nPeacekeepers',
+	'Rebel(s) Stronger\nthan Govt.',
+	'Rebel(s) Supported\nby Foreign Govt.',
+	'Govt. Supported\nby Foreign Govt.'
 	)
 coefData$varName = varKey$clean[
 	match(coefData$var,varKey$dirty) ]

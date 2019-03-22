@@ -11,6 +11,12 @@ loadPkg('MASS')
 ########################################################
 # load data
 load(paste0(pathData, 'iData_acled.rda'))
+
+# # check for kathman peace keeper
+# data = data[data$year<=2013,]
+# iData = lapply(iData, function(data){
+# 	data[data$year<=2013,]
+# })
 ########################################################
 
 ########################################################
@@ -21,7 +27,6 @@ modBase_noImp = glm.nb(
 	, data=data
 	)
 summBase_noImp = summary(modBase_noImp)$'coefficients'
-round(summBase_noImp[!grepl('factor',rownames(summBase_noImp)),], 3)
 
 modsBase = lapply(iData, function(data){
 	mod = glm.nb(
@@ -40,6 +45,8 @@ modsCntrls = lapply(iData, function(data){
 			+ polity2 + popLog + gdpCapLog   # structural controls
 			+ ethfrac
 			+ anyPeaceKeeper 
+			+ rebsStronger # capabilities gov/rebels			
+			+ rebSupportGov + govSupportGov # external shit			
 			+ factor(cname) -1 			
 		, data=data
 		)
