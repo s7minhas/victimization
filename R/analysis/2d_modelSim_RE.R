@@ -16,17 +16,18 @@ load(paste0(pathData, 'iData_acled.rda'))
 ########################################################
 # check against random effect
 loadPkg('lme4')
-toKeep = names(table(data$cname)[table(data$cname)>5])
+toKeep = names(table(data$cname)[table(data$cname)>1])
 slice = data[data$cname %in% toKeep,]
 slice$ccode = factor(slice$ccode)
 for(v in c('nConf','nActors','graph_dens')){
 	slice[,v] = (slice[,v] - mean(slice[,v]))/sd(slice[,v])
 }
-modBase_noImp_RE = glmer.nb(
-	civVicCount ~  # dv
-		graph_dens + nConf + nActors + (1|ccode)
-	, data=slice
-	)
+
+# modBase_noImp_RE = glmer.nb(
+# 	civVicCount ~  # dv
+# 		graph_dens + nConf + nActors + (1|ccode)
+# 	, data=slice
+# 	)
 
 modsCntrls_noImp_RE = glmer.nb(
 	civVicCount ~  # dv
@@ -38,6 +39,7 @@ modsCntrls_noImp_RE = glmer.nb(
 	, data=slice
 	)
 modsCntrls = list(modBase_noImp_RE)
+modsCntrls = list(modsCntrls_noImp_RE)
 ########################################################
 
 ########################################################
@@ -52,20 +54,20 @@ varCov = vcov(mod)
 
 # extract draws from model
 set.seed(6886)
-draws = mvrnorm(1000, beta, varCov)
+draws = mvrnorm(10000, beta, varCov)
 
 # set up scenario matrix
 densRange = sort(unique(slice$graph_dens))
-densRange = quantile(slice$graph_dens, probs=c(0.25,0.75))
+densRange = quantile(slice$graph_dens, probs=seq(0,1,.25))
 medNA = function(x){median(x,na.rm=TRUE)}
 meaNA = function(x){mean(x,na.rm=TRUE)}
 scen = cbind(
 	1, 
 	densRange,
 	medNA(slice$nConf), medNA(slice$nActors)
-	# ,meaNA(data$polity2), meaNA(data$popLog),
-	# meaNA(data$gdpCapLog), meaNA(data$ethfrac),
-	# medNA(data$anyPeaceKeeper)
+	,meaNA(data$polity2), meaNA(data$popLog),
+	meaNA(data$gdpCapLog), meaNA(data$ethfrac),
+	medNA(data$anyPeaceKeeper)
 	)
 
 # generate predicted values
@@ -82,5 +84,11 @@ ggplot(ggData,
 	aes(x=value, fill=factor(densRange),color=factor(densRange))
 	) +
 	geom_density(alpha=.1) +
-	facet_wrap(~factor(densRange),nrow=2)
+	facet_wrap(~factor(densRange),ncol=1,scales='free_y')
+
+# ggData = melt(yHat, id='densRange')
+# ggplot(ggData, 
+# 	aes(x=densRange, y=value, group=variable)
+# 	) +
+# 	geom_line(alpha=.1)
 ########################################################
