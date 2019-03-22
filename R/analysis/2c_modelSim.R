@@ -50,33 +50,33 @@ set.seed(6886) ; randMod = sample(1:length(modsCntrls),1)
 mod = modsCntrls[[randMod]]
 
 # extract params from model
-beta = coef(mod)
+beta = fixef(mod)
 varCov = vcov(mod)
 
 # extract draws from model
 set.seed(6886)
 draws = mvrnorm(1000, beta, varCov)
 
-# pick random country
-set.seed(6886)
-randCntry = sample(
-	names(beta)[grepl('factor',names(beta))],
-	1 )
+# # pick random country
+# set.seed(6886)
+# randCntry = sample(
+# 	names(beta)[grepl('factor',names(beta))],
+# 	1 )
 
-# subset draws
-draws = draws[,
-	c(
-		# randCntry,
-		names(beta)[!grepl('factor',names(beta))]
-		)
-	]
+# # subset draws
+# draws = draws[,
+# 	c(
+# 		randCntry,
+# 		names(beta)[!grepl('factor',names(beta))]
+# 		)
+# 	]
 
 # set up scenario matrix
 densRange = sort(unique(data$graph_dens))
 medNA = function(x){median(x,na.rm=TRUE)}
 meaNA = function(x){mean(x,na.rm=TRUE)}
 scen = cbind(
-	# 1, 
+	1, 
 	densRange,
 	medNA(data$nConf), medNA(data$nActors),
 	meaNA(data$polity2), meaNA(data$popLog),
