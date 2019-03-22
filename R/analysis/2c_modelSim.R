@@ -73,6 +73,7 @@ draws = mvrnorm(1000, beta, varCov)
 
 # set up scenario matrix
 densRange = sort(unique(data$graph_dens))
+densRange = quantile(data$graph_dens, probs=c(0.25,0.75))
 medNA = function(x){median(x,na.rm=TRUE)}
 meaNA = function(x){mean(x,na.rm=TRUE)}
 scen = cbind(
@@ -93,11 +94,12 @@ yHat = data.frame(cbind(densRange, yHat))
 
 ########################################################
 # viz
-# ggData = melt(yHat, id='densRange')
-# ggplot(ggData, 
-# 	aes(x=densRange, y=value, group=variable)
-# 	) +
-# 	geom_line()
+ggData = melt(yHat, id='densRange')
+ggplot(ggData, 
+	aes(x=value, fill=factor(densRange),color=factor(densRange))
+	) +
+	geom_density(alpha=.1) +
+	facet_wrap(~factor(densRange),nrow=2)
 
 agg = ggData %>% 
 	group_by(densRange) %>%
