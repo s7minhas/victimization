@@ -26,23 +26,21 @@ round(summBase_noImp[!grepl('factor',rownames(summBase_noImp)),], 3)
 modsBase = lapply(iData, function(data){
 	mod = glm.nb(
 		civVicCount ~  # dv
-			graph_dens + nConf + nActors + factor(cname) -1 
+			graph_dens + nConf + nActors
+			 + factor(cname) -1 
 		, data=data
 		)
 	return(mod) })
 
 # run mod with controls
-# toKeep = names(
-# 	table(iData[[1]]$cname)[
-# 	table(iData[[1]]$cname)>10] ) # check to make sure results consistent
 modsCntrls = lapply(iData, function(data){
 	mod = glm.nb(
 		civVicCount ~  # dv
 			graph_dens + nConf + nActors
-			+ factor(cname) -1 
 			+ polity2 + popLog + gdpCapLog   # structural controls
 			+ ethfrac
 			+ anyPeaceKeeper 
+			+ factor(cname) -1 			
 		, data=data
 		)
 	return(mod) })
@@ -50,9 +48,6 @@ modsCntrls = lapply(iData, function(data){
 # summarize
 summBase = rubinCoef(modsBase, TRUE)
 summCntrls = rubinCoef(modsCntrls, TRUE)
-
-# quick glimpse
-# round(summCntrls[!grepl('factor',rownames(summCntrls)),],3)
 
 # save
 save(
