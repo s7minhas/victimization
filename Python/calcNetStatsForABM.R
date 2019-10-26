@@ -160,7 +160,7 @@ netStats$numConf[is.na(netStats$numConf)] = 0
 
 # 
 abmPath = paste0(pathDrop, 'abm/')
-save(netStats, file=paste0(abmPath, 'abmResults.rda'))
+# save(netStats, file=paste0(abmPath, 'abmResults.rda'))
 ########################################################
 
 ########################################################
@@ -172,10 +172,24 @@ ggcorrplot(corr, colors=c('red','white','blue'))
 
 ########################################################
 # run neg binom
-loadPkg('MASS')
+loadPkg(c('MASS','KRLS','bigKRLS'))
 mod = glm.nb(
 	vic ~ graph_dens + numConf + n_actors, 
 	data=netStats)
+
+nonlinMod=krls(
+	X=data.matrix(
+		netStats[,c('graph_dens', 'numConf', 'n_actors')]
+		),
+	y=netStats[,'vic']
+	)
+
+nonlinMod2=bigKRLS(
+	X=data.matrix(
+		netStats[,c('graph_dens', 'numConf', 'n_actors')]
+		),
+	y=netStats[,'vic']
+	)
 
 # viz of results
 raw = summary(mod)$'coefficients'[-1,]
