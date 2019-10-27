@@ -172,7 +172,7 @@ ggcorrplot(corr, colors=c('red','white','blue'))
 
 ########################################################
 # run neg binom
-loadPkg(c('MASS','KRLS','bigKRLS'))
+loadPkg(c('MASS','KRLS','bigKRLS','randomForest'))
 mod = glm.nb(
 	vic ~ graph_dens + numConf + n_actors, 
 	data=netStats)
@@ -190,6 +190,11 @@ nonlinMod2=bigKRLS(
 		),
 	y=netStats[,'vic']
 	)
+
+rfMod = randomForest(x=data.matrix(
+	netStats[,c('graph_dens', 'numConf', 'n_actors')]
+	), y=netStats[,'vic'], type='regression')
+partialPlot(rfMod, pred.data=netStats, x.var='graph_dens')
 
 # viz of results
 raw = summary(mod)$'coefficients'[-1,]
