@@ -58,7 +58,8 @@ draws = mvrnorm(10000, beta, varCov)
 
 # set up scenario matrix
 densRange = sort(unique(slice$graph_dens))
-densRange = quantile(slice$graph_dens, probs=seq(0,1,.25))
+# densRange = quantile(slice$graph_dens, probs=seq(0,1,.25))
+densRange = quantile(slice$graph_dens, c(0.025, 0.975))
 medNA = function(x){median(x,na.rm=TRUE)}
 meaNA = function(x){mean(x,na.rm=TRUE)}
 scen = cbind(
@@ -80,6 +81,9 @@ yHat = data.frame(cbind(densRange, yHat))
 ########################################################
 # viz
 ggData = melt(yHat, id='densRange')
+
+ggData = ggData[ggData$densRange %in% c(densRange[2],densRange[4]),]
+
 ggplot(ggData, 
 	aes(x=value, fill=factor(densRange),color=factor(densRange))
 	) +

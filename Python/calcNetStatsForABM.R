@@ -172,29 +172,39 @@ ggcorrplot(corr, colors=c('red','white','blue'))
 
 ########################################################
 # run neg binom
-loadPkg(c('MASS','KRLS','bigKRLS','randomForest'))
+loadPkg(c('MASS'
+	# ,'KRLS','bigKRLS','randomForest'
+	))
+
 mod = glm.nb(
 	vic ~ graph_dens + numConf + n_actors, 
 	data=netStats)
 
-nonlinMod=krls(
-	X=data.matrix(
-		netStats[,c('graph_dens', 'numConf', 'n_actors')]
-		),
-	y=netStats[,'vic']
-	)
+mod_pois = glm(
+	vic ~ graph_dens + numConf + n_actors, 
+	data=netStats,
+	family='poisson')
 
-nonlinMod2=bigKRLS(
-	X=data.matrix(
-		netStats[,c('graph_dens', 'numConf', 'n_actors')]
-		),
-	y=netStats[,'vic']
-	)
 
-rfMod = randomForest(x=data.matrix(
-	netStats[,c('graph_dens', 'numConf', 'n_actors')]
-	), y=netStats[,'vic'], type='regression')
-partialPlot(rfMod, pred.data=netStats, x.var='graph_dens')
+
+# nonlinMod=krls(
+# 	X=data.matrix(
+# 		netStats[,c('graph_dens', 'numConf', 'n_actors')]
+# 		),
+# 	y=netStats[,'vic']
+# 	)
+
+# nonlinMod2=bigKRLS(
+# 	X=data.matrix(
+# 		netStats[,c('graph_dens', 'numConf', 'n_actors')]
+# 		),
+# 	y=netStats[,'vic']
+# 	)
+
+# rfMod = randomForest(x=data.matrix(
+# 	netStats[,c('graph_dens', 'numConf', 'n_actors')]
+# 	), y=netStats[,'vic'], type='regression')
+# partialPlot(rfMod, pred.data=netStats, x.var='graph_dens')
 
 # viz of results
 raw = summary(mod)$'coefficients'[-1,]
