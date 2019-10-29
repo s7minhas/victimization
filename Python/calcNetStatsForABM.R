@@ -185,7 +185,8 @@ mod_pois = glm(
 	data=netStats,
 	family='poisson')
 
-
+summary(mod)$'coefficients'
+summary(mod_pois)$'coefficients'
 
 # nonlinMod=krls(
 # 	X=data.matrix(
