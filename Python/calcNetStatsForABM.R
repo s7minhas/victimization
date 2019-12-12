@@ -1,3 +1,4 @@
+if(Sys.info()['user'] %in% c('Owner')){ source('C:/Users/Owner/Research/victimization/R/setup.R') }
 if(Sys.info()['user'] %in% c('s7m', 'janus829')){ source('~/Research/victimization/R/setup.R') }
 if(Sys.info()['user'] %in% c('maxgallop')){ source('~/Documents/victimization/R/setup.R') }
 
@@ -202,10 +203,31 @@ summary(mod_pois)$'coefficients'
 # 	y=netStats[,'vic']
 # 	)
 
+# library(randomForest)
 # rfMod = randomForest(x=data.matrix(
 # 	netStats[,c('graph_dens', 'numConf', 'n_actors')]
 # 	), y=netStats[,'vic'], type='regression')
 # partialPlot(rfMod, pred.data=netStats, x.var='graph_dens')
+
+# library(BART)
+# set.seed(6886)
+# nd = 200
+# burn = 50
+# x = data.matrix(
+# 	netStats[,c('graph_dens', 'numConf', 'n_actors')]
+# 	)
+# y = netStats[,'vic']
+# post = wbart(x, y, nskip=burn, ndpost=nd)
+
+# plot(post$sigma, type="l")
+# abline(v=burn, lwd=2, col="red")
+
+# library(BayesTree)
+
+# pdb1 = pdbart(x,y,xind=c(1,2),
+#               levs=list(seq(-1,1,.2),seq(-1,1,.2)),pl=FALSE,
+#               keepevery=10,ntree=100,nskip=100,ndpost=200) #should run longer!
+# plot(pdb1,ylim=c(-.6,.6))
 
 # viz of results
 raw = summary(mod)$'coefficients'[-1,]

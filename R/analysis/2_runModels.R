@@ -1,4 +1,6 @@
 ########################################################
+if(Sys.info()['user'] %in% c('Owner')){
+	source('C:/Users/Owner/Research/victimization/R/setup.R') }
 if(Sys.info()['user'] %in% c('s7m', 'janus829')){ 
 	source('~/Research/victimization/R/setup.R') }
 if(Sys.info()['user'] %in% c('cassydorff')){ 
@@ -55,6 +57,17 @@ modsCntrls = lapply(iData, function(data){
 # summarize
 summBase = rubinCoef(modsBase, TRUE)
 summCntrls = rubinCoef(modsCntrls, TRUE)
+
+# library(randomForest)
+# netStats = iData[[4]]
+# netStats$numConf = netStats$nConf
+# netStats$n_actors = netStats$nActors
+# netStats$vic = netStats$civVicCount
+
+# rfMod = randomForest(x=data.matrix(
+# 	netStats[,c('graph_dens', 'numConf', 'n_actors')]
+# 	), y=netStats[,'vic'], type='regression')
+# partialPlot(rfMod, pred.data=netStats[,c('graph_dens', 'numConf', 'n_actors')], x.var='graph_dens')
 
 # save
 save(
