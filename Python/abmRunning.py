@@ -1,11 +1,11 @@
 from VicForViz import *
 import csv
 
-with open('abmTerritoryRun.csv', 'w') as csvfile:
+with open('abmNewSelectProb.csv', 'w') as csvfile:
   abmwriter = csv.writer(csvfile, delimiter=',')
-  for i in range(3000):
+  for i in range(1000):
     actors = 10
-    territory = min(np.random.poisson(13), actors + 1)
+    territory = max(np.random.poisson(13), actors + 1)
     conn = np.random.uniform(low = .2, high = .75)
     civ = np.random.poisson(45)
     VicPenalty = np.random.uniform(low = .05, high = .3)
@@ -22,5 +22,5 @@ with open('abmTerritoryRun.csv', 'w') as csvfile:
       abmwriter.writerow([actors, territory, conn, civ, VicPenalty, CoerceMob, delta, battledeaths, growthrate, victimerror, turnlimit, abm.victimhist, abm.attackhist, abm.actorlists])
     except ZeroDivisionError:
       print("next one")
-    if i%100 == 0:
+    if i%10 == 0:
       print(i)
