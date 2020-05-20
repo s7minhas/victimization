@@ -125,6 +125,11 @@ actorCntsID$nActors = num(actorCntsID$nActors)
 
 #
 summary(actorCntsID$nActors)
+
+# qs for the future
+## are multiactor conflicts more fatal
+## are multiactor conflicts longer
+## are multiactor conflicts worse for those poor ole civies
 ###########################################################
 
 ###########################################################
