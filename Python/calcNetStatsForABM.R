@@ -1,14 +1,18 @@
-if(Sys.info()['user'] %in% c('Owner')){ source('C:/Users/Owner/Research/victimization/R/setup.R') }
-if(Sys.info()['user'] %in% c('s7m', 'janus829')){ source('~/Research/victimization/R/setup.R') }
-if(Sys.info()['user'] %in% c('maxgallop')){ source('~/Documents/victimization/R/setup.R') }
+if(Sys.info()['user'] %in% c('Owner')){
+	source('C:/Users/Owner/Research/victimization/R/setup.R') }
+if(Sys.info()['user'] %in% c('s7m', 'janus829')){
+	source('~/Research/victimization/R/setup.R') }
+if(Sys.info()['user'] %in% c('maxgallop')){
+	source('~/Documents/victimization/R/setup.R') }
 
 # abm path
 abmPath = paste0(pathDrop, 'abm/')
 abmPath = paste0(pathGit, "python/")
 # load in file
-abmData = read.csv(paste0(abmPath, 'terrBigRun.csv'), header=FALSE)
-add = read.csv(paste0(abmPath, 'terrBigRun2.csv'), header=FALSE)
-abmData = rbind(abmData,add)
+# abmData = read.csv(paste0(abmPath, 'terrBigRun.csv'), header=FALSE)
+# add = read.csv(paste0(abmPath, 'terrBigRun2.csv'), header=FALSE)
+# abmData = rbind(abmData,add)
+abmData = read.csv(paste0(abmPath, 'abmNewSelectProb.csv'))
 
 # clean stuff up
 abmData$V12 = char(abmData$V12)
@@ -60,7 +64,7 @@ dyadConf = do.call('rbind', lapply(1:length(out), function(gameIter){
 		zMat[,1] = trim(zMat[,1]) ; zMat[,2] = trim(zMat[,2])
 		numConf = length(z)
 		zMat = cbind(gameIter, turnIter, zMat, numConf)
-		if(length(z)==0){ zMat = NULL }		
+		if(length(z)==0){ zMat = NULL }
 		return(zMat) })
 	return(do.call('rbind', gameSumm)) }) )
 
@@ -112,12 +116,12 @@ stat = function(expr, object){
 	if(class(x)=='try-error'){x=NA}
 	return(x) }
 
-if(!file.exists(paste0(abmPath, 'abmNetStats.rda'))){
+# if(!file.exists(paste0(abmPath, 'abmNetStats.rda'))){
 	netStats = lapply(1:length(actorSet), function(game){
 		gameList = actorSet[[game]]
 		out = lapply(1:length(gameList), function(turn){
 			mat = gameList[[turn]]
-			grph = graph_from_adjacency_matrix(mat, 
+			grph = graph_from_adjacency_matrix(mat,
 				mode='directed', weighted=NULL )
 			sgrph = network::network(mat, matrix.type="adjacency",directed=TRUE)
 			graph_recip = stat(sna::grecip, sgrph)
@@ -125,20 +129,20 @@ if(!file.exists(paste0(abmPath, 'abmNetStats.rda'))){
 			graph_dens = stat(sna::gden, sgrph)
 			n_actors = nrow(mat)
 			out = c(
-				graph_recip=graph_recip, 
-				graph_trans=graph_trans, 
+				graph_recip=graph_recip,
+				graph_trans=graph_trans,
 				graph_dens=graph_dens,
 				n_actors=n_actors,
 				game=game, turn=turn
-				)		
-		})		
+				)
+		})
 		res = do.call('rbind', out)
 	})
 	netStats = do.call('rbind', netStats)
 	netStats[,"turn"] = netStats[,"turn"] + 1
 	netStats = netStats[!is.nan(netStats[,"graph_dens"]),]
-	save(netStats, file=paste0(abmPath, 'abmNetStats.rda'))
-} else { load(paste0(abmPath, 'abmNetStats.rda')) }
+	# save(netStats, file=paste0(abmPath, 'abmNetStats.rda'))
+# } else { load(paste0(abmPath, 'abmNetStats.rda')) }
 
 # merge in hyperparams
 netStats = data.frame(netStats)
@@ -159,7 +163,7 @@ dyadConf$id = with(dyadConf, paste(gameIter, turnIter, sep='_'))
 netStats$numConf = dyadConf$numConf[match(netStats$id, dyadConf$id)]
 netStats$numConf[is.na(netStats$numConf)] = 0
 
-# 
+#
 abmPath = paste0(pathDrop, 'abm/')
 # save(netStats, file=paste0(abmPath, 'abmResults.rda'))
 ########################################################
@@ -178,11 +182,11 @@ loadPkg(c('MASS'
 	))
 
 mod = glm.nb(
-	vic ~ graph_dens + numConf + n_actors, 
+	vic ~ graph_dens + numConf + n_actors,
 	data=netStats)
 
 mod_pois = glm(
-	vic ~ graph_dens + numConf + n_actors, 
+	vic ~ graph_dens + numConf + n_actors,
 	data=netStats,
 	family='poisson')
 
@@ -239,7 +243,7 @@ coefData = raw %>%
 			varName=c(
 				'Graph Density',
 				'Number of\nConflicts',
-				'Number of\nActors'				
+				'Number of\nActors'
 				),
 			model='ABM Simulation Model'
 			) %>%
@@ -256,14 +260,14 @@ coefData$varName = factor(
 ########################################################
 # viz
 ggCoef = ggplot(coefData, aes(x=varName, y=mean, color=sig)) +
-	geom_hline(aes(yintercept=0), linetype=2, color = "black") + 
-	geom_point(size=4) + 
-	geom_linerange(aes(ymin=lo90, ymax=hi90),alpha = 1, size = 1) + 
-	geom_linerange(aes(ymin=lo95,ymax=hi95),alpha = 1, size = .5) +		
+	geom_hline(aes(yintercept=0), linetype=2, color = "black") +
+	geom_point(size=4) +
+	geom_linerange(aes(ymin=lo90, ymax=hi90),alpha = 1, size = 1) +
+	geom_linerange(aes(ymin=lo95,ymax=hi95),alpha = 1, size = .5) +
 	scale_colour_manual(values = coefp_colors, guide=FALSE) +
 	ylab('') + xlab('') +
 	facet_wrap(~model) +
-	coord_flip() +	
+	coord_flip() +
 	theme_light(base_family="Source Sans Pro") +
 	theme(
 		legend.position='top', legend.title=element_blank(),
@@ -271,9 +275,9 @@ ggCoef = ggplot(coefData, aes(x=varName, y=mean, color=sig)) +
 		axis.ticks=element_blank(),
 		axis.text.y=element_text(hjust=0),
 		strip.text.x = element_text(size = 9, color='white'),
-		strip.background = element_rect(fill = "#525252", color='#525252')		
+		strip.background = element_rect(fill = "#525252", color='#525252')
 	)
-ggsave(ggCoef, 
+ggsave(ggCoef,
 	width=7, height=4,
 	file=paste0(pathGraphics, 'abm_coefPlot.pdf'),
 	device=cairo_pdf

@@ -77,7 +77,7 @@ actors = data.frame(actors, stringsAsFactors=FALSE) %>%
     fatalities = sum(fatalities, na.rm=TRUE)
   )
 
-actorVec = actors$actor2[actors$fatalities>=10]
+actorVec = actors$actor2[actors$fatalities>=100]
 ###########################
 
 ###########################
@@ -115,7 +115,11 @@ actorCntsID = lapply( ids, function(id){
   n = length(actors)
 
   #
-  out = c('country'=slice$country[1], 'year'=slice$year[1], 'nActors'=n)
+  out = c(
+    'country'=slice$country[1],
+    'year'=slice$year[1],
+    'nActors'=n
+  )
   return(out)
 }) %>% do.call('rbind', .) %>% data.frame(.,stringsAsFactors=FALSE)
 
@@ -125,6 +129,12 @@ actorCntsID$nActors = num(actorCntsID$nActors)
 
 #
 summary(actorCntsID$nActors)
+
+actorCntsID %>%
+  group_by(year) %>%
+  summarize(
+    mean(nActors)
+  )
 
 # qs for the future
 ## are multiactor conflicts more fatal
@@ -155,7 +165,7 @@ worldSubset <- inner_join(world, groups, by = "country")
 head(worldSubset)
 
 worldSubset %>%
-  filter(number_groups>100)
+  filter(number_groups>10)
 
 ## theme
 basic <- theme(
