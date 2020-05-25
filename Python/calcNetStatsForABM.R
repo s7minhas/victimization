@@ -15,7 +15,7 @@ abmPath = paste0(pathGit, "python/")
 abmData = read.csv(paste0(abmPath, 'abmNewSelectProb.csv'))
 
 # clean stuff up
-abmData$V12 = char(abmData$V12)
+abmData$V12 = as.character(abmData[,12])
 tmp = strsplit(abmData$V12, '],', fixed=TRUE)
 cleaner = function(x){
 	out = trim(
@@ -51,7 +51,7 @@ if(!file.exists(paste0(abmPath, 'df_withVicCount.rda'))){
 } else { load(paste0(abmPath, 'df_withVicCount.rda')) }
 
 # net stats
-abmData$V13 = char(abmData$V13)
+abmData$V13 = char(abmData[,13])
 tmp = strsplit(abmData$V13, '],', fixed=TRUE)
 out = lapply(tmp, cleaner)
 dyadConf = do.call('rbind', lapply(1:length(out), function(gameIter){
@@ -78,7 +78,7 @@ dyadConf$numConf = num(dyadConf$numConf)
 rownames(dyadConf) = NULL
 
 # get actor list for each game iter
-abmData$V14 = char(abmData$V14)
+abmData$V14 = char(abmData[,14])
 tmp = strsplit(abmData$V14, '],', fixed=TRUE)
 out = lapply(tmp, cleaner)
 actorSet = lapply(out, function(x){
@@ -154,7 +154,7 @@ for(v in hyperparams){
 
 # merge in vic
 netStats$vic = 0
-netStats$id = with(netStats, paste(game, turn, sep='_'))
+netStats$id = with(netStats, paste(game, V11, sep='_'))
 df$id = with(df, paste(gameID, turnID, sep='_'))
 netStats$vic = df$vicCount[match(netStats$id,df$id)]
 
