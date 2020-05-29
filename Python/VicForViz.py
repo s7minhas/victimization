@@ -22,6 +22,7 @@ growthrate = .1
 ###victimerror = .1
 #If no one wins, how many turns should the game last
 turnlimit = 10
+govIdeo = 0
 
 def sketchmultinom(probs):
   try:
@@ -295,7 +296,7 @@ class ArmedActor(object):
     self.gov = gov
     ##Government doesnt share (ideo = 0) and has extreme preferences. Alternatively we could have them have moderate prefs.
     if self.gov == 1:
-      self.preference = 0.0
+      self.preference = (1- govIdeo)*0.5 + govIdeo)*uniform(0,1)
       self.ideo = 0.0
     else:
       self.preference = uniform(0,1)
