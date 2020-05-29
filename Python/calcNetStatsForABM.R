@@ -16,6 +16,7 @@ abmData = read.csv(paste0(abmPath, 'abmNewSelectProb.csv'))
 
 # clean stuff up
 abmData$V12 = as.character(abmData[,12])
+# abmData$V12 = char(abmData$V12)
 tmp = strsplit(abmData$V12, '],', fixed=TRUE)
 cleaner = function(x){
 	out = trim(
@@ -39,16 +40,17 @@ df = data.frame(df, stringsAsFactors = FALSE)
 names(df) = c('gameID', 'turnID')
 
 # overall count of vic per turn
-if(!file.exists(paste0(abmPath, 'df_withVicCount.rda'))){
+# if(!file.exists(paste0(abmPath, 'df_withVicCount.rda'))){
 	df$vicCount = 0
 	for(i in 1:nrow(df)){
 		turnResults = out[[ df$gameID[i] ]][ df$turnID[i] ]
 		if(nchar(turnResults)!=0){
 			concatResult=trim(gsub(', ', '', turnResults, fixed=TRUE))
+			concatResult=gsub(')','',gsub('(','',concatResult,fixed=TRUE),fixed=TRUE)
 			vicCount = nchar(concatResult) } else { vicCount=0 }
 		df$vicCount[i] = vicCount }
-	save(df, file=paste0(abmPath, 'df_withVicCount.rda'))
-} else { load(paste0(abmPath, 'df_withVicCount.rda')) }
+	# save(df, file=paste0(abmPath, 'df_withVicCount.rda'))
+# } else { load(paste0(abmPath, 'df_withVicCount.rda')) }
 
 # net stats
 abmData$V13 = char(abmData[,13])
