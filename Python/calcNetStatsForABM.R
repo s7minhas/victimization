@@ -1,9 +1,12 @@
-if(Sys.info()['user'] %in% c('Owner')){
-	source('C:/Users/Owner/Research/victimization/R/setup.R') }
+if(Sys.info()['user'] %in% c('Owner','herme')){
+	source(paste0(
+		'C:/Users/',Sys.info()['user'],
+		'/Research/victimization/R/setup.R')) }
 if(Sys.info()['user'] %in% c('s7m', 'janus829')){
 	source('~/Research/victimization/R/setup.R') }
 if(Sys.info()['user'] %in% c('maxgallop')){
 	source('~/Documents/victimization/R/setup.R') }
+loadPkg('stringr')
 
 # abm path
 abmPath = paste0(pathDrop, 'abm/')
@@ -46,7 +49,9 @@ names(df) = c('gameID', 'turnID')
 		turnResults = out[[ df$gameID[i] ]][ df$turnID[i] ]
 		if(nchar(turnResults)!=0){
 			concatResult=trim(gsub(', ', '', turnResults, fixed=TRUE))
-			concatResult=gsub(')','',gsub('(','',concatResult,fixed=TRUE),fixed=TRUE)
+			concatResult=gsub(
+				')','',gsub(
+					'(','',concatResult,fixed=TRUE),fixed=TRUE)
 			vicCount = nchar(concatResult) } else { vicCount=0 }
 		df$vicCount[i] = vicCount }
 	# save(df, file=paste0(abmPath, 'df_withVicCount.rda'))
@@ -62,7 +67,9 @@ dyadConf = do.call('rbind', lapply(1:length(out), function(gameIter){
 	gameSumm = lapply(1:length(toExtractFrom), function(turnIter){
 		z = toExtractFrom[[turnIter]]
 		z = gsub(')','',gsub('(', '', z, fixed=TRUE),fixed=TRUE)
-		zMat = do.call('rbind', lapply(strsplit(z, ', ', z, fixed=TRUE), function(u){t(cbind(u))}))
+		zMat = do.call('rbind',
+			lapply(
+				strsplit(z, ', ', z, fixed=TRUE), function(u){t(cbind(u))}))
 		zMat[,1] = trim(zMat[,1]) ; zMat[,2] = trim(zMat[,2])
 		numConf = length(z)
 		zMat = cbind(gameIter, turnIter, zMat, numConf)
@@ -79,8 +86,32 @@ dyadConf$V4 = char(dyadConf$V4)
 dyadConf$numConf = num(dyadConf$numConf)
 rownames(dyadConf) = NULL
 
-# get actor list for each game iter
+# add id for last actor
 abmData$V14 = char(abmData[,14])
+govActor = data.frame( gov = unlist( lapply(
+	strsplit(abmData$V14, '],', fixed=TRUE),
+	function(x){
+		actors=cleaner(x[1])
+		govActor=str_extract(
+			trim(gsub(',|)','',actors)), '\\w\\Z')
+		return(govActor) }) ), stringsAsFactors=FALSE )
+govActor$govID = with(govActor,
+	paste0(gov, '_', 1:nrow(govActor)))
+
+# merge into dyadconf
+dyadConf$senID = with(dyadConf,
+	paste0(V3,'_',gameIter))
+dyadConf$recID = with(dyadConf,
+	paste0(V4,'_',gameIter))
+
+# tag events by whether or not
+# they involve the gov
+dyadConf$senGov = 1*(dyadConf$senID %in% govActor$govID)
+dyadConf$recGov = 1*(dyadConf$recID %in% govActor$govID)
+mean(dyadConf$senGov)
+mean(dyadConf$recGov)
+
+# get actor list for each game iter
 tmp = strsplit(abmData$V14, '],', fixed=TRUE)
 out = lapply(tmp, cleaner)
 actorSet = lapply(out, function(x){
@@ -125,7 +156,8 @@ stat = function(expr, object){
 			mat = gameList[[turn]]
 			grph = graph_from_adjacency_matrix(mat,
 				mode='directed', weighted=NULL )
-			sgrph = network::network(mat, matrix.type="adjacency",directed=TRUE)
+			sgrph = network::network(
+				mat, matrix.type="adjacency",directed=TRUE)
 			graph_recip = stat(sna::grecip, sgrph)
 			graph_trans = stat(sna::gtrans, sgrph)
 			graph_dens = stat(sna::gden, sgrph)
@@ -173,7 +205,10 @@ abmPath = paste0(pathDrop, 'abm/')
 ########################################################
 # basic look at results
 library(ggcorrplot)
-corr = round(cor(netStats[,-c(5:6,ncol(netStats)-1)], use='pairwise.complete.obs'),3)
+corr = round(
+	cor(
+		netStats[,-c(5:6,ncol(netStats)-1)],
+		use='pairwise.complete.obs'),3)
 ggcorrplot(corr, colors=c('red','white','blue'))
 ########################################################
 

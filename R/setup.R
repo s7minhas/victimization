@@ -1,8 +1,10 @@
 ########
 rm(list=ls())
-if(Sys.info()['user'] %in% c('Owner')){
-	pathGit = 'C:/Users/Owner/Research/victimization/'
-	pathDrop = 'C:/Users/Owner/Dropbox/Research/victimization/'
+if(Sys.info()['user'] %in% c('Owner','herme')){
+	pathGit = paste0(
+		'C:/Users/',Sys.info()['user'],'/Research/victimization/')
+	pathDrop = paste0(
+		'C:/Users/',Sys.info()['user'],'/Dropbox/Research/victimization/')
 	pathData = paste0(pathDrop, 'data/')
 	pathResults = paste0(pathDrop, 'results/')
 	pathGraphics = paste0(pathDrop, 'graphics/')
@@ -46,7 +48,7 @@ simpleMerge = function(toData, fromData, vars, toID, fromID, lagVars=TRUE){
 		fromData$unitForMerge = unlist(
 			lapply(strsplit(fromData[,fromID],'_'),function(x){x[1]}))
 		fromData$yrForMerge = num(fromData$yrForMerge) + 1
-		fromData[,fromID] = with(fromData, 
+		fromData[,fromID] = with(fromData,
 			paste0(unitForMerge, '_', yrForMerge))
 	}
 	for(v in vars){
@@ -64,7 +66,7 @@ load(paste0(pathData, 'panel.rda'))
 # install/load libraries
 loadPkg=function(toLoad){
 	for(lib in toLoad){
-	  if(!(lib %in% installed.packages()[,1])){ 
+	  if(!(lib %in% installed.packages()[,1])){
 	    install.packages(lib, repos='http://cran.rstudio.com/') }
 	  suppressMessages( library(lib, character.only=TRUE) )
 	}
@@ -72,7 +74,7 @@ loadPkg=function(toLoad){
 
 pkgs = c(
 	'dplyr', 'tidyr', 'magrittr',
-	'network', 'igraph', 
+	'network', 'igraph',
 	'ggplot2', 'RColorBrewer', 'latex2exp',
 	'countrycode'
 	)
@@ -83,18 +85,18 @@ theme_set(theme_bw())
 ########
 
 ########
-# combine model results from imputed data using 
+# combine model results from imputed data using
 # rubin's rules
 rubinCoef = function(mod, matrixFormat=FALSE){
   modCoef = lapply(mod, function(x){
     beta = coef(x)
     se = sqrt(diag(vcov(x)))
     return( cbind(beta, se) )
-    }) %>% do.call('rbind',.) 
+    }) %>% do.call('rbind',.)
 
   modSumm = Amelia::mi.meld(
-    q=matrix(modCoef[,1],ncol=length(unique(rownames(modCoef))), byrow=TRUE), 
-    se=matrix(modCoef[,2],ncol=length(unique(rownames(modCoef))), byrow=TRUE), 
+    q=matrix(modCoef[,1],ncol=length(unique(rownames(modCoef))), byrow=TRUE),
+    se=matrix(modCoef[,2],ncol=length(unique(rownames(modCoef))), byrow=TRUE),
     byrow=TRUE) %>% lapply(., t) %>% do.call('cbind',.) %>% data.frame(.)
 
   names(modSumm) = c('beta', 'se')
@@ -115,7 +117,7 @@ rubinCoef = function(mod, matrixFormat=FALSE){
 getCIVecs = function(beta){
 	beta$lo95 = beta$mean - qnorm(.975)*beta$sd
 	beta$hi95 = beta$mean + qnorm(.975)*beta$sd
-	beta$lo90 = beta$mean - qnorm(.95)*beta$sd  
+	beta$lo90 = beta$mean - qnorm(.95)*beta$sd
 	beta$hi90 = beta$mean + qnorm(.95)*beta$sd
 	return(beta)
 }
