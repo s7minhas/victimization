@@ -1,10 +1,10 @@
 from VicForViz import *
 import csv
 
-with open('abmNewSelectProb.csv', 'w') as csvfile:
+with open('abmNewSelectProbRand.csv', 'w') as csvfile:
   abmwriter = csv.writer(csvfile, delimiter=',')
   for i in range(3000):
-    actors = nr.random.poisson(10)
+    actors = np.random.poisson(10)
     territory = max(np.random.poisson(13), actors + 1)
     conn = np.random.uniform(low = .2, high = .75)
     civ = np.random.poisson(45)
@@ -16,7 +16,7 @@ with open('abmNewSelectProb.csv', 'w') as csvfile:
     growthrate = .1
     victimerror = np.random.uniform(low = 0, high = .5)
     turnlimit = np.random.poisson(10) + 1
-    govIdeo = 0
+    govIdeo = 1
     abm = Country("abm", territory, conn, actors, civ)
     try:
       abm.Game()
