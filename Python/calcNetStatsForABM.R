@@ -172,13 +172,13 @@ stat = function(expr, object){
 				mode='directed', weighted=NULL )
 			sgrph = network::network(
 				mat, matrix.type="adjacency",directed=TRUE)
-			graph_recip = stat(sna::grecip, sgrph)
-			graph_trans = stat(sna::gtrans, sgrph)
+			# graph_recip = stat(sna::grecip, sgrph)
+			# graph_trans = stat(sna::gtrans, sgrph)
 			graph_dens = stat(sna::gden, sgrph)
 			n_actors = nrow(mat)
 			out = c(
-				graph_recip=graph_recip,
-				graph_trans=graph_trans,
+				# graph_recip=graph_recip,
+				# graph_trans=graph_trans,
 				graph_dens=graph_dens,
 				n_actors=n_actors,
 				game=game, turn=turn
@@ -220,7 +220,7 @@ abmPath = paste0(pathDrop, 'abm/')
 
 # peak at results ##############################
 # basic look at results
-library(ggcorrplot)
+loadPkg('ggcorrplot')
 corr = round(
 	cor(
 		netStats[,-c(5:6,ncol(netStats)-1)],
