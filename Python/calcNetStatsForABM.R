@@ -1,3 +1,4 @@
+# setup #########################################
 if(Sys.info()['user'] %in% c('Owner','herme')){
 	source(paste0(
 		'C:/Users/',Sys.info()['user'],
@@ -6,17 +7,25 @@ if(Sys.info()['user'] %in% c('s7m', 'janus829')){
 	source('~/Research/victimization/R/setup.R') }
 if(Sys.info()['user'] %in% c('maxgallop')){
 	source('~/Documents/victimization/R/setup.R') }
-loadPkg('stringr')
 
+# pkgs
+loadPkg('stringr')
+################################################
+
+# load in data #################################
 # abm path
 abmPath = paste0(pathDrop, 'abm/')
 abmPath = paste0(pathGit, "python/")
 # load in file
-# abmData = read.csv(paste0(abmPath, 'terrBigRun.csv'), header=FALSE)
-# add = read.csv(paste0(abmPath, 'terrBigRun2.csv'), header=FALSE)
+# abmData = read.csv(
+# 	paste0(abmPath, 'terrBigRun.csv'), header=FALSE)
+# add = read.csv(
+# 	paste0(abmPath, 'terrBigRun2.csv'), header=FALSE)
 # abmData = rbind(abmData,add)
 abmData = read.csv(paste0(abmPath, 'abmNewSelectProb.csv'))
+################################################
 
+# victimization info ###########################
 # clean stuff up
 abmData$V12 = as.character(abmData[,12])
 # abmData$V12 = char(abmData$V12)
@@ -56,8 +65,10 @@ names(df) = c('gameID', 'turnID')
 		df$vicCount[i] = vicCount }
 	# save(df, file=paste0(abmPath, 'df_withVicCount.rda'))
 # } else { load(paste0(abmPath, 'df_withVicCount.rda')) }
+################################################
 
-# net stats
+# get dyad frame of battles ####################
+# extract dyadic battle info from v3
 abmData$V13 = char(abmData[,13])
 tmp = strsplit(abmData$V13, '],', fixed=TRUE)
 out = lapply(tmp, cleaner)
@@ -86,7 +97,7 @@ dyadConf$V4 = char(dyadConf$V4)
 dyadConf$numConf = num(dyadConf$numConf)
 rownames(dyadConf) = NULL
 
-# add id for last actor
+# add id for gov actor
 abmData$V14 = char(abmData[,14])
 govActor = data.frame( gov = unlist( lapply(
 	strsplit(abmData$V14, '],', fixed=TRUE),
@@ -110,7 +121,9 @@ dyadConf$senGov = 1*(dyadConf$senID %in% govActor$govID)
 dyadConf$recGov = 1*(dyadConf$recID %in% govActor$govID)
 mean(dyadConf$senGov)
 mean(dyadConf$recGov)
+################################################
 
+# actor list to construct adj mats #############
 # get actor list for each game iter
 tmp = strsplit(abmData$V14, '],', fixed=TRUE)
 out = lapply(tmp, cleaner)
@@ -141,8 +154,9 @@ for(i in 1:nrow(dyadConf)){
 		}
 	}
 }
+################################################
 
-# calc graph stats
+# calc net measures ############################
 loadPkg(c('sna','igraph','network'))
 stat = function(expr, object){
 	x=try(expr(object),TRUE)
@@ -177,7 +191,9 @@ stat = function(expr, object){
 	netStats = netStats[!is.nan(netStats[,"graph_dens"]),]
 	# save(netStats, file=paste0(abmPath, 'abmNetStats.rda'))
 # } else { load(paste0(abmPath, 'abmNetStats.rda')) }
+################################################
 
+# create abm df for analysis ###################
 # merge in hyperparams
 netStats = data.frame(netStats)
 abmData$game = 1:nrow(abmData)
@@ -200,9 +216,9 @@ netStats$numConf[is.na(netStats$numConf)] = 0
 #
 abmPath = paste0(pathDrop, 'abm/')
 # save(netStats, file=paste0(abmPath, 'abmResults.rda'))
-########################################################
+################################################
 
-########################################################
+# peak at results ##############################
 # basic look at results
 library(ggcorrplot)
 corr = round(
@@ -210,9 +226,9 @@ corr = round(
 		netStats[,-c(5:6,ncol(netStats)-1)],
 		use='pairwise.complete.obs'),3)
 ggcorrplot(corr, colors=c('red','white','blue'))
-########################################################
+################################################
 
-########################################################
+################################################
 # run neg binom
 loadPkg(c('MASS'
 	# ,'KRLS','bigKRLS','randomForest'
@@ -265,9 +281,10 @@ summary(mod_pois)$'coefficients'
 
 # library(BayesTree)
 
-# pdb1 = pdbart(x,y,xind=c(1,2),
-#               levs=list(seq(-1,1,.2),seq(-1,1,.2)),pl=FALSE,
-#               keepevery=10,ntree=100,nskip=100,ndpost=200) #should run longer!
+# pdb1 = pdbart(
+# 	x,y,xind=c(1,2),
+# 	levs=list(seq(-1,1,.2),seq(-1,1,.2)),pl=FALSE,
+# 	keepevery=10,ntree=100,nskip=100,ndpost=200) #should run longer!
 # plot(pdb1,ylim=c(-.6,.6))
 
 # viz of results
