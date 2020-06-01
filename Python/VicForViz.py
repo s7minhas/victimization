@@ -210,7 +210,7 @@ class Territory(object):
     c = battledeaths
 ###How much do you benefit from good things happening to the owner of the territory
     sq = (.5 - abs(self.control.preference - target.control.preference))*2*self.control.ideo*R
-    attack = (.5 - abs(self.control.preference - target.control.preference))*2*self.control.ideo*(R - c)*(1 - pwin) + pwin*(R - c) - c 
+    attack = (.5 - abs(self.control.preference - target.control.preference))*2*self.control.ideo*(R)*(1 - pwin) + pwin*R - c - (.5 - abs(self.control.preference - target.control.preference))*2*self.control.ideo*c
 ###Ok, is the cost of war higher than the benefit of war?
     return(attack > sq)
 ###Do any of your neighbors want to attack you?
@@ -297,7 +297,7 @@ class ArmedActor(object):
     ##Government doesnt share (ideo = 0) and has extreme preferences. Alternatively we could have them have moderate prefs.
     if self.gov == 1:
       self.preference = (1- govIdeo)*0.5 + govIdeo*uniform(0,1)
-      self.ideo = 0.0
+      self.ideo = uniform(0, .5)
     else:
       self.preference = uniform(0,1)
       self.ideo = uniform(0,1)
