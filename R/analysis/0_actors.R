@@ -12,7 +12,11 @@ if(Sys.info()['user'] %in% c('Owner','herme','S7M')){
 if(Sys.info()['user'] %in% c('dorffc')){
   source('~/ProjectsGit/victimization/R/setup.R') }
 
-loadPkg(c('readr', 'ggmap', 'abind', 'countrycode'))
+loadPkg(c(
+  'readr', 'ggmap', 'abind',
+  'countrycode',
+  'gifski', 'av', 'gganimate'
+  ))
 
 smTheme = theme(
   axis.ticks=element_blank(),
@@ -151,11 +155,8 @@ actorCntsID$year = num(actorCntsID$year)
 actorCntsID$nActors = num(actorCntsID$nActors)
 
 # todos
-## make some charts to explore the "average" that we calcd
-## make a map
 ## are multiactor conflicts more fatal
 ## are multiactor conflicts worse for those poor ole civies
-## are multiactor conflicts longer
 ###########################################################
 
 ###########################################################
@@ -224,54 +225,39 @@ ggsave(
   height=8, width=12
 )
 
-# create animated version
-
-###########################################################
-
-###########################################################
-actorCntsID = actorCntsID %>%
-  group_by(year) %>%
-  mutate(
-    nActorYrAvg = mean(nActors, na.rm=TRUE)
-  )
-
-ggplot(
-  actorCntsID,
-  aes(x=nActors) ) +
-  geom_histogram() +
-  geom_vline(
-    aes(xintercept=nActorYrAvg),
-    color='red',
-    linetype='dashed'
-  ) +
-  facet_wrap(~year) +
-  theme(
-    panel.border=element_blank(),
-    axis.ticks=element_blank()
-  )
-###########################################################
-
-###########################################################
-# boxplot summary of actor dist over time
-ggplot(
-  actorCntsID,
-  aes(x=factor(year), y=nActors)
-  ) +
-  geom_boxplot(outlier.shape=NA) +
-  geom_jitter(alpha=.3) +
-  geom_hline(
-    aes(yintercept=5),
-    color='red',
-    linetype='dashed'
-  ) +
-  labs(
-    x='', y='# Active Armed Groups'
-  ) +
-  theme(
-    axis.text.x=element_text(angle=45),
-    panel.border=element_blank(),
-    axis.ticks=element_blank()
-  )
+# # create animated version
+# worldGif = ggplot() +
+#   geom_polygon(
+#     data = worldBig,
+#     mapping = aes(
+#       x = long,
+#       y = lat,
+#       group = group,
+#       fill = nActors
+#   ) ) +
+#   coord_fixed(1.3) +
+#   scale_fill_gradient2(
+#     low='#f7fbff',
+#     mid='#6baed6',
+#     high='#08306b',
+#     na.value='grey70'
+#     ) +
+#   labs(
+#     fill="# Active \n Armed Groups in {frame_time}"
+#   ) +
+#   facet_wrap(~year) +
+#   theme_void() +
+#   theme(
+#     legend.position='top',
+#     legend.key.width=unit(1.5, 'cm')
+#   ) +
+#   transition_time(year) +
+#   ease_aes('linear')
+#
+# anim_save(
+#   worldGif,
+#   file=paste0(pathGraphics,'actorCntMapGif.gif'),
+#   height=8, width=12)
 ###########################################################
 
 ###########################################################
@@ -285,7 +271,7 @@ actorCntsID$nCat = factor(
   levels=rev(c('1-4','5-9','>10'))
 )
 
-ggplot(actorCntsID,
+actorCats = ggplot(actorCntsID,
   aes(
     x=factor(year),
     fill=factor(nCat)
@@ -300,5 +286,64 @@ ggplot(actorCntsID,
   smTheme +
   theme(
     axis.text.x=element_text(angle=45)
+  )
+ggsave(actorCats,
+  file=paste0(pathGraphics, 'actorCntCats.pdf'),
+  width=8, height=6
+)
+###########################################################
+
+###########################################################
+# are multiactor conflicts more violent
+acledRaw = suppressMessages(read_csv(
+  file=paste0(pathData, 'acled_raw_1997-01-01-2020-06-03.csv')
+))
+
+# create subsetted versions based on event types
+acledRawBattles = acledRaw[
+  acledRaw$event_type %in% c('Battles'),]
+acledRawCivies = acledRaw[
+  acledRaw$event_type %in% c('Violence against civilians'),]
+
+# are they more fatal in general
+acledSummCivies = acledRawCivies %>%
+  group_by(
+    country, year
+  ) %>%
+  summarize(
+    civ_fatals = sum(fatalities, na.rm=TRUE)
+  )
+
+acledSummBattles = acledRawBattles %>%
+  group_by(
+    country, year
+  ) %>%
+  summarize(
+    bat_fatals = sum(fatalities, na.rm=TRUE)
+  )
+
+# create id variables
+acledSummCivies$id = with(acledSummCivies, paste0(country, year))
+acledSummBattles$id = with(acledSummBattles, paste0(country, year))
+actorCntsID$id = with(actorCntsID, paste0(country, year))
+
+# merge
+actorCntsID$civ_fatals = acledSummCivies$civ_fatals[
+  match(actorCntsID$id, acledSummCivies$id)]
+actorCntsID$bat_fatals = acledSummBattles$bat_fatals[
+  match(actorCntsID$id, acledSummBattles$id)]
+
+# check rel
+cor(
+  actorCntsID[,c('nActors','civ_fatals','bat_fatals')],
+  use='pairwise.complete.obs'
+)
+
+# check by cat
+actorCntsID %>%
+  group_by(nCat) %>%
+  summarize(
+    civ_fatals=mean(civ_fatals),
+    bat_fatals=mean(bat_fatals)
   )
 ###########################################################
