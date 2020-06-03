@@ -24,19 +24,30 @@ acled = read_csv(
 # how many unique actors per country?
 # first select a few key vars
 acled <- acled %>%
-  select('event_type','year', 'actor1', 'actor2', 'country','latitude', 'longitude','fatalities')
+  select(
+    'event_type','year',
+    'actor1', 'actor2',
+    'country','latitude',
+    'longitude','fatalities'
+  )
 
 ###########################
 # aggregate military and police forces into gov
-acled$actor1[grepl('Military Forces of|Police Forces of',acled$actor1)] = paste0(
+acled$actor1[
+  grepl('Military Forces of|Police Forces of',acled$actor1)
+  ] = paste0(
   'Gov Forces of ',
-  acled$country[grepl('Military Forces of|Police Forces of',acled$actor1)]
-)
+  acled$country[
+    grepl('Military Forces of|Police Forces of',acled$actor1)
+    ] )
 
-acled$actor2[grepl('Military Forces of|Police Forces of',acled$actor2)] = paste0(
+acled$actor2[
+  grepl('Military Forces of|Police Forces of',acled$actor2)
+  ] = paste0(
   'Gov Forces of ',
-  acled$country[grepl('Military Forces of|Police Forces of',acled$actor2)]
-)
+  acled$country[
+    grepl('Military Forces of|Police Forces of',acled$actor2)
+    ] )
 ###########################
 
 ###########################
@@ -84,12 +95,17 @@ actorVec = actors$actor2[actors$fatalities>=100]
 # take the actors identified in actorVec
 # and subset our acled dataset
 
-# include any event that involed an actor at all from our parsed actor list
-# acledParsed = acled[acled$actor1 %in% actorVec | acled$actor2 %in% actorVec,]
+# include any event that involed
+# an actor at all from our parsed actor list
+# acledParsed = acled[
+#   acled$actor1 %in% actorVec |
+#   acled$actor2 %in% actorVec,]
 
-# only include events in which both actors come from our parsed actor list
+# only include events in which both
+# actors come from our parsed actor list
 acledParsed = acled[which(acled$actor1 %in% actorVec),]
-acledParsed = acledParsed[which(acledParsed$actor2 %in% actorVec),]
+acledParsed = acledParsed[
+  which(acledParsed$actor2 %in% actorVec),]
 ###########################
 
 ###########################################################
@@ -99,7 +115,8 @@ acledParsed = acledParsed[which(acledParsed$actor2 %in% actorVec),]
 # parsed actor list
 
 # create conflict id
-acledParsed$cyear = with(acledParsed, paste(country, year, sep='_'))
+acledParsed$cyear = with(
+  acledParsed, paste(country, year, sep='_'))
 
 # count up how many actors show up in a country-year
 ids = sort(unique(acledParsed$cyear))
@@ -121,7 +138,8 @@ actorCntsID = lapply( ids, function(id){
     'nActors'=n
   )
   return(out)
-}) %>% do.call('rbind', .) %>% data.frame(.,stringsAsFactors=FALSE)
+}) %>% do.call('rbind', .) %>%
+  data.frame(.,stringsAsFactors=FALSE)
 
 # fix up object types
 actorCntsID$year = num(actorCntsID$year)
@@ -135,7 +153,6 @@ actorCntsID %>%
   summarize(
     mean(nActors)
   )
-
 # qs for the future
 ## are multiactor conflicts more fatal
 ## are multiactor conflicts longer
@@ -179,7 +196,10 @@ basic <- theme(
   plot.title = element_text(hjust = 0.5)
 )
 
-worldGroups <- ggplot(data = worldSubset, mapping = aes(x = long, y = lat, group = group)) +
+worldGroups <- ggplot(
+  data = worldSubset,
+  mapping = aes(x = long, y = lat, group = group)
+  ) +
   coord_fixed(1.3) +
   geom_polygon(aes(fill = number_groups)) +
   scale_fill_distiller(palette ="BrBG", direction = -1) +
