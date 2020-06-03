@@ -1,4 +1,4 @@
-# GET THA FACTS!
+# GET THAT FACTS!
 # How many countries that have 'battles'  from ALL years of ACLED data
 # (maybe should subset on like actual civil wars?)
 ###########################################################
@@ -12,7 +12,7 @@ if(Sys.info()['user'] %in% c('Owner','herme','S7M')){
 if(Sys.info()['user'] %in% c('dorffc')){
   source('~/ProjectsGit/victimization/R/setup.R') }
 
-loadPkg(c('readr', 'ggmap', 'abind'))
+loadPkg(c('readr', 'ggmap', 'abind', 'countrycode'))
 ###########################################################
 
 ###########################################################
@@ -88,7 +88,7 @@ actors = data.frame(actors, stringsAsFactors=FALSE) %>%
     fatalities = sum(fatalities, na.rm=TRUE)
   )
 
-actorVec = actors$actor2[actors$fatalities>=100]
+actorVec = actors$actor2[actors$fatalities>=10]
 ###########################
 
 ###########################
@@ -148,32 +148,47 @@ actorCntsID$nActors = num(actorCntsID$nActors)
 #
 summary(actorCntsID$nActors)
 
+head(actorCntsID)
 actorCntsID %>%
   group_by(year) %>%
   summarize(
     mean(nActors)
   )
-# qs for the future
+
+# todos
+## make some charts to explore the "average" that we calcd
+## make a map
 ## are multiactor conflicts more fatal
-## are multiactor conflicts longer
 ## are multiactor conflicts worse for those poor ole civies
+## are multiactor conflicts longer
 ###########################################################
 
 ###########################################################
-# then count up unique actors per group across act1 and act2
-groups = acled %>%
-  group_by(country) %>%
-  summarise(number_groups = n_distinct(actor1, actor2)) %>%
-  arrange(desc(number_groups))
+# use actorCntsID (summary of actors by country-year)
+# to make a map
 
 # now make a map that is dumb w/o further revisions
 world <- map_data("world")
 worldplot <- ggplot() +
   geom_polygon(data = world, aes(x=long, y = lat, group = group)) +
-  coord_fixed(1.3)
+  coord_fixed(1.3) +
+  theme_void()
 worldplot
 
 ## check for disagreements between the two datasets
+# use countrycode pkg to stdz names across
+# acled and map region variable
+world$cname = countrycode(
+  world$region, 'country.name', 'country.name'
+)
+# unique(world$region[is.na(world$cname)])
+world = world[!is.na(world$region),]
+
+# do the same for acled
+actorCntsID$cname = countrycode(
+  actorCntsID$country, 'country.name', 'country.name'
+)
+
 diff <- setdiff(world$region, groups$country) #ugh lots to clean
 
 #if I do not fix above^ this is wrong:
