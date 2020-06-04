@@ -55,12 +55,6 @@ simpleMerge = function(toData, fromData, vars, toID, fromID, lagVars=TRUE){
 		toData$tmp = fromData[match(toData[,toID], fromData[,fromID]), v]
 		names(toData)[ncol(toData)] = v }
 	return(toData) }
-
-# ggplot theme
-smTheme = theme(
-  axis.ticks=element_blank(),
-  panel.border=element_blank()
-)
 ########
 
 ########
@@ -88,6 +82,10 @@ loadPkg(pkgs)
 
 # Set a theme for gg
 theme_set(theme_bw())
+smTheme = theme(
+  axis.ticks=element_blank(),
+  panel.border=element_blank()
+)
 ########
 
 ########

@@ -57,16 +57,66 @@ actorCntsID$bat_fatals = acledSummBattles$bat_fatals[
   match(actorCntsID$id, acledSummBattles$id)]
 
 # check rel
-cor(
+rhoActorsFatals = cor(
   actorCntsID[,c('nActors','civ_fatals','bat_fatals')],
   use='pairwise.complete.obs'
 )
 
 # check by cat
-actorCntsID %>%
+catActorsFatals = actorCntsID %>%
   group_by(nCat) %>%
   summarize(
     civ_fatals=mean(civ_fatals),
     bat_fatals=mean(bat_fatals)
   )
+
+aovCiv = aov(civ_fatals ~ nCat, data=actorCntsID)
+aovBat = aov(bat_fatals ~ nCat, data=actorCntsID)
+# summary(aovCiv) ; summary(aovBat)
+###########################################################
+
+###########################################################
+# reshape data
+ggData = pivot_longer(
+    data=actorCntsID,
+    cols=c(civ_fatals, bat_fatals),
+    names_to=c('fatals')
+)
+
+# rename
+ggData$fatals[ggData$fatals=='bat_fatals'] = "Battle Fatalities"
+ggData$fatals[ggData$fatals=='civ_fatals'] = "Civilian Fatalities"
+
+# log
+ggData$value = log(ggData$value + 1)
+
+# calc means by nCat and fatals
+ggData = ggData %>%
+  group_by(nCat, fatals) %>%
+  mutate(
+    avg = mean(value, na.rm=TRUE),
+    q25 = quantile(value, .25, na.rm=TRUE),
+    q75 = quantile(value, .75, na.rm=TRUE),
+    qLo = quantile(value, .025, na.rm=TRUE),
+    qHi = quantile(value, .975, na.rm=TRUE)
+  )
+
+# viz
+ggData$nCat = factor(ggData$nCat,
+  levels=rev(levels(ggData$nCat)))
+actorConfDyn = ggplot(ggData, aes(x=nCat)) +
+  geom_linerange(aes(ymin=q25, ymax=q75), size=.75) +
+  geom_linerange(aes(ymin=qLo, ymax=qHi), size=.5) +
+  geom_point(aes(y=avg), size=2) +
+  geom_jitter(aes(y=value), alpha=.15) +
+  labs(
+    x='Number of Armed Actors',
+    y='Logged Fatality Counts'
+  ) +
+  facet_wrap(~fatals, nrow=2, scales='free_y') +
+  smTheme
+ggsave(actorConfDyn,
+  file=paste0(pathGraphics, 'actorConfDyn.pdf'),
+  width=10, height=6
+)
 ###########################################################
