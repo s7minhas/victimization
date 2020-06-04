@@ -25,12 +25,12 @@ if(Sys.info()['user'] %in% c('dorffc')){
 	pathData = paste0(pathDrop, 'data/')
 	pathGraphics = paste0(pathDrop, 'graphics/')
 }
+
 if(Sys.info()['user'] %in% c('maxgallop')){
 	pathGit = '~/Documents/victimization/'
 	pathDrop = '~/Dropbox/intraConfNetDyn/'
 	pathData = paste0(pathDrop, 'data/')
 }
-
 ########
 
 ########
@@ -55,6 +55,12 @@ simpleMerge = function(toData, fromData, vars, toID, fromID, lagVars=TRUE){
 		toData$tmp = fromData[match(toData[,toID], fromData[,fromID]), v]
 		names(toData)[ncol(toData)] = v }
 	return(toData) }
+
+# ggplot theme
+smTheme = theme(
+  axis.ticks=element_blank(),
+  panel.border=element_blank()
+)
 ########
 
 ########
