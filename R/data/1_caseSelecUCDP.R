@@ -1,11 +1,12 @@
 if(Sys.info()['user'] %in% c('s7m', 'janus829')){
 	source('~/Research/victimization/R/setup.R') }
-if(Sys.info()['user'] %in% c('cassydorff')){ 
+if(Sys.info()['user'] %in% c('cassydorff')){
 	source('~/ProjectsGit/victimization/R/setup.R') }
 if(Sys.info()['user'] %in% c('maxgallop')){
   source('~/Documents/victimization/R/setup.R') }
 
-load(paste0(pathData, 'ged171.Rdata'))
+# load(paste0(pathData, 'ged171.Rdata'))
+load(paste0(pathData, 'ged191.RData'))
 ged=data.frame(ged171, stringsAsFactors = FALSE) ; rm(ged171)
 
 ged = ged[,c(
@@ -22,7 +23,7 @@ ged = ged[,c(
 # types other than one-sided violence bc of actor names
 ged = ged[ged$type_of_vi %in% c(1:2),]
 
-# 
+#
 cntries = unique(ged$country)
 summStatsGED = data.frame(do.call('rbind', lapply(cntries, function(c){
 	slice = ged[ged$country==c,]

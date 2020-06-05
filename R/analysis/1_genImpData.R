@@ -1,7 +1,7 @@
 ########################################################
-if(Sys.info()['user'] %in% c('s7m', 'janus829')){ 
+if(Sys.info()['user'] %in% c('s7m', 'janus829')){
 	source('~/Research/victimization/R/setup.R') }
-if(Sys.info()['user'] %in% c('dorffc')){ 
+if(Sys.info()['user'] %in% c('dorffc')){
 	source('~/ProjectsGit/victimization/R/setup.R') }
 
 # helpful pkgs
@@ -24,7 +24,7 @@ data$nConf[is.na(data$nConf)] = 0
 ########################################################
 
 ########################################################
-# naive just impute everything
+# impute
 loadPkg('sbgcop')
 if(!file.exists(paste0(pathData, 'imputedData_acledUndirected.rda'))){
 	impData = data.matrix(data[,c(5:6,10,18:19,22:38,42:43,47:48,51,53)])
@@ -39,7 +39,7 @@ set.seed(6886)
 iData = lapply(500:1000, function(i){
 	sbgFrom = sbgData$Y.impute[,,i]
 	data = cbind(
-		data[,c('cname','year','cnameYear','nActors','nConf')], 
+		data[,c('cname','year','cnameYear','nActors','nConf')],
 		sbgFrom
 		)
 	return(data)	})

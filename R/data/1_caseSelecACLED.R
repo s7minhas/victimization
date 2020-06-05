@@ -7,22 +7,23 @@ loadPkg('readr')
 acled = read_csv(
 	paste0(
 		pathData,
-		"ACLED-Version-7-All-Africa-1997-2016_csv_dyadic-file.csv"))
+		# "ACLED-Version-7-All-Africa-1997-2016_csv_dyadic-file.csv"))
+		"acled_raw_1997-01-01-2020-06-03.csv"))
 
 acledCiv = acled[
 	which(
 		acled$EVENT_TYPE=='Violence against civilians'),]
 
 toKeep = c(
-	# 'Remote violence', 'Headquarters or base established', 
-	'Battle-No change of territory', 
-	'Battle-Government regains territory', 
+	# 'Remote violence', 'Headquarters or base established',
+	'Battle-No change of territory',
+	'Battle-Government regains territory',
 	'Battle-Non-state actor overtakes territory')
 
 acled = acled[which(acled$EVENT_TYPE %in% toKeep),]
 acled$dyad_name = paste0(acled$ACTOR1, '_', acled$ACTOR2)
 
-# 
+#
 cntries = unique(acled$COUNTRY)
 summStatsACLED = data.frame(
 	do.call(
@@ -44,9 +45,9 @@ summStatsACLED = data.frame(
 
 		# org
 		c(
-			cntConf=cntConf, 
-			yrCnt=yrCnt, 
-			cntActors=cntActors, 
+			cntConf=cntConf,
+			yrCnt=yrCnt,
+			cntActors=cntActors,
 			cntDyads=cntDyads
 			)
 	})))
@@ -74,8 +75,8 @@ summStatsACLED_toFocus = data.frame(
 		sliceCiv = acledCiv[acledCiv$COUNTRY==c & acledCiv$YEAR==t,]
 		cntCivEvents = nrow(sliceCiv)
 		cntCivFatals = ifelse(nrow(sliceCiv)>0, sum(sliceCiv$FATALITIES), 0)
-		c(cntry=c, year=t, 
-			cntConf=cntConf, cntActors=cntActors, cntDyads=cntDyads, 
+		c(cntry=c, year=t,
+			cntConf=cntConf, cntActors=cntActors, cntDyads=cntDyads,
 			cntCivEvents=cntCivEvents, cntCivFatals=cntCivFatals)
 	}) )
 })), stringsAsFactors=FALSE)
@@ -88,7 +89,7 @@ plotSumm = function(data, yVar, yLab, fName){
 	g=ggplot(data, aes(x=year, y=ggY, group=1)) +
 		geom_line() +
 		geom_point() +
-		ylab(yLab) + 
+		ylab(yLab) +
 		scale_x_continuous('', breaks=seq(2000,2016,2)) +
 		facet_wrap(~cntry, scales='free_y', ncol=3) +
 		theme_bw() +
@@ -97,7 +98,7 @@ plotSumm = function(data, yVar, yLab, fName){
 			axis.ticks=element_blank(),
 			panel.border=element_blank()
 			)
-	ggsave(g, file=paste0(pathDrop, fName), width=9, height=5)	
+	ggsave(g, file=paste0(pathDrop, fName), width=9, height=5)
 }
 
 ##
