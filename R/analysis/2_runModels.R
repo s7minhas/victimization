@@ -52,6 +52,9 @@ modsCntrls = lapply(iData, function(data){
 summBase = rubinCoef(modsBase, TRUE)
 summCntrls = rubinCoef(modsCntrls, TRUE)
 
+summBase
+summCntrls
+
 # library(randomForest)
 # netStats = iData[[4]]
 # netStats$numConf = netStats$nConf
@@ -61,7 +64,9 @@ summCntrls = rubinCoef(modsCntrls, TRUE)
 # rfMod = randomForest(x=data.matrix(
 # 	netStats[,c('graph_dens', 'numConf', 'n_actors')]
 # 	), y=netStats[,'vic'], type='regression')
-# partialPlot(rfMod, pred.data=netStats[,c('graph_dens', 'numConf', 'n_actors')], x.var='graph_dens')
+# partialPlot(
+	# rfMod, pred.data=netStats[,
+		# c('graph_dens', 'numConf', 'n_actors')], x.var='graph_dens')
 
 # save
 save(
