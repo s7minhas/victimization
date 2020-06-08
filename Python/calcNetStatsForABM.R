@@ -22,7 +22,9 @@ abmPath = paste0(pathGit, "python/")
 # add = read.csv(
 # 	paste0(abmPath, 'terrBigRun2.csv'), header=FALSE)
 # abmData = rbind(abmData,add)
-abmData = read.csv(paste0(abmPath, 'abmNewSelectProb.csv'))
+abmData1 = read.csv(paste0(abmPath, 'abmGovIdeoRandom.csv'), header = F)
+abmData2 = read.csv(paste0(abmPath, 'abmGovIdeoRandom2.csv'), header = F)
+abmData = rbind(abmData1,abmData2)
 ################################################
 
 # victimization info ###########################
@@ -213,6 +215,30 @@ dyadConf$id = with(dyadConf, paste(gameIter, turnIter, sep='_'))
 netStats$numConf = dyadConf$numConf[match(netStats$id, dyadConf$id)]
 netStats$numConf[is.na(netStats$numConf)] = 0
 
+
+# function for lagging single variables:
+lagger<-function(variable, country, year, laglength){
+  
+  country<-as.character(country)
+  laggedvar<-rep(NA,length(variable))
+  
+  leadingNAs<-rep(NA,laglength)
+  countryshift<-c(leadingNAs, country[1:(length(country)-laglength)])
+  
+  variableshift<-c(leadingNAs, variable[1:(length(variable)-laglength)])
+  
+  replacementrefs<-country==countryshift
+  replacementrefs[is.na(replacementrefs)==T]<-FALSE
+  laggedvar[replacementrefs]<-variableshift[replacementrefs]
+  
+  laggedvar
+  
+} # close lagger function
+
+netStats$graph_dens.l1 = lagger(netStats$graph_dens, netStats$game, netStats$V11, laglength = 1)
+netStats$numConf.l1 = lagger(netStats$numConf, netStats$game, netStats$V11, laglength = 1)
+netStats$n_actors.l1 = lagger(netStats$n_actors, netStats$game, netStats$V11, laglength = 1)
+
 #
 abmPath = paste0(pathDrop, 'abm/')
 # save(netStats, file=paste0(abmPath, 'abmResults.rda'))
@@ -223,7 +249,7 @@ abmPath = paste0(pathDrop, 'abm/')
 loadPkg('ggcorrplot')
 corr = round(
 	cor(
-		netStats[,-c(5:6,ncol(netStats)-1)],
+		netStats[,-c(3,4,6)],
 		use='pairwise.complete.obs'),3)
 ggcorrplot(corr, colors=c('red','white','blue'))
 ################################################
@@ -242,6 +268,10 @@ mod_pois = glm(
 	vic ~ graph_dens + numConf + n_actors,
 	data=netStats,
 	family='poisson')
+mod_bin = glm(
+  (vic>0) ~ graph_dens + numConf + n_actors,
+  data=netStats,
+  family='binomial')
 
 summary(mod)$'coefficients'
 summary(mod_pois)$'coefficients'
@@ -337,3 +367,6 @@ ggsave(ggCoef,
 	device=cairo_pdf
 	)
 ########################################################
+
+
+actorList[[1]]
