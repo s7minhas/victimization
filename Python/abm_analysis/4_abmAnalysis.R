@@ -18,11 +18,11 @@ load(paste0(abmPath, 'netStats.rda'))
 loadPkg('ggcorrplot')
 corr = round(
 	cor(
-		netStats[,c(1:11, 30, 26)],
+		netStats[,c(1:12, 30, 26)],
 		use='pairwise.complete.obs'),3)
 ggcorrplot(corr, colors=c('red','white','blue'))
 
-cor(netStats[,1:11])
+cor(netStats[,1:12])
 ################################################
 
 ################################################
