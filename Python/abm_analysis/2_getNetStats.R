@@ -26,6 +26,7 @@ cleaner = function(x){
 
 # load in data #################################
 load(paste0(abmPath, 'abmData.rda'))
+load(paste0(abmPath, 'df_withVicCount.rda'))
 ################################################
 
 # get dyad frame of battles ####################
@@ -124,6 +125,10 @@ stat = function(expr, object){
 	if(class(x)=='try-error'){x=NA}
 	return(x) }
 
+localTrans = function(x){
+  igraph::transitivity(x, type='average')
+}
+
 netStats = lapply(1:length(actorSet), function(game){
 	gameList = actorSet[[game]]
 	out = lapply(1:length(gameList), function(turn){
@@ -132,10 +137,12 @@ netStats = lapply(1:length(actorSet), function(game){
 			mode='directed', weighted=NULL )
 		sgrph = network::network(
 			mat, matrix.type="adjacency",directed=TRUE)
+    graph_avgDeg = mean(stat(sna::degree, sgrph))
+    graph_globalTrans = stat(igraph::transitivity, grph)
+    graph_localTrans = stat(localTrans, grph)
+    graph_meanDist = mean_distance(grph)
 		graph_recip = stat(sna::grecip, sgrph)
-		graph_trans = stat(sna::gtrans, sgrph)
 		graph_dens = stat(sna::gden, sgrph)
-		graph_hier_recip = stat(sna::hierarchy, sgrph)
 		graph_hier_krack = hierarchy(sgrph, measure='krackhardt')
 		graph_conn_krack = stat(sna::connectedness, sgrph)
 		graph_eff_krack = stat(sna::efficiency, sgrph)
@@ -143,13 +150,17 @@ netStats = lapply(1:length(actorSet), function(game){
 		graph_lubness = stat(sna::lubness, sgrph)
 		n_actors = nrow(mat)
 		out = c(
+      graph_avgDeg = graph_avgDeg,
+      graph_globalTrans = graph_globalTrans,
+      graph_localTrans = graph_localTrans,
+      graph_meanDist = graph_meanDist,
 			graph_recip=graph_recip,
-			graph_trans=graph_trans,
 			graph_dens=graph_dens,
-			graph_hier_recip = graph_hier_recip,
 			graph_hier_krack = graph_hier_krack,
 			graph_conn_krack = graph_conn_krack,
+			graph_eff_krack = graph_eff_krack,
 			graph_centrz = graph_centrz,
+			graph_lubness = graph_lubness,
 			n_actors=n_actors,
 			game=game, turn=turn
 			)

@@ -27,7 +27,7 @@ for(v in hyperparams){
 
 # merge in vic
 netStats$vic = 0
-netStats$id = with(netStats, paste(game, V11, sep='_'))
+netStats$id = with(netStats, paste(game, turn, sep='_'))
 df$id = with(df, paste(gameID, turnID, sep='_'))
 netStats$vic = df$vicCount[match(netStats$id,df$id)]
 
@@ -37,5 +37,5 @@ netStats$numConf = dyadConf$numConf[match(netStats$id, dyadConf$id)]
 netStats$numConf[is.na(netStats$numConf)] = 0
 
 #
-save(netStats, file=paste0(abmPath, 'abmResults.rda'))
+save(netStats, file=paste0(abmPath, 'netStats.rda'))
 ################################################

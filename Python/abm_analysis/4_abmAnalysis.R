@@ -10,7 +10,7 @@ if(Sys.info()['user'] %in% c('maxgallop')){
 ################################################
 
 # load in data #################################
-load(paste0(abmPath, 'abmResults.rda'))
+load(paste0(abmPath, 'netStats.rda'))
 ################################################
 
 # peak at results ##############################
@@ -18,9 +18,11 @@ load(paste0(abmPath, 'abmResults.rda'))
 loadPkg('ggcorrplot')
 corr = round(
 	cor(
-		netStats[,-c(3,4,6)],
+		netStats[,c(1:8, 24, 22)],
 		use='pairwise.complete.obs'),3)
 ggcorrplot(corr, colors=c('red','white','blue'))
+
+cor(netStats[,1:8])
 ################################################
 
 ################################################
@@ -40,6 +42,16 @@ mod_pois = glm(
 
 summary(mod)$'coefficients'
 summary(mod_pois)$'coefficients'
+
+vars = names(netStats)[1:8]
+res = lapply(vars, function(v){
+  form=formula(paste0('vic~numConf+n_actors+', v))
+  mod = glm.nb(form, data=netStats)
+  out = summary(mod)$'coefficients'
+  return(out)
+  })
+names(res) = vars
+res
 
 # nonlinMod=krls(
 # 	X=data.matrix(
