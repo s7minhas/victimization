@@ -8,6 +8,7 @@ if(Sys.info()['user'] %in% c('Owner','herme')){
 	pathData = paste0(pathDrop, 'data/')
 	pathResults = paste0(pathDrop, 'results/')
 	pathGraphics = paste0(pathDrop, 'graphics/')
+	abmPath = paste0(pathDrop, "abm/")
 }
 
 if(Sys.info()['user'] %in% c('s7m', 'janus829')){
@@ -17,6 +18,7 @@ if(Sys.info()['user'] %in% c('s7m', 'janus829')){
 	pathData = paste0(pathDrop, 'data/')
 	pathResults = paste0(pathDrop, 'results/')
 	pathGraphics = paste0(pathDrop, 'graphics/')
+	abmPath = paste0(pathDrop, "abm/")
 }
 
 if(Sys.info()['user'] %in% c('dorffc')){
@@ -24,12 +26,14 @@ if(Sys.info()['user'] %in% c('dorffc')){
 	pathDrop = '~/Dropbox/Research/nothingbutnet/victimization/'
 	pathData = paste0(pathDrop, 'data/')
 	pathGraphics = paste0(pathDrop, 'graphics/')
+	abmPath = paste0(pathDrop, "abm/")
 }
 
 if(Sys.info()['user'] %in% c('maxgallop')){
 	pathGit = '~/Documents/victimization/'
 	pathDrop = '~/Dropbox/intraConfNetDyn/'
 	pathData = paste0(pathDrop, 'data/')
+	abmPath = paste0(pathDrop, "abm/")
 }
 ########
 
