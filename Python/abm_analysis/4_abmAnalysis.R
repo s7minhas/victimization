@@ -18,11 +18,11 @@ load(paste0(abmPath, 'netStats.rda'))
 loadPkg('ggcorrplot')
 corr = round(
 	cor(
-		netStats[,c(1:8, 24, 22)],
+		netStats[,c(1:11, 30, 26)],
 		use='pairwise.complete.obs'),3)
 ggcorrplot(corr, colors=c('red','white','blue'))
 
-cor(netStats[,1:8])
+cor(netStats[,1:11])
 ################################################
 
 ################################################
@@ -43,7 +43,7 @@ mod_pois = glm(
 summary(mod)$'coefficients'
 summary(mod_pois)$'coefficients'
 
-vars = names(netStats)[1:8]
+vars = names(netStats)[1:11]
 res = lapply(vars, function(v){
   form=formula(paste0('vic~numConf+n_actors+', v))
   mod = glm.nb(form, data=netStats)
