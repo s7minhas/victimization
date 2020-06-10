@@ -78,9 +78,9 @@ plot_nigeria_actors <-
 plot_nigeria_actors
 
 plot_nigeria_fatals <-
-  ggplot(data=nigeriaFats, aes(x=year, y=avg)) + 
+  ggplot(data=nigeriaFats, aes(x=year, y=value)) + 
   geom_line() + 
-  xlab('') + ylab('Average Civilian Fatalities')
+  xlab('') + ylab('Number of Civilian Fatalities')
 plot_nigeria_fatals
 
 grid.arrange(plot_nigeria_actors, plot_nigeria_density, plot_nigeria_fatals)
