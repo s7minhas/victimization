@@ -25,6 +25,9 @@ loadPkg(c(
 load(paste0(pathData, 'actorCntsID.rda'))
 load(paste0(pathData, 'netStats.rda'))
 load(paste0(pathData, 'actConfDynFat.rda'))
+load(paste0(pathData, 'actorNets.rda'))
+#acled = suppressMessages(read_csv(
+  #paste0(pathData, "acled-armedactors-battles.csv")))
 
 # potentially good candidates for anecdotes:
 actorCntsID[actorCntsID$country=="Pakistan",]
@@ -84,3 +87,14 @@ plot_nigeria_fatals <-
 plot_nigeria_fatals
 
 grid.arrange(plot_nigeria_actors, plot_nigeria_density, plot_nigeria_fatals)
+
+## what about the network?
+netNigeriaData <- acled %>% select(actor1,actor2, year) #needs morecleaning
+netNigeriaData <-  acled %>% filter(country=='Nigeria' & year==2010) %>% 
+              group_by(actor1,actor2) %>% 
+              summarise(fatal=sum(fatalities)) %>% 
+              filter(fatal>10)
+netNigeria <- graph_from_data_frame(netNigeriaData,directed = FALSE)
+plot(netNigeria)
+
+
