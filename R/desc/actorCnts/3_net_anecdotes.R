@@ -25,9 +25,8 @@ loadPkg(c(
 load(paste0(pathData, 'actorCntsID.rda'))
 load(paste0(pathData, 'netStats.rda'))
 load(paste0(pathData, 'actConfDynFat.rda'))
-load(paste0(pathData, 'actorNets.rda'))
-#acled = suppressMessages(read_csv(
-  #paste0(pathData, "acled-armedactors-battles.csv")))
+load(paste0(pathData, 'actorAdjList.rda'))
+
 
 # potentially good candidates for anecdotes:
 actorCntsID[actorCntsID$country=="Pakistan",]
@@ -88,13 +87,23 @@ plot_nigeria_fatals
 
 grid.arrange(plot_nigeria_actors, plot_nigeria_density, plot_nigeria_fatals)
 
-## what about the network?
-netNigeriaData <- acled %>% select(actor1,actor2, year) #needs morecleaning
-netNigeriaData <-  acled %>% filter(country=='Nigeria' & year==2010) %>% 
-              group_by(actor1,actor2) %>% 
-              summarise(fatal=sum(fatalities)) %>% 
-              filter(fatal>10)
-netNigeria <- graph_from_data_frame(netNigeriaData,directed = FALSE)
-plot(netNigeria)
+## what about the network? (Cd currently isn't sure what to make of this)
+## unfortunately the data i grabbed for this only goes to 2016
+## need to remake
+set.seed(12344)
+netNigeria <- yListAll$Nigeria
+netNigeria2008 <- netNigeria$`2008`
+netNigeria2008 <- graph_from_incidence_matrix(netNigeria2008, weighted=TRUE)
+V(netNigeria2008)$label <- NA
+plot(netNigeria2008, vertex.size=4, vertex.color="gray50")
 
+netNigeria2014 <- netNigeria$`2014`
+netNigeria2014 <- graph_from_incidence_matrix(netNigeria2014, weighted=TRUE)
+V(netNigeria2014)$label <- NA
+plot(netNigeria2014, vertex.size=4, vertex.color="gray50")
+
+netNigeria2016 <- netNigeria$`2016`
+netNigeria2016 <- graph_from_incidence_matrix(netNigeria2016, weighted=TRUE)
+V(netNigeria2016)$label <- NA
+plot(netNigeria2016, vertex.size=4, vertex.color="gray50")
 
