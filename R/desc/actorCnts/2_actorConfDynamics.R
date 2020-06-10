@@ -119,4 +119,7 @@ ggsave(actorConfDyn,
   file=paste0(pathGraphics, 'actorConfDyn.pdf'),
   width=10, height=6
 )
+#save
+actConfDynFats = ggData
+save(actConfDynFats, file=paste0(pathData, 'actConfDynFats.rda'))
 ###########################################################
