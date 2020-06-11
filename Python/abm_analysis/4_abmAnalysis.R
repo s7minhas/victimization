@@ -10,7 +10,7 @@ if(Sys.info()['user'] %in% c('maxgallop')){
 
 loadPkg(c('MASS'
 	# ,'KRLS','bigKRLS','randomForest'
-	))	
+	))
 ################################################
 
 # load in data #################################
@@ -19,13 +19,6 @@ load(paste0(abmPath, 'netStats.rda'))
 
 # peak at results ##############################
 # basic look at results
-loadPkg('ggcorrplot')
-corr = round(
-	cor(
-		netStats[,c(1:12, 30, 26)],
-		use='pairwise.complete.obs'),3)
-ggcorrplot(corr, colors=c('red','white','blue'))
-
 cor(netStats[,1:12])
 ################################################
 
