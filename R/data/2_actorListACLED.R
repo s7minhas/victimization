@@ -99,7 +99,7 @@ yListAll = lapply(names(actorsCT), function(cntry){
 	return(yList)
 }) ; names(yListAll) = names(actorsCT)
 
-## save
+# save
 save(yListAll,
      file=paste0(pathData, 'actorAdjList.rda'))
 #################
