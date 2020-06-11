@@ -1,3 +1,14 @@
+### todos:
+
+# in the net stats table also consider adding in other measures such as 
+# the average of the degree scores of every indiv actor
+
+# bring in civilian vic data, add another plot htat shows time series of
+# graph level stats against civilian vic
+
+# to get at the star level thing, we can also have another table that
+# shows a sorting of actors by degree
+
 #################
 if(Sys.info()['user'] %in% c('Owner','herme','S7M')){
     source(paste0(
