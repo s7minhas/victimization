@@ -1,5 +1,10 @@
 ### todos:
 
+# make vertex label size a function of degree
+
+# consider using plotly for network viz (https://plotly.com/r/network-graphs/)
+# visnetwork
+
 # in the net stats table also consider adding in other measures such as 
 # the average of the degree scores of every indiv actor
 

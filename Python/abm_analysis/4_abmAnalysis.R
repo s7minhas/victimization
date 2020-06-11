@@ -25,11 +25,11 @@ cor(netStats[,1:12])
 ################################################
 # run neg binom
 mod = glm.nb(
-	vic ~ graph_dens + numConf + n_actors,
+	vic ~ graph_avgDeg + numConf + n_actors +  graph_centrz,
 	data=netStats)
 
 mod_pois = glm(
-	vic ~ graph_dens + numConf + n_actors,
+	vic ~ graph_avgDeg + numConf + n_actors +  graph_centrz,
 	data=netStats,
 	family='poisson')
 
