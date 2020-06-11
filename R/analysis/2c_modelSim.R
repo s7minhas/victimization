@@ -1,7 +1,11 @@
 ########################################################
-if(Sys.info()['user'] %in% c('s7m', 'janus829')){ 
+if(Sys.info()['user'] %in% c('Owner','herme','S7M')){
+	source(paste0(
+		'C:/Users/',Sys.info()['user'],
+		'/Research/victimization/R/setup.R')) }
+if(Sys.info()['user'] %in% c('s7m', 'janus829')){
 	source('~/Research/victimization/R/setup.R') }
-if(Sys.info()['user'] %in% c('cassydorff')){ 
+if(Sys.info()['user'] %in% c('cassydorff')){
 	source('~/ProjectsGit/victimization/R/setup.R') }
 
 #
@@ -17,7 +21,7 @@ load(paste0(pathResults, 'nbMods_acled.rda'))
 ########################################################
 
 ########################################################
-# sim 
+# sim
 ## pick a random model
 set.seed(6886) ; randMod = sample(1:length(modsCntrls),1)
 mod = modsCntrls[[randMod]]
@@ -49,7 +53,7 @@ densRange = sort(unique(data$graph_dens))
 medNA = function(x){median(x,na.rm=TRUE)}
 meaNA = function(x){mean(x,na.rm=TRUE)}
 scen = cbind(
-	1, 
+	1,
 	densRange,
 	medNA(data$nConf), medNA(data$nActors),
 	meaNA(data$polity2), meaNA(data$popLog),
@@ -66,14 +70,14 @@ yHat = data.frame(cbind(densRange, yHat))
 
 ########################################################
 # viz
-agg = ggData %>% 
+agg = ggData %>%
 	group_by(densRange) %>%
 	summarize(
 		med=median(value),
 		hi95=quantile(value,.975),
 		hi90=quantile(value,.95),
 		lo95=quantile(value,.025),
-		lo90=quantile(value,.05)		
+		lo90=quantile(value,.05)
 		)
 ggplot(agg, aes(x=densRange,y=mu)) + geom_line()
 ########################################################

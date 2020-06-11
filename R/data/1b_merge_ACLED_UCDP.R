@@ -1,4 +1,8 @@
 ########################################################
+if(Sys.info()['user'] %in% c('Owner','herme','S7M')){
+	source(paste0(
+		'C:/Users/',Sys.info()['user'],
+		'/Research/victimization/R/setup.R')) }
 if(Sys.info()['user'] %in% c('s7m', 'janus829')){
 	source('~/Research/victimization/R/setup.R') }
 
@@ -46,14 +50,14 @@ taxonomy = lapply(taxonomy, function(x){
 aAvT = taxonomy$actor_tax[
 	taxonomy$actor_tax$data.source=='acled',]
 gAvT = taxonomy$actor_tax[
-	taxonomy$actor_tax$data.source=='ged',]	
+	taxonomy$actor_tax$data.source=='ged',]
 
 # construct acled actor taxonomy
 acledActors = data.frame(
 	data.source='acled',
 	base.categories=unique(c(acled$ACTOR1,acled$ACTOR2)),
 	# default given event type restriction will be violent group
-	actor_level_1_txt='violent groups', 
+	actor_level_1_txt='violent groups',
 	# all level 2 will be violent groups
 	actor_level_2_txt='violent groups',
 	stringsAsFactors = FALSE
@@ -63,14 +67,14 @@ acledActors = data.frame(
 # goes with govt
 acledActors$actor_level_1_txt[
 	grepl(
-		'Military Forces of|Police Forces of', 
+		'Military Forces of|Police Forces of',
 		acledActors$base.categories
 		)] = 'government'
 
 # fix up some mutiny and former groupings
 acledActors$actor_level_1_txt[
 	grepl(
-		'Mutiny of|Former Military Forces of', 
+		'Mutiny of|Former Military Forces of',
 		acledActors$base.categories
 		)] = 'violent group'
 
@@ -83,11 +87,11 @@ write.csv(
 	unique(
 		acledActors$base.categories[
 			acledActors$actor_level_1_txt=='violent groups']),
-	file=paste0(pathData, 'sillyActorGroupingCheck.csv') ) }	
+	file=paste0(pathData, 'sillyActorGroupingCheck.csv') ) }
 
 # load in cleaned file
 cleaned = read.csv(
-	paste0(pathData, 'sillyActorGroupingCheck.csv'), 
+	paste0(pathData, 'sillyActorGroupingCheck.csv'),
 	stringsAsFactors=FALSE
 	)
 
@@ -97,7 +101,7 @@ gedActors = data.frame(
 	data.source='ged',
 	base.categories=unique(c(ged$side_a,ged$side_b)),
 	# default given event type restriction will be violent group
-	actor_level_1_txt='violent groups', 
+	actor_level_1_txt='violent groups',
 	# all level 2 will be violent groups
 	actor_level_2_txt='violent groups',
 	stringsAsFactors = FALSE
@@ -110,7 +114,7 @@ taxonomy$actor_tax = rbind(acledActors,gedActors)
 # goes with govt
 gedActors$actor_level_1_txt[
 	grepl(
-		'Government of', 
+		'Government of',
 		gedActors$base.categories
 		)] = 'government'
 
@@ -118,33 +122,30 @@ gedActors$actor_level_1_txt[
 aEvT = taxonomy$event_tax[
 	taxonomy$event_tax$data.source=='acled',]
 gEvT = taxonomy$event_tax[
-	taxonomy$event_tax$data.source=='ged',]	
+	taxonomy$event_tax$data.source=='ged',]
 aEvT = aEvT[grepl('Battle',aEvT$base.categories),]
 gEvT = gEvT[gEvT$base.categories %in% 1:2,]
 taxonomy$event_tax = rbind(aEvT,gEvT) ; rm(aEvT,gEvT)
-
-# prec taxonomy
-### gonna trust them on this for now
 ########################################################
 
 ########################################################
 # formatting data
-acled = acled %>% 
+acled = acled %>%
 	# Convert dates to class date
-	# Rename variables to match taxonomy names. 
+	# Rename variables to match taxonomy names.
 	mutate(
 		date = dmy(EVENT_DATE),
 		enddate = dmy(EVENT_DATE),
 		event_tax = EVENT_TYPE,
 		# need to change this to dyadic after we resolve
 		# acled non-gov list
-		actor_tax = ACTOR1, 
+		actor_tax = ACTOR1,
 		prec_tax = GEO_PRECISION
-		) %>% 
-	rename_all(tolower) %>% 
+		) %>%
+	rename_all(tolower) %>%
 	data.frame(.,stringsAsFactors = FALSE)
 
-ged = ged %>%    
+ged = ged %>%
 	# ditto
 	mutate(
 		date = as.Date(date_start),
@@ -152,9 +153,9 @@ ged = ged %>%
 		event_tax = type_of_vi,
 		actor_tax = side_a,
 		prec_tax = where_prec
-		) %>% 
+		) %>%
 	data.frame(.,stringsAsFactors = FALSE)
-########################################################	
+########################################################
 
 ########################################################
 # meltt data

@@ -1,6 +1,12 @@
 ####
-if(Sys.info()['user'] %in% c('s7m', 'janus829')){ source('~/Research/victimization/R/setup.R') }
-if(Sys.info()['user'] %in% c('cassydorff')){ source('~/ProjectsGit/victimization/R/setup.R') }
+if(Sys.info()['user'] %in% c('Owner','herme','S7M')){
+	source(paste0(
+		'C:/Users/',Sys.info()['user'],
+		'/Research/victimization/R/setup.R')) }
+if(Sys.info()['user'] %in% c('s7m', 'janus829')){
+	source('~/Research/victimization/R/setup.R') }
+if(Sys.info()['user'] %in% c('cassydorff')){
+	source('~/ProjectsGit/victimization/R/setup.R') }
 
 # load libs
 loadPkg('readr')
@@ -18,15 +24,15 @@ acled = acled[acled$YEAR>=1997,]
 
 # subset on battles
 toKeep = c(
-	# 'Remote violence', 'Headquarters or base established', 
-	'Battle-No change of territory', 
-	'Battle-Government regains territory', 
+	# 'Remote violence', 'Headquarters or base established',
+	'Battle-No change of territory',
+	'Battle-Government regains territory',
 	'Battle-Non-state actor overtakes territory')
 
 acled = acled[which(acled$EVENT_TYPE %in% toKeep),]
 
 # stdz country names using panel
-acled$cname = cname(acled$COUNTRY) 
+acled$cname = cname(acled$COUNTRY)
 acled$id = with(acled, paste0(cname, '_', YEAR))
 acled$ccode=panel$ccode[match(acled$cname,panel$cname)]
 acled$cyear=paste(acled$ccode, acled$YEAR, sep='_')
