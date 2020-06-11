@@ -1,7 +1,7 @@
 from VicForViz import *
 import csv
 
-with open('abmGovIdeoRandom2.csv', 'w') as csvfile:
+with open('abmEpsilonBack.csv', 'w') as csvfile:
   abmwriter = csv.writer(csvfile, delimiter=',')
   for i in range(3000):
     actors = np.random.poisson(10)
@@ -14,7 +14,7 @@ with open('abmGovIdeoRandom2.csv', 'w') as csvfile:
     delta = np.random.uniform(low = .1, high = .75)
     battledeaths = np.random.poisson(1) + 1
     growthrate = .1
-    victimerror = np.random.uniform(low = 0, high = .5)
+    victimerror = np.random.uniform(low = 0, high = .2)
     turnlimit = np.random.poisson(10) + 1
     govIdeo = 0
     abm = Country("abm", territory, conn, actors, civ)

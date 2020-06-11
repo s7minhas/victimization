@@ -19,7 +19,7 @@ battledeaths = 2
 #Rate that the population grows in a turn
 growthrate = .1
 #How likely you are, with 1 supporter, to incorrectly kill a supporter
-###victimerror = .1
+victimerror = .05
 #If no one wins, how many turns should the game last
 turnlimit = 10
 govIdeo = 0
@@ -181,7 +181,7 @@ class Territory(object):
           nosupp.append(i)
       if len(nosupp) > 0:
     #Based on how many supporters, you get a probability of selective vs indiscriminate violence
-        selectprob = 1 - (((len(self.civilians) - len(supps))*(len(supps)))/len(self.civilians)**2)
+        selectprob = 1 - (((len(self.civilians) - len(supps))*(len(supps)))/len(self.civilians)**2 + victimerror*len(supps)/len(self.civilians))
         selective = np.random.binomial(1, selectprob, 1)
     ##If it works, you kill an opponent, everyone loves you!
         if selective == 1:
@@ -234,7 +234,7 @@ class Territory(object):
             suppnum += 1
         nsuppnum = len(self.civilians) - suppnum
   ###How likely are you to kill the right people
-        selectprob  = 1 - (((nsuppnum)*(suppnum))/len(self.civilians)**2)
+        selectprob  = 1 - (((nsuppnum)*(suppnum))/len(self.civilians)**2 + victimerror*suppnum/len(self.civilians))
         if nsuppnum > 0:
     ###What are the ranges of preferences for which people will support or oppose you
           if suppnum > 0:
@@ -273,7 +273,7 @@ class Territory(object):
     ###Opponent supporters
               nonloyal = len(self.civilians) - loyal
               nsuppnum = len(self.civilians) - suppnum
-              selectprob  = 1 - ((nsuppnum)*(suppnum))/(len(self.civilians)**2)
+              selectprob  = 1 - ((nsuppnum)*(suppnum))/(len(self.civilians)**2 + victimerror*suppnum/len(self.civilians))
     ###How victimization effects the resource balance
               if loyalzone == 0:
                 lossFunction = selectprob*nonloyal*VicPenalty*(1 + DisloyalPenalty) 
