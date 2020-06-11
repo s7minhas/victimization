@@ -33,7 +33,11 @@ data$year = num(unlist(lapply(strsplit(data$id,'_'), function(x){x[2]})))
 
 ############################
 # merge graph level measures
-graphVars = c('graph_trans','graph_dens')
+graphVars = c(
+	'graph_trans','graph_dens',
+	'graph_avgDeg', 'graph_meanDist',
+	'graph_localTrans'
+)
 data = simpleMerge(data, netDF, graphVars, 'id', 'id', lagVars=FALSE)
 ############################
 

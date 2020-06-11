@@ -110,8 +110,10 @@ stat = function(expr, object){
 	x=try(expr(object),TRUE)
 	if(class(x)=='try-error'){x=NA}
 	return(x) }
+localTrans = function(x){
+  igraph::transitivity(x, type='average') }
 
-cl = makeCluster(6)
+cl = makeCluster(20)
 registerDoParallel(cl)
 netStats <- foreach(
 	cntry = names(yListAll),
@@ -133,12 +135,18 @@ netStats <- foreach(
 		btwn = igraph::betweenness(grph)
 		totClose = igraph::closeness(grph)
 		eigenCent = igraph::evcent(grph)$vector # eigenvector centrality
-		graph_trans = stat(sna::gtrans, sgrph)
+		graph_trans = stat(igraph::transitivity, grph)
+    graph_localTrans = stat(localTrans, grph)
 		graph_dens = sna::gden(sgrph, mode='graph')
+		graph_avgDeg = mean(stat(sna::degree, sgrph))
+		graph_meanDist = mean_distance(grph)
+		graph_recip = stat(sna::grecip, sgrph)
 		out = data.frame(
 			totDegree, btwn,
 			totClose, eigenCent,
 			graph_trans, graph_dens,
+			graph_localTrans, graph_avgDeg,
+			graph_meanDist, graph_recip,
 			year=t )
 		out$country = cntry ; out$actor = rownames(mat)
 		rownames(out) = NULL ; return(out) })
@@ -146,6 +154,7 @@ netStats <- foreach(
 	return(cntryDF)
 }
 names(netStats) = names(yListAll)
+stopCluster(cl)
 
 save(netStats,
 	file=paste0(pathData, 'netStats_acled.rda'))

@@ -96,8 +96,10 @@ stat = function(expr, object){
 	x=try(expr(object),TRUE)
 	if(class(x)=='try-error'){x=NA}
 	return(x) }
+localTrans = function(x){
+  igraph::transitivity(x, type='average') }
 
-cl = makeCluster(6)
+cl = makeCluster(20)
 registerDoParallel(cl)
 netStats <- foreach(
 	cntry = names(yListAll),
@@ -106,6 +108,7 @@ netStats <- foreach(
 	cntryStats = lapply(yrs, function(t){
 		mat = yListAll[[cntry]][[char(t)]]
 		if(is.null(mat)){return(NULL)}
+
 		grph = graph_from_adjacency_matrix(mat,
 			mode='directed', weighted=NULL )
 		sgrph = network::network(mat, matrix.type="adjacency",directed=TRUE)
@@ -125,20 +128,25 @@ netStats <- foreach(
 		if(sum(totDegree)<3){lcent = NA} else {
 			lcent = stat(sna::loadcent,sgrph) } # load centrality
 		prestige = stat(sna::prestige, sgrph) # prestige
+		graph_trans = stat(igraph::transitivity, grph)
+    graph_localTrans = stat(localTrans, grph)
+		graph_dens = sna::gden(sgrph, mode='graph')
+		graph_avgDeg = mean(stat(sna::degree, sgrph))
+		graph_meanDist = mean_distance(grph)
 		graph_recip = stat(sna::grecip, sgrph)
-		graph_trans = stat(sna::gtrans, sgrph)
-		graph_dens = stat(sna::gden, sgrph)
 		out = data.frame(
 			inDegree, outDegree, totDegree, btwn, power,
 			inClose, outClose, totClose, eigenCent, flow, gcent,
 			icent, lcent, prestige,
 			graph_recip, graph_trans, graph_dens,
+			graph_localTrans, graph_avgDeg, graph_meanDist,
 			year=t )
 		out$country = cntry ; out$actor = rownames(mat)
 		rownames(out) = NULL ; return(out) })
 	cntryDF = do.call('rbind', cntryStats)
 	return(cntryDF)
 }
+stopCluster(cl)
 
 names(netStats) = names(yListAll)
 netStatsGED = netStats
