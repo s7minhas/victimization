@@ -26,9 +26,7 @@ cleaner = function(x){
 
 # load in data #################################
 abmPyPath = paste0(pathGit, '/Python/')
-abmData1 = read.csv(paste0(abmPyPath, 'abmGovIdeoRandom.csv'), header = F)
-abmData2 = read.csv(paste0(abmPyPath, 'abmGovIdeoRandom2.csv'), header = F)
-abmData = rbind(abmData1,abmData2)
+abmData = read.csv(paste0(abmPyPath, 'abmEpsilonBack.csv'), header = F)
 save(abmData, file=paste0(abmPath, 'abmData.rda'))
 ################################################
 
