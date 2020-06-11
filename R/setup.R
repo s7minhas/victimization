@@ -85,7 +85,7 @@ pkgs = c(
 loadPkg(pkgs)
 
 # load fonts
-loadfonts()
+suppressMessages(loadfonts())
 
 # Set a theme for gg
 theme_set(theme_bw())
