@@ -88,6 +88,11 @@ yListAll = lapply(names(actorsCT), function(cntry){
 	}) ; names(yList) = yrs
 	return(yList)
 }) ; names(yListAll) = names(actorsCT)
+
+## save
+yListAll_GED = yListAll
+save(yListAll_GED,
+     file=paste0(pathData, 'actorAdjList_GED.rda'))
 #################
 
 #################
