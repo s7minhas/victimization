@@ -18,9 +18,9 @@ loadPkg(c(
 #################
 # load data
 load(paste0(pathData, 'actorAdjList.rda')) # yListAll
-load(paste0(pathData, 'netStats.rda')) # netStats
-load(paste0(pathData, 'actorAdjList_GED.rda')) # yListALL_GED
-load(paste0(pathData, 'netStatsGED.rda')) # netStatsGED
+# load(paste0(pathData, 'netStats.rda')) # netStats
+# load(paste0(pathData, 'actorAdjList_GED.rda')) # yListALL_GED
+# load(paste0(pathData, 'netStatsGED.rda')) # netStatsGED
 #################
 
 #################
@@ -32,9 +32,9 @@ cntries = names(yListAll)
 cntries = countrycode(cntries, 'country.name', 'country.name')
 names(yListAll) = cntries
 
-cntries = names(yListAll_GED)
-cntries = countrycode(cntries, 'country.name', 'country.name')
-names(yListAll_GED) = cntries
+# cntries = names(yListAll_GED)
+# cntries = countrycode(cntries, 'country.name', 'country.name')
+# names(yListAll_GED) = cntries
 
 # label of object for ui/server
 netList = yListAll
@@ -54,11 +54,11 @@ ui <- fluidPage(
                 "plotYr", 
                 "Year:",
                 choices=yrs,
-                selected='1997'
+                selected="1997"
             ),
             selectInput(
-                'cntry',
-                'Country:',
+                "cntry",
+                "Country:",
                 choices=sort(names(netList))
             )
         ),
@@ -66,7 +66,7 @@ ui <- fluidPage(
         # Show a plot of the generated distribution
         mainPanel(
            plotOutput("netPlot"),
-           tableOutput('netTable')
+           tableOutput("netTable")
         )
     )
 )
@@ -95,7 +95,7 @@ server <- function(input, output) {
     })
     
     # make net plot
-    netPlot <- renderPlot({
+    output$netPlot <- renderPlot({
       
         # get graph
         g = prepData()
@@ -124,7 +124,7 @@ server <- function(input, output) {
     })
     
     # make netTable
-    netTable <- renderTable({
+    output$netTable <- renderTable({
         
         # pull out specific country from netList
         cntryList = netList[[input$cntry]]
