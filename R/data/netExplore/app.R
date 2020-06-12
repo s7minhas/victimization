@@ -1,15 +1,6 @@
 ### todos:
 
-# make vertex label size a function of degree
-
-# consider using plotly for network viz (https://plotly.com/r/network-graphs/)
-# visnetwork
-
-# in the net stats table also consider adding in other measures such as 
-# the average of the degree scores of every indiv actor
-
-# bring in civilian vic data, add another plot htat shows time series of
-# graph level stats against civilian vic
+# make things pretty
 
 # to get at the star level thing, we can also have another table that
 # shows a sorting of actors by degree
@@ -27,14 +18,17 @@ if(Sys.info()['user'] %in% c('cassydorff')){
 
 #################
 loadPkg(c(
-    'shiny', 'shinyWidgets', 'scales'
+    'shiny', 'shinyWidgets', 
+    'scales', 'visNetwork',
+    'tidyr', 'ggplot2'
 ))
 #################
 
 #################
 # load data
 load(paste0(pathData, 'actorAdjList.rda')) # yListAll
-# load(paste0(pathData, 'netStats.rda')) # netStats
+load(paste0(pathData, 'netStats_acled.rda')) # netStats
+load(paste0(pathData, 'iData_acled.rda')) # modeling file
 # load(paste0(pathData, 'actorAdjList_GED.rda')) # yListALL_GED
 # load(paste0(pathData, 'netStatsGED.rda')) # netStatsGED
 #################
@@ -43,14 +37,32 @@ load(paste0(pathData, 'actorAdjList.rda')) # yListAll
 # get years
 yrs = sort(unique(unlist(lapply(yListAll, names))))
 
-# clean up countrynames in both ucdp and acled
-cntries = names(yListAll)
-cntries = countrycode(cntries, 'country.name', 'country.name')
-names(yListAll) = cntries
+# clean up countrynames in both acled and ucdp 
+# for both the adjLists and netStats
 
-# cntries = names(yListAll_GED)
-# cntries = countrycode(cntries, 'country.name', 'country.name')
-# names(yListAll_GED) = cntries
+cleanListNames = function(x){
+  cntries = names(x)
+  cntries = countrycode(cntries, 'country.name', 'country.name')
+  names(x) = cntries
+  return(x) }
+
+# acled adj list
+yListAll = cleanListNames(yListAll)
+
+# ucdp adj list
+# yListAll_GED = cleanListNames(yListAll_GED)
+
+# acled net stats 
+netStats = cleanListNames(netStats)
+
+# vector of graph stats from net stats
+# for use in table output
+graphStats = names(netStats[[1]])[
+  grepl('graph_',names(netStats[[1]]))]
+
+# when using acled graph_recip will equal one
+# change when modifying to choosing between acled/ucdp
+graphStats = graphStats[-length(graphStats)]
 
 # label of object for ui/server
 netList = yListAll
@@ -63,11 +75,11 @@ ui <- fluidPage(
     # Application title
     titlePanel("Conflict Networks"),
 
-    # Sidebar with a slider input for number of bins 
+    # Sidebar with a slider input for number of bins
     sidebarLayout(
         sidebarPanel(
             sliderTextInput(
-                "plotYr", 
+                "plotYr",
                 "Year:",
                 choices=yrs,
                 selected="1997"
@@ -76,17 +88,30 @@ ui <- fluidPage(
                 "cntry",
                 "Country:",
                 choices=sort(names(netList))
+            ),
+            selectInput(
+              'vicGraphCompare',
+              'Graph Measure to Compare Vic Against:',
+              choices=sort(graphStats),
+              selected='graph_avgDeg',
+              multiple = TRUE
             )
         ),
 
         # Show a plot of the generated distribution
         mainPanel(
-           plotOutput("netPlot"),
-           tableOutput("netTable")
+          visNetworkOutput("netPlot", height='700px', width='100%'),
+          plotOutput("vicCompare", width='80%'),
+          tableOutput("netTable")
         )
     )
 )
 #################
+
+# input = list(
+#   cntry='NIGERIA',
+#   plotYr=2000
+# )
 
 #################
 # Define server logic
@@ -94,10 +119,10 @@ server <- function(input, output) {
 
     # prep data
     prepData <- reactive({
-        
+
         # choose mat based on user input
         mat = netList[[input$cntry]][[char(input$plotYr)]]
-        
+
         # make graph if it is not null
         if(!is.null(mat)){
             g = graph_from_adjacency_matrix(
@@ -106,63 +131,132 @@ server <- function(input, output) {
             g = NULL
         }
 
-        # 
+        #
         return(g)
     })
-    
+
     # make net plot
-    output$netPlot <- renderPlot({
-      
+    output$netPlot <- renderVisNetwork({
+
         # get graph
         g = prepData()
-        
+
         # exit if null
         validate(
             need(!is.null(g), 'No events for this country-year')
         )
-        
-        # rescale
-        V(g)$size = degree(g, mode='total')
-        V(g)$size = rescale(V(g)$size, 1, 25)
-        
-        # net plot
-        set.seed(6886)
-        par(mar=c(0,0,0,0))
-        plot(
-            g, 
-            vertex.size = V(g)$size, 
-            vertex.color='grey',
-            vertex.label.color='black',
-            vertex.label.cex=.75,
-            edge.curved=.25,
-            edge.color='grey20'
-        )
+
+
+        ## create plotly version
+        # extract nodes and edges from graph
+        edges = data.frame(as_edgelist(g), stringsAsFactors=FALSE)
+        names(edges) = c('from', 'to')
+        nodes = data.frame(id=V(g)$name, stringsAsFactors = FALSE)
+
+        # set attributes for nodes
+        nodes$title = nodes$id
+        nodes$label = nodes$id
+        nodes$size = rescale(degree(g, mode='total'), to=c(10, 30))
+        nodes$color.background = 'slategrey'
+        nodes$color.border = 'black'
+
+        # set special node attribute for gov actors
+        nodes$gov = grepl(
+          'Police Forces|Military Forces',
+          nodes$id
+          )
+        nodes$color.background[nodes$gov] = 'gold'
+
+        # set attributes for edges
+        edges$width = 3
+        edges$color = 'black'
+        edges$smooth = TRUE
+
+        # viz
+        visNetwork(nodes, edges, width='100%')
     })
-    
+
+    # extract network data from netStats
+    prepNetTabData <- reactive({
+      
+      # pull in cntrylevel results (at the level of actor)
+      actorStats = netStats[[input$cntry]]
+      
+      # calculate number of actors for every year
+      nVec = tapply(actorStats$actor, actorStats$year, length)
+      
+      # subset to relev unique rows and only graph level
+      # columns
+      cntryStats = unique(
+        actorStats[,c('year', graphStats)] )
+      
+      # merge nActors and reorg table order
+      cntryStats = cbind(cntryStats, nActors=nVec)
+      cntryStats = cntryStats[,c('year', 'nActors', graphStats)]
+      
+      # cleanup
+      cntryStats$year = as.integer(cntryStats$year)
+      
+      #
+      return(cntryStats)
+    })
+
     # make netTable
     output$netTable <- renderTable({
-        
-        # pull out specific country from netList
-        cntryList = netList[[input$cntry]]
-        yrs = names(cntryList)
-        
-        # calc some stats
-        nActors = unlist(lapply(cntryList, nrow))
-        if(is.null(nActors)){ nActors = rep('No events', length(yrs)) }
-        dens = suppressWarnings(
-            round(
-                unlist(lapply(cntryList, mean, na.rm=TRUE)),
-                2)
-        )
-        dens = char(dens)
-        dens[is.na(dens)] = 'No events'
-        
-        # org
-        tab = cbind(Year=yrs, nActors, dens)
-        rownames(tab) = NULL
-        tab = data.frame(tab, stringsAsFactors = FALSE)
-        return(tab)
+
+        # get net stats for table
+        cntryStatsForTab = prepNetTabData()
+      
+        # cleanup
+        cntryStatsForTab[,graphStats] = round(cntryStatsForTab[,graphStats], 2)
+        rownames(cntryStatsForTab) = NULL
+
+        #
+        return(cntryStatsForTab)
     })
+
+  # make viz comparing net stats to vic
+  output$vicCompare <- renderPlot({
+  
+    # get vic data from iData_acled result (data)
+    vicData = data[data$cname == input$cntry,
+    c(
+      'cname','year',
+      'civVicCount'
+      ) ]
+  
+    # get net stats for plot
+    cntryNetStats = prepNetTabData()
+    
+    # merge
+    toMerge = setdiff(names(cntryNetStats), 'year') 
+    for(v in toMerge){
+      vicData$tmp = cntryNetStats[match(vicData$year, cntryNetStats$year), v]
+      names(vicData)[ncol(vicData)] = v }
+    
+    # adj data for plotting
+    ggData = pivot_longer(vicData, 
+      cols=civVicCount:graph_centrz,
+      names_to = 'graphMeasure',
+      values_to = 'value'
+      )
+    
+    # bring in user input to limit graph measures
+    toPlot = c('civVicCount', input$vicGraphCompare)
+    ggData = ggData[which(ggData$graphMeasure %in% toPlot),]
+    
+    # plot
+    ggplot(ggData, aes(x=year, y=value)) +
+      geom_line() + geom_point() +
+      facet_wrap(~graphMeasure, ncol=1) +
+      labs(
+        x=''
+      ) +
+      theme(
+        axis.ticks=element_blank(),
+        panel.border=element_blank()
+      )
+  })
 }
 #################
 
