@@ -1,7 +1,11 @@
 ########################################################
-if(Sys.info()['user'] %in% c('s7m', 'janus829')){ 
+if(Sys.info()['user'] %in% c('Owner','herme','S7M')){
+	source(paste0(
+		'C:/Users/',Sys.info()['user'],
+		'/Research/victimization/R/setup.R')) }
+if(Sys.info()['user'] %in% c('s7m', 'janus829')){
 	source('~/Research/victimization/R/setup.R') }
-if(Sys.info()['user'] %in% c('cassydorff')){ 
+if(Sys.info()['user'] %in% c('cassydorff')){
 	source('~/ProjectsGit/victimization/R/setup.R') }
 
 #
@@ -35,7 +39,7 @@ modsCntrls_noImp_RE = glmer.nb(
 		+ (1|ccode)
 		+ polity2 + popLog + gdpCapLog   # structural controls
 		+ ethfrac
-		+ anyPeaceKeeper 
+		+ anyPeaceKeeper
 	, data=slice
 	)
 modsCntrls = list(modBase_noImp_RE)
@@ -43,7 +47,7 @@ modsCntrls = list(modsCntrls_noImp_RE)
 ########################################################
 
 ########################################################
-# sim 
+# sim
 ## pick a random model
 set.seed(6886) ; randMod = sample(1:length(modsCntrls),1)
 mod = modsCntrls[[randMod]]
@@ -63,7 +67,7 @@ densRange = quantile(slice$graph_dens, c(0.025, 0.975))
 medNA = function(x){median(x,na.rm=TRUE)}
 meaNA = function(x){mean(x,na.rm=TRUE)}
 scen = cbind(
-	1, 
+	1,
 	densRange,
 	medNA(slice$nConf), medNA(slice$nActors)
 	,meaNA(data$polity2), meaNA(data$popLog),
@@ -84,14 +88,14 @@ ggData = melt(yHat, id='densRange')
 
 ggData = ggData[ggData$densRange %in% c(densRange[2],densRange[4]),]
 
-ggplot(ggData, 
+ggplot(ggData,
 	aes(x=value, fill=factor(densRange),color=factor(densRange))
 	) +
 	geom_density(alpha=.1) +
 	facet_wrap(~factor(densRange),ncol=1,scales='free_y')
 
 # ggData = melt(yHat, id='densRange')
-# ggplot(ggData, 
+# ggplot(ggData,
 # 	aes(x=densRange, y=value, group=variable)
 # 	) +
 # 	geom_line(alpha=.1)

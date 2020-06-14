@@ -1,7 +1,11 @@
 ####
-if(Sys.info()['user'] %in% c('s7m', 'janus829')){ 
+if(Sys.info()['user'] %in% c('Owner','herme','S7M')){
+	source(paste0(
+		'C:/Users/',Sys.info()['user'],
+		'/Research/victimization/R/setup.R')) }
+if(Sys.info()['user'] %in% c('s7m', 'janus829')){
 	source('~/Research/victimization/R/setup.R') }
-if(Sys.info()['user'] %in% c('dorffc')){ 
+if(Sys.info()['user'] %in% c('dorffc')){
 	source('~/ProjectsGit/victimization/R/setup.R') }
 
 # helpful pkgs
@@ -36,7 +40,7 @@ makePlot = function(ggData, varName){
 	g=ggplot(ggData, aes(x=year, y=iv)) +
 	geom_line() + geom_point() +
 	labs(
-		x='', 
+		x='',
 		y=''
 		) +
 	facet_wrap(~cname, scales='free_y') +
@@ -46,7 +50,7 @@ makePlot = function(ggData, varName){
 		legend.position = 'bottom',
 		legend.title = element_blank()
 		)
-	ggsave(g, 
+	ggsave(g,
 		file=paste0(pathGraphics, varName, 'timeSeries.pdf'),
 		width=12, height=10
 		)

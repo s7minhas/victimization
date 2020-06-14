@@ -1,5 +1,5 @@
 # setup #########################################
-if(Sys.info()['user'] %in% c('Owner','herme')){
+if(Sys.info()['user'] %in% c('Owner','herme','S7M')){
 	source(paste0(
 		'C:/Users/',Sys.info()['user'],
 		'/Research/victimization/R/setup.R')) }

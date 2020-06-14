@@ -1,4 +1,8 @@
 #################
+if(Sys.info()['user'] %in% c('Owner','herme','S7M')){
+	source(paste0(
+		'C:/Users/',Sys.info()['user'],
+		'/Research/victimization/R/setup.R')) }
 if(Sys.info()['user'] %in% c('s7m', 'janus829')){
 	source('~/Research/victimization/R/setup.R') }
 
@@ -58,7 +62,7 @@ actorsCT = lapply(unique(actorDates$COUNTRY), function(cntry){
 	actorsT = lapply( yrs, function(t){
 	  actors = NULL
 	  for( ii in 1:nrow(aDateSlice)){
-	     if( t %in% aDateSlice$YEAR.min[ii]:aDateSlice$YEAR.max[ii] ) { 
+	     if( t %in% aDateSlice$YEAR.min[ii]:aDateSlice$YEAR.max[ii] ) {
 	      actors = append(actors, aDateSlice$a1[[ii]]) } }
 	  return(actors)
 	}) ; names(actorsT) = yrs
@@ -71,20 +75,20 @@ yListAll = lapply(names(actorsCT), function(cntry){
 	nData = aData[aData$COUNTRY==cntry,]
 	nData$dv = 1 ; yVar = 'dv'
 	actorsT = actorsCT[[cntry]]
-	yList = lapply(yrs, function(ii){ 		
+	yList = lapply(yrs, function(ii){
 		if(
-			is.null(actorsT[[char(ii)]]) | 
+			is.null(actorsT[[char(ii)]]) |
 			length(actorsT[[char(ii)]])<5){
 			return(NULL)
 		}
 		actorSlice = actorsT[[char(ii)]]
-		slice = nData[ which( 
-			nData$YEAR==ii & 
+		slice = nData[ which(
+			nData$YEAR==ii &
 			nData$a1 %in% actorSlice &
 			nData$a2 %in% actorSlice
 			), c('a1', 'a2', yVar) ]
 		if(nrow(slice)==0){return(NULL)}
-		adjMat = matrix(0, 
+		adjMat = matrix(0,
 			nrow=length(actorSlice), ncol=length(actorSlice),
 			dimnames=list(actorSlice,actorSlice) )
 		for(r in 1:nrow(slice)){ adjMat[slice$a1[r],slice$a2[r]]=1  }
@@ -95,8 +99,8 @@ yListAll = lapply(names(actorsCT), function(cntry){
 	return(yList)
 }) ; names(yListAll) = names(actorsCT)
 
-## save 
-save(yListAll, 
+# save
+save(yListAll,
      file=paste0(pathData, 'actorAdjList.rda'))
 #################
 
@@ -106,11 +110,13 @@ stat = function(expr, object){
 	x=try(expr(object),TRUE)
 	if(class(x)=='try-error'){x=NA}
 	return(x) }
+localTrans = function(x){
+  igraph::transitivity(x, type='average') }
 
-cl = makeCluster(6)
+cl = makeCluster(20)
 registerDoParallel(cl)
 netStats <- foreach(
-	cntry = names(yListAll), 
+	cntry = names(yListAll),
 	.packages=c('igraph','sna','network')
 	) %dopar% {
 	cntryStats = lapply(yrs, function(t){
@@ -118,31 +124,38 @@ netStats <- foreach(
 		if(is.null(mat)){return(NULL)}
 
 		# mats are undirected by construction
-		# for any country-t we just look for the 
+		# for any country-t we just look for the
 		# presence of an event
-		grph = graph_from_adjacency_matrix(mat, 
+		grph = graph_from_adjacency_matrix(mat,
 			mode='undirected', weighted=NULL )
-		sgrph = network::network(mat, 
+		sgrph = network::network(mat,
 			matrix.type="adjacency", directed=FALSE)
 
 		totDegree = igraph::degree(grph)
 		btwn = igraph::betweenness(grph)
 		totClose = igraph::closeness(grph)
 		eigenCent = igraph::evcent(grph)$vector # eigenvector centrality
-		graph_trans = stat(sna::gtrans, sgrph)
+		graph_trans = stat(igraph::transitivity, grph)
+    graph_localTrans = stat(localTrans, grph)
 		graph_dens = sna::gden(sgrph, mode='graph')
+		graph_avgDeg = mean(stat(sna::degree, sgrph))
+		graph_meanDist = mean_distance(grph)
+		graph_recip = stat(sna::grecip, sgrph)
 		out = data.frame(
-			totDegree, btwn, 
-			totClose, eigenCent, 
+			totDegree, btwn,
+			totClose, eigenCent,
 			graph_trans, graph_dens,
+			graph_localTrans, graph_avgDeg,
+			graph_meanDist, graph_recip,
 			year=t )
 		out$country = cntry ; out$actor = rownames(mat)
 		rownames(out) = NULL ; return(out) })
 	cntryDF = do.call('rbind', cntryStats)
-	return(cntryDF)	
+	return(cntryDF)
 }
 names(netStats) = names(yListAll)
+stopCluster(cl)
 
-save(netStats, 
+save(netStats,
 	file=paste0(pathData, 'netStats_acled.rda'))
 #################

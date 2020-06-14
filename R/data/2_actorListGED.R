@@ -1,6 +1,17 @@
-if(Sys.info()['user'] %in% c('s7m', 'janus829')){ source('~/Research/victimization/R/setup.R') }
-if(Sys.info()['user'] %in% c('cassydorff')){ source('~/ProjectsGit/victimization/R/setup.R') }
+#################
+if(Sys.info()['user'] %in% c('Owner','herme','S7M')){
+	source(paste0(
+		'C:/Users/',Sys.info()['user'],
+		'/Research/victimization/R/setup.R')) }
+if(Sys.info()['user'] %in% c('s7m', 'janus829')){
+	source('~/Research/victimization/R/setup.R') }
+if(Sys.info()['user'] %in% c('cassydorff')){
+	source('~/ProjectsGit/victimization/R/setup.R') }
+#################
+
+#################
 load(paste0(pathData, 'cntriesGED_byAll.rda'))
+#################
 
 #################
 # clean actor names for ged
@@ -20,7 +31,7 @@ length(setdiff(cntriesGED, cntriesAcled)) #38
 
 # subset ged data to match acled countries if we ewant
 cDataSubset = cData[which(cData$country %in% cntriesAcled),]
-length(unique(cDataSubset$country)) 
+length(unique(cDataSubset$country))
 rm(cntriesAcled)
 #################
 
@@ -43,7 +54,7 @@ actorsCT = lapply(unique(actorDatesGED$country), function(cntry){
 	actorsT = lapply( yrs, function(t){
 	  actors = NULL
 	  for( ii in 1:nrow(aDateSlice)){
-	     if( t %in% aDateSlice$year.min[ii]:aDateSlice$year.max[ii] ) {  
+	     if( t %in% aDateSlice$year.min[ii]:aDateSlice$year.max[ii] ) {
 	      actors = append(actors, aDateSlice$a1[[ii]]) } }
 	  return(actors)
 	}) ; names(actorsT) = yrs
@@ -56,20 +67,20 @@ yListAll = lapply(names(actorsCT), function(cntry){
 	nData = cData[cData$country==cntry,]
 	nData$dv = 1 ; yVar = 'dv'
 	actorsT = actorsCT[[cntry]]
-	yList = lapply(yrs, function(ii){ 		
+	yList = lapply(yrs, function(ii){
 		if(
-			is.null(actorsT[[char(ii)]]) | 
+			is.null(actorsT[[char(ii)]]) |
 			length(actorsT[[char(ii)]])<5){
 			return(NULL)
 		}
 		actorSlice = actorsT[[char(ii)]]
-		slice = nData[ which( 
-			nData$year==ii & 
+		slice = nData[ which(
+			nData$year==ii &
 			nData$a1 %in% actorSlice &
 			nData$a2 %in% actorSlice
 			), c('a1', 'a2', yVar) ]
 		if(nrow(slice)==0){return(NULL)}
-		adjMat = matrix(0, 
+		adjMat = matrix(0,
 			nrow=length(actorSlice), ncol=length(actorSlice),
 			dimnames=list(actorSlice,actorSlice) )
 		for(r in 1:nrow(slice)){ adjMat[slice$a1[r],slice$a2[r]]=1  }
@@ -77,6 +88,11 @@ yListAll = lapply(names(actorsCT), function(cntry){
 	}) ; names(yList) = yrs
 	return(yList)
 }) ; names(yListAll) = names(actorsCT)
+
+## save
+yListAll_GED = yListAll
+save(yListAll_GED,
+     file=paste0(pathData, 'actorAdjList_GED.rda'))
 #################
 
 #################
@@ -85,17 +101,20 @@ stat = function(expr, object){
 	x=try(expr(object),TRUE)
 	if(class(x)=='try-error'){x=NA}
 	return(x) }
+localTrans = function(x){
+  igraph::transitivity(x, type='average') }
 
-cl = makeCluster(6)
+cl = makeCluster(20)
 registerDoParallel(cl)
 netStats <- foreach(
-	cntry = names(yListAll), 
+	cntry = names(yListAll),
 	.packages=c('igraph','sna','network')
 	) %dopar% {
 	cntryStats = lapply(yrs, function(t){
 		mat = yListAll[[cntry]][[char(t)]]
 		if(is.null(mat)){return(NULL)}
-		grph = graph_from_adjacency_matrix(mat, 
+
+		grph = graph_from_adjacency_matrix(mat,
 			mode='directed', weighted=NULL )
 		sgrph = network::network(mat, matrix.type="adjacency",directed=TRUE)
 
@@ -104,7 +123,7 @@ netStats <- foreach(
 		totDegree = igraph::degree(grph, mode='total')
 		btwn = igraph::betweenness(grph)
 		power = stat(igraph::bonpow,grph) # bonaich 1987
-		inClose = igraph::closeness(grph, mode='in') 
+		inClose = igraph::closeness(grph, mode='in')
 		outClose = igraph::closeness(grph, mode='out')
 		totClose = igraph::closeness(grph, mode='total')
 		eigenCent = igraph::evcent(grph)$vector # eigenvector centrality
@@ -114,22 +133,27 @@ netStats <- foreach(
 		if(sum(totDegree)<3){lcent = NA} else {
 			lcent = stat(sna::loadcent,sgrph) } # load centrality
 		prestige = stat(sna::prestige, sgrph) # prestige
+		graph_trans = stat(igraph::transitivity, grph)
+    graph_localTrans = stat(localTrans, grph)
+		graph_dens = sna::gden(sgrph, mode='graph')
+		graph_avgDeg = mean(stat(sna::degree, sgrph))
+		graph_meanDist = mean_distance(grph)
 		graph_recip = stat(sna::grecip, sgrph)
-		graph_trans = stat(sna::gtrans, sgrph)
-		graph_dens = stat(sna::gden, sgrph)
 		out = data.frame(
-			inDegree, outDegree, totDegree, btwn, power, 
-			inClose, outClose, totClose, eigenCent, flow, gcent, 
-			icent, lcent, prestige, 
+			inDegree, outDegree, totDegree, btwn, power,
+			inClose, outClose, totClose, eigenCent, flow, gcent,
+			icent, lcent, prestige,
 			graph_recip, graph_trans, graph_dens,
+			graph_localTrans, graph_avgDeg, graph_meanDist,
 			year=t )
 		out$country = cntry ; out$actor = rownames(mat)
 		rownames(out) = NULL ; return(out) })
 	cntryDF = do.call('rbind', cntryStats)
-	return(cntryDF)	
+	return(cntryDF)
 }
+stopCluster(cl)
 
 names(netStats) = names(yListAll)
 netStatsGED = netStats
-save(netStatsGED, file=paste0(pathData, 'netStatsGED.rda'))	
+save(netStatsGED, file=paste0(pathData, 'netStatsGED.rda'))
 #################

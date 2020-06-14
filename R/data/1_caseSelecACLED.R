@@ -1,3 +1,7 @@
+if(Sys.info()['user'] %in% c('Owner','herme','S7M')){
+	source(paste0(
+		'C:/Users/',Sys.info()['user'],
+		'/Research/victimization/R/setup.R')) }
 if(Sys.info()['user'] %in% c('s7m', 'janus829')){
 	source('~/Research/victimization/R/setup.R') }
 if(Sys.info()['user'] %in% c('cassydorff')){
@@ -7,8 +11,7 @@ loadPkg('readr')
 acled = read_csv(
 	paste0(
 		pathData,
-		# "ACLED-Version-7-All-Africa-1997-2016_csv_dyadic-file.csv"))
-		"acled_raw_1997-01-01-2020-06-03.csv"))
+		"ACLED-Version-7-All-Africa-1997-2016_csv_dyadic-file.csv"))
 
 acledCiv = acled[
 	which(

@@ -1,5 +1,5 @@
 # setup #########################################
-if(Sys.info()['user'] %in% c('Owner','herme')){
+if(Sys.info()['user'] %in% c('Owner','herme','S7M')){
 	source(paste0(
 		'C:/Users/',Sys.info()['user'],
 		'/Research/victimization/R/setup.R')) }
@@ -7,6 +7,10 @@ if(Sys.info()['user'] %in% c('s7m', 'janus829')){
 	source('~/Research/victimization/R/setup.R') }
 if(Sys.info()['user'] %in% c('maxgallop')){
 	source('~/Documents/victimization/R/setup.R') }
+
+loadPkg(c('MASS'
+	# ,'KRLS','bigKRLS','randomForest'
+	))
 ################################################
 
 # load in data #################################
@@ -15,28 +19,17 @@ load(paste0(abmPath, 'netStats.rda'))
 
 # peak at results ##############################
 # basic look at results
-loadPkg('ggcorrplot')
-corr = round(
-	cor(
-		netStats[,c(1:12, 30, 26)],
-		use='pairwise.complete.obs'),3)
-ggcorrplot(corr, colors=c('red','white','blue'))
-
 cor(netStats[,1:12])
 ################################################
 
 ################################################
 # run neg binom
-loadPkg(c('MASS'
-	# ,'KRLS','bigKRLS','randomForest'
-	))
-
 mod = glm.nb(
-	vic ~ graph_dens + numConf + n_actors,
+	vic ~ graph_avgDeg + numConf + n_actors +  graph_centrz,
 	data=netStats)
 
 mod_pois = glm(
-	vic ~ graph_dens + numConf + n_actors,
+	vic ~ graph_avgDeg + numConf + n_actors +  graph_centrz,
 	data=netStats,
 	family='poisson')
 
@@ -91,7 +84,8 @@ res
 # pdb1 = pdbart(
 # 	x,y,xind=c(1,2),
 # 	levs=list(seq(-1,1,.2),seq(-1,1,.2)),pl=FALSE,
-# 	keepevery=10,ntree=100,nskip=100,ndpost=200) #should run longer!
+#should run longer!
+# 	keepevery=10,ntree=100,nskip=100,ndpost=200)
 # plot(pdb1,ylim=c(-.6,.6))
 
 # viz of results
@@ -120,12 +114,18 @@ coefData$varName = factor(
 
 ########################################################
 # viz
-ggCoef = ggplot(coefData, aes(x=varName, y=mean, color=sig)) +
-	geom_hline(aes(yintercept=0), linetype=2, color = "black") +
+ggCoef = ggplot(
+		coefData,
+		aes(x=varName, y=mean, color=sig)) +
+	geom_hline(
+		aes(yintercept=0), linetype=2, color = "black") +
 	geom_point(size=4) +
-	geom_linerange(aes(ymin=lo90, ymax=hi90),alpha = 1, size = 1) +
-	geom_linerange(aes(ymin=lo95,ymax=hi95),alpha = 1, size = .5) +
-	scale_colour_manual(values = coefp_colors, guide=FALSE) +
+	geom_linerange(
+		aes(ymin=lo90, ymax=hi90),alpha = 1, size = 1) +
+	geom_linerange(
+		aes(ymin=lo95,ymax=hi95),alpha = 1, size = .5) +
+	scale_colour_manual(
+		values = coefp_colors, guide=FALSE) +
 	ylab('') + xlab('') +
 	facet_wrap(~model) +
 	coord_flip() +
@@ -135,8 +135,10 @@ ggCoef = ggplot(coefData, aes(x=varName, y=mean, color=sig)) +
 		panel.border=element_blank(),
 		axis.ticks=element_blank(),
 		axis.text.y=element_text(hjust=0),
-		strip.text.x = element_text(size = 9, color='white'),
-		strip.background = element_rect(fill = "#525252", color='#525252')
+		strip.text.x = element_text(
+			size = 9, color='white'),
+		strip.background = element_rect(
+			fill = "#525252", color='#525252')
 	)
 ggsave(ggCoef,
 	width=7, height=4,

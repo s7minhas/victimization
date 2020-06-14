@@ -1,6 +1,6 @@
 ########
 rm(list=ls())
-if(Sys.info()['user'] %in% c('Owner','herme')){
+if(Sys.info()['user'] %in% c('Owner','herme','S7M')){
 	pathGit = paste0(
 		'C:/Users/',Sys.info()['user'],'/Research/victimization/')
 	pathDrop = paste0(
@@ -80,9 +80,12 @@ pkgs = c(
 	'dplyr', 'tidyr', 'magrittr',
 	'network', 'igraph',
 	'ggplot2', 'RColorBrewer', 'latex2exp',
-	'countrycode'
+	'countrycode', 'extrafont', 'Cairo'
 	)
 loadPkg(pkgs)
+
+# load fonts
+suppressMessages(loadfonts())
 
 # Set a theme for gg
 theme_set(theme_bw())

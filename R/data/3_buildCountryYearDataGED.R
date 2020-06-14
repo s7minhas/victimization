@@ -1,7 +1,11 @@
 ####
-if(Sys.info()['user'] %in% c('s7m', 'janus829')){ 
+if(Sys.info()['user'] %in% c('Owner','herme','S7M')){
+	source(paste0(
+		'C:/Users/',Sys.info()['user'],
+		'/Research/victimization/R/setup.R')) }
+if(Sys.info()['user'] %in% c('s7m', 'janus829')){
 	source('~/Research/victimization/R/setup.R') }
-if(Sys.info()['user'] %in% c('cassydorff')){ 
+if(Sys.info()['user'] %in% c('cassydorff')){
 	source('~/ProjectsGit/victimization/R/setup.R') }
 ####
 
@@ -14,7 +18,7 @@ rownames(netDF) = NULL
 # convert to country year
 netDF$id = with(netDF, paste0(country, '_', year))
 
-# 
+#
 data = netDF[,c('country','year','id')] %>%
 	group_by(id) %>%
 	summarize(
@@ -27,7 +31,11 @@ data$year = num(unlist(lapply(strsplit(data$id,'_'), function(x){x[2]})))
 
 ############################
 # merge graph level measures
-graphVars = c('graph_recip','graph_trans','graph_dens')
+graphVars = c(
+	'graph_trans','graph_dens',
+	'graph_avgDeg', 'graph_meanDist',
+	'graph_localTrans', 'graph_recip'
+)
 data = simpleMerge(data, netDF, graphVars, 'id', 'id', lagVars=FALSE)
 rm(netDF)
 ############################
@@ -74,8 +82,8 @@ rm(cinc)
 # icrg
 load(paste0(pathData, 'icrg/icrg.rda'))
 icrgVars = c(
-	'govtStab', 'socEconCon', 'invProf', 'intConf', 
-	'extConf', 'corr', 'milPol', 'relPol', 'lawOrd', 
+	'govtStab', 'socEconCon', 'invProf', 'intConf',
+	'extConf', 'corr', 'milPol', 'relPol', 'lawOrd',
 	'ethTens', 'demAcct', 'burQual')
 data = simpleMerge(data, icrg, icrgVars, 'id', 'cnameYear')
 rm(icrg)
@@ -116,7 +124,7 @@ gedCiv2$cnameYear = with(gedCiv2, paste0(cname, '_', year))
 data$gedCivOneSided = gedCiv2$deaths_civ[match(data$id, gedCiv2$cnameYear)]
 
 ####
-# epr 
+# epr
 load(paste0(pathData, 'epr/epr.rda'))
 eprVars = c(
 	'ethfrac', 'exclgrps', 'exclpop'
@@ -138,7 +146,7 @@ rm(kath)
 # convert missing to zero
 for(v in kathVars){ data[is.na(data[,v]),v] = 0 }
 
-# create binary indicator for any intervention 
+# create binary indicator for any intervention
 #NOTE: this might not make sense with more cases?
 data$anyPeaceKeeper = 0
 data$anyPeaceKeeper[data$totalPeacekeepers>0] = 1
@@ -159,7 +167,7 @@ woodVars = names(wood)[3:5]
 data = simpleMerge(data, wood, woodVars, 'cname', 'cname', lagVars=FALSE)
 for(v in woodVars){data[is.na(data[,v]),] = 0}
 data$loot_goods_sum = apply(data[,woodVars],1,sum)
-data$loot_goods = ifelse(data$loot_goods_sum>1,1,0) 
+data$loot_goods = ifelse(data$loot_goods_sum>1,1,0)
 rm(wood)
 ####
 ############################

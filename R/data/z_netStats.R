@@ -1,4 +1,8 @@
-if(Sys.info()['user'] %in% c('s7m', 'janus829')){ 
+if(Sys.info()['user'] %in% c('Owner','herme','S7M')){
+	source(paste0(
+		'C:/Users/',Sys.info()['user'],
+		'/Research/victimization/R/setup.R')) }
+if(Sys.info()['user'] %in% c('s7m', 'janus829')){
 	source('~/Research/victimization/R/setup.R') }
 pathGraphics = paste0(pathDrop, 'graphics/netStatsExplore/')
 
@@ -18,7 +22,7 @@ netActorDF = netDF[,c(
 
 # graph level plots
 ggNetGraphDF = gather(netGraphDF[,-c(1:2)])
-g=ggplot(ggNetGraphDF, aes(x=value)) + 
+g=ggplot(ggNetGraphDF, aes(x=value)) +
 	geom_density() +
 	facet_wrap(~key, scales='free')
 ggsave(g, file=paste0(pathGraphics, 'graph_level_distributions.pdf'), width=8, height=3)
@@ -35,7 +39,7 @@ ggsave(g, file=paste0(pathGraphics, 'graph_level_distributions_by_country.pdf'),
 
 # actor level plots
 ggActorGraphDF = gather(netActorDF[,-c(1:3)])
-g=ggplot(ggActorGraphDF, aes(x=value)) + 
+g=ggplot(ggActorGraphDF, aes(x=value)) +
 	geom_density() +
 	facet_wrap(~key, scales='free')
 ggsave(g, file=paste0(pathGraphics, 'actor_level_distributions.pdf'), width=8, height=6)
