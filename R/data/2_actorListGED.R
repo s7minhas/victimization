@@ -139,12 +139,19 @@ netStats <- foreach(
 		graph_avgDeg = mean(stat(sna::degree, sgrph))
 		graph_meanDist = mean_distance(grph)
 		graph_recip = stat(sna::grecip, sgrph)
+		graph_hier_krack = hierarchy(sgrph, measure='krackhardt')
+		graph_conn_krack = stat(sna::connectedness, sgrph)
+		graph_eff_krack = stat(sna::efficiency, sgrph)
+		graph_centrz = centr_degree(grph)$centralization
+		graph_lubness = stat(sna::lubness, sgrph)
 		out = data.frame(
 			inDegree, outDegree, totDegree, btwn, power,
 			inClose, outClose, totClose, eigenCent, flow, gcent,
 			icent, lcent, prestige,
 			graph_recip, graph_trans, graph_dens,
 			graph_localTrans, graph_avgDeg, graph_meanDist,
+			graph_hier_krack, graph_conn_krack,
+			graph_eff_krack, graph_centrz, graph_lubness,			
 			year=t )
 		out$country = cntry ; out$actor = rownames(mat)
 		rownames(out) = NULL ; return(out) })
