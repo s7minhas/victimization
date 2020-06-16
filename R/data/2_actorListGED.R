@@ -151,7 +151,7 @@ netStats <- foreach(
 			graph_recip, graph_trans, graph_dens,
 			graph_localTrans, graph_avgDeg, graph_meanDist,
 			graph_hier_krack, graph_conn_krack,
-			graph_eff_krack, graph_centrz, graph_lubness,			
+			graph_eff_krack, graph_centrz, graph_lubness,
 			year=t )
 		out$country = cntry ; out$actor = rownames(mat)
 		rownames(out) = NULL ; return(out) })

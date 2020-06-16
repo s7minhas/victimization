@@ -24,27 +24,72 @@ cor(netStats[,1:12])
 
 ################################################
 # run neg binom
-mod = glm.nb(
-	vic ~ graph_avgDeg + numConf + n_actors +  graph_centrz,
-	data=netStats)
+# mod = glm.nb(
+# 	vic ~ graph_avgDeg + numConf + n_actors +  graph_centrz,
+# 	data=netStats)
+#
+# mod_pois = glm(
+# 	vic ~ graph_avgDeg + numConf + n_actors +  graph_centrz,
+# 	data=netStats,
+# 	family='poisson')
+# summary(mod)$'coefficients'
+# summary(mod_pois)$'coefficients'
 
-mod_pois = glm(
-	vic ~ graph_avgDeg + numConf + n_actors +  graph_centrz,
-	data=netStats,
-	family='poisson')
-
-summary(mod)$'coefficients'
-summary(mod_pois)$'coefficients'
-
+# run across relev net stat vars
 vars = names(netStats)[1:11]
-res = lapply(vars, function(v){
-  form=formula(paste0('vic~numConf+n_actors+', v))
+perfVars = vars[c(1,3,6)]
+res = lapply(perfVars, function(v){
+  form=formula(paste0('vic~numConf+n_actors+graph_centrz+', v))
   mod = glm.nb(form, data=netStats)
   out = summary(mod)$'coefficients'
   return(out)
   })
-names(res) = vars
+names(res) = perfVars
+
+# compare performance of metrics via cross val
+loadPkg(c('doParallel', 'foreach'))
+nFolds = 10
+folds = letters[1:nFolds]
+set.seed(6886)
+netStats$fold = sample(folds, nrow(netStats), TRUE)
+parDF = expand.grid(perfVars, folds, stringsAsFactors=FALSE)
+
+# run in parallel
+cl = makeCluster(20)
+registerDoParallel(cl)
+perfRes = foreach(ii = 1:nrow(parDF), .packages=c('MASS')) %dopar% {
+	# get instr from parDF
+	v = parDF[ii,1] ; f = parDF[ii,2]
+
+	# set up form
+	form=formula(paste0('vic~numConf+n_actors+graph_centrz+', v))
+
+	# divide data
+	train = netStats[netStats$fold!=f,]
+	test = netStats[netStats$fold==f,]
+	test = test[!is.na(test[,v]),]
+
+	# run model on train
+	mod = glm.nb(form, data=train)
+
+	# eval
+	preds = predict(mod, test, type='response')
+	rmse = sqrt( mean( (preds-test$vic)^2 ) )
+
+	#
+	out = data.frame(
+		var=v, fold=f, rmse=rmse, stringsAsFactors=FALSE)
+	return(out) }
+stopCluster(cl)
+
+# org results
+perfRes = do.call('rbind', perfRes)
+
+# quick analysis
 res
+perfRes %>% group_by(var) %>% summarize(mean(rmse))
+ggplot(perfRes, aes(x=var, y=rmse)) +
+	geom_point()
 
 # nonlinMod=krls(
 # 	X=data.matrix(

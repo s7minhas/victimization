@@ -39,6 +39,14 @@ toRemove = trim( groupType$x[
 for(remove in toRemove){
 	for(id in ids[1:2]){
 		aData = aData[which(!grepl(remove, aData[,id])),] } }
+
+# aggregate military and police forces into gov
+srchStr = 'Military Forces of|Police Forces of'
+repStr = 'Gov Forces of '
+for (id in ids){
+	aData[grepl(srchStr, aData[,id]),id] =
+		paste0(repStr, aData[grepl(srchStr, aData[,id]),'COUNTRY'])
+ }
 #################
 
 #################
