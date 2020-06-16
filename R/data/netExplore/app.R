@@ -162,7 +162,7 @@ server <- function(input, output) {
 
         # set special node attribute for gov actors
         nodes$gov = grepl(
-          'Police Forces|Military Forces',
+          'Gov Forces of',
           nodes$id
           )
         nodes$color.background[nodes$gov] = 'gold'
@@ -248,7 +248,7 @@ server <- function(input, output) {
     # plot
     ggplot(ggData, aes(x=year, y=value)) +
       geom_line() + geom_point() +
-      facet_wrap(~graphMeasure, ncol=1) +
+      facet_wrap(~graphMeasure, ncol=1, scales='free_y') +
       labs(
         x=''
       ) +
