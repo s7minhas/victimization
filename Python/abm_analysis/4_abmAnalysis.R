@@ -17,6 +17,8 @@ loadPkg(c('MASS'
 load(paste0(abmPath, 'netStats.rda'))
 ################################################
 
+cor(netStats[,c("numConf", 'graph_avgDeg', 'graph_dens', 'n_actors')])
+
 ################################################
 # run neg binom
 # mod = glm.nb(
@@ -48,6 +50,32 @@ folds = letters[1:nFolds]
 set.seed(6886)
 netStats$fold = sample(folds, nrow(netStats), TRUE)
 parDF = expand.grid(perfVars, folds, stringsAsFactors=FALSE)
+
+#
+cbind(names(netStats))
+netStatsAgg = netStats %>%
+	group_by(game) %>%
+	summarize(
+		vic = sum(vic, na.rm=TRUE),
+		graph_dens = mean(graph_dens,na.rm=TRUE),
+		graph_avgDeg = mean(graph_avgDeg, na.rm=TRUE),
+		graph_localTrans = mean(graph_localTrans, na.rm=TRUE),
+		numConf = sum(numConf, na.rm=TRUE),
+		n_actors = max(n_actors, na.rm=TRUE)
+	)
+
+netStatsAggStdz = apply(netStatsAgg, 2, function(x){(x-mean(x, na.rm=TRUE))/sd(x,na.rm=TRUE)})
+head(netStatsAggStdz)
+vars = names(netStats)[1:11]
+perfVars = vars[c(1,3,6)]
+res = lapply(perfVars, function(v){
+  form=formula(paste0('vic~numConf+n_actors+', v))
+  mod = lm(form, data=netStatsAggStdz)
+  out = summary(mod)$'coefficients'
+  return(out)
+  })
+names(res) = perfVars
+res
 
 # run in parallel
 cl = makeCluster(20)
@@ -86,6 +114,26 @@ perfRes %>% group_by(var) %>% summarize(mean(rmse))
 ggplot(perfRes, aes(x=var, y=rmse)) +
 	geom_point()
 
+summary(netStats$vic)
+sd(netStats$vic)
+mean(netStats$vic)
+
+head(netStats)
+dim(netStats)
+cbind(names(netStats))
+
+toDrop = -which(names(netStats) %in% c('game', 'turn', 'fold', 'id', 'V1', 'V10', 'V9','graph_meanDist', 'graph_dens'))
+
+slice = na.omit(netStats[,toDrop])
+y = slice[,'vic']
+ftrs = slice[,-which(names(slice) %in% 'vic')]
+ftrs = apply(ftrs, 2, function(x){ (x-mean(x))/sd(x) })
+
+library(glmnet)
+lassoMod = cv.glmnet(x=data.matrix(
+	ftrs,
+	), y=y, family='poisson', alpha=1)
+coef(lassoMod)
 # nonlinMod=krls(
 # 	X=data.matrix(
 # 		netStats[,c('graph_dens', 'numConf', 'n_actors')]
@@ -100,10 +148,14 @@ ggplot(perfRes, aes(x=var, y=rmse)) +
 # 	y=netStats[,'vic']
 # 	)
 
-# library(randomForest)
-# rfMod = randomForest(x=data.matrix(
-# 	netStats[,c('graph_dens', 'numConf', 'n_actors')]
-# 	), y=netStats[,'vic'], type='regression')
+library(randomForest)
+rfMod = randomForest(x=data.matrix(
+	netStats[,c('graph_dens', 'numConf', 'n_actors', 'graph_avgDeg')]
+	), y=netStats[,'vic'], type='regression')
+
+preds = predict(rfMod, type='response')
+head(preds)
+sqrt( mean( (preds - netStats[,'vic'])^2 ) )
 # partialPlot(rfMod, pred.data=netStats, x.var='graph_dens')
 
 # library(BART)

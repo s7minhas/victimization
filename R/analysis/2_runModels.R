@@ -19,6 +19,18 @@ loadPkg('MASS')
 load(paste0(pathData, 'iData_acled.rda'))
 ########################################################
 
+dim(na.omit(data[,c('cname', 'cnameYear')]))
+dim(
+	na.omit(
+		data[,c(
+			'civVicCount', 'graph_dens', 'nConf2', 'nActors',
+			'cname', 'polity2', 'popLog', 'gdpCapLog',
+			'ethfrac', 'anyPeaceKeeper', 'rebsStronger',
+			'rebSupportGov', 'govSupportGov'
+			)]
+	)
+)
+
 ########################################################
 # run base model
 modBase_noImp = glm.nb(
@@ -27,14 +39,14 @@ modBase_noImp = glm.nb(
 	, data=data
 	)
 summBase_noImp = summary(modBase_noImp)$'coefficients'
-summBase_noImp[1:3,]
+summBase_noImp[1:5,]
 
 a = glm.nb(
 	civVicCount ~  # dv
 		graph_avgDeg + nConf2 + nActors + factor(cname) -1
 	, data=data
 	)
-summary(a)$'coefficients'[1:3,]
+summary(a)$'coefficients'[1:5,]
 
 # pick slice of imputed data
 set.seed(6886)
@@ -98,10 +110,10 @@ summBase2 = rubinCoef(modsBase2, TRUE)
 summCntrls2 = rubinCoef(modsCntrls2, TRUE)
 
 #
-summBase[1:3,]
-summCntrls[1:3,]
-summBase2[1:3,]
-summCntrls2[1:3,]
+summBase[1:5,]
+summCntrls[1:5,]
+summBase2[1:5,]
+summCntrls2[1:5,]
 
 # library(randomForest)
 # netStats = iData[[4]]
