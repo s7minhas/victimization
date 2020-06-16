@@ -59,6 +59,7 @@ simpleMerge = function(toData, fromData, vars, toID, fromID, lagVars=TRUE){
 		toData$tmp = fromData[match(toData[,toID], fromData[,fromID]), v]
 		names(toData)[ncol(toData)] = v }
 	return(toData) }
+options(warn=-1)
 ########
 
 ########

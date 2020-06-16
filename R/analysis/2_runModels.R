@@ -23,25 +23,38 @@ load(paste0(pathData, 'iData_acled.rda'))
 # run base model
 modBase_noImp = glm.nb(
 	civVicCount ~  # dv
-		graph_dens + nConf + nActors + factor(cname) -1
+		graph_dens + nConf2 + nActors + factor(cname) -1
 	, data=data
 	)
 summBase_noImp = summary(modBase_noImp)$'coefficients'
+summBase_noImp[1:3,]
 
-modsBase = lapply(iData, function(data){
+a = glm.nb(
+	civVicCount ~  # dv
+		graph_avgDeg + nConf2 + nActors + factor(cname) -1
+	, data=data
+	)
+summary(a)$'coefficients'[1:3,]
+
+# pick slice of imputed data
+set.seed(6886)
+impPicks = sample(1:length(iData), 10)
+
+# run base mods on imputed data
+modsBase = lapply(iData[impPicks], function(data){
 	mod = glm.nb(
 		civVicCount ~  # dv
-			graph_dens + nConf + nActors
+			graph_dens + nConf2 + nActors
 			 + factor(cname) -1
 		, data=data
 		)
 	return(mod) })
 
-# run mod with controls
-modsCntrls = lapply(iData, function(data){
+# run mod with controls on imputed data
+modsCntrls = lapply(iData[impPicks], function(data){
 	mod = glm.nb(
 		civVicCount ~  # dv
-			graph_dens + nConf + nActors
+			graph_dens + nConf2 + nActors
 			+ polity2 + popLog + gdpCapLog   # structural controls
 			+ ethfrac
 			+ anyPeaceKeeper
@@ -56,12 +69,43 @@ modsCntrls = lapply(iData, function(data){
 summBase = rubinCoef(modsBase, TRUE)
 summCntrls = rubinCoef(modsCntrls, TRUE)
 
-summBase
-summCntrls
+modsBase2 = lapply(iData[impPicks], function(data){
+	mod = glm.nb(
+		civVicCount ~  # dv
+			graph_avgDeg + nConf2 + nActors
+			 + factor(cname) -1
+		, data=data
+		)
+	return(mod) })
+
+# run mod with controls
+modsCntrls2 = lapply(iData[impPicks], function(data){
+	mod = glm.nb(
+		civVicCount ~  # dv
+			graph_avgDeg + nConf2 + nActors
+			+ polity2 + popLog + gdpCapLog   # structural controls
+			+ ethfrac
+			+ anyPeaceKeeper
+			+ rebsStronger # capabilities gov/rebels
+			+ rebSupportGov + govSupportGov # external shit
+			+ factor(cname) -1
+		, data=data
+		)
+	return(mod) })
+
+# summarize
+summBase2 = rubinCoef(modsBase2, TRUE)
+summCntrls2 = rubinCoef(modsCntrls2, TRUE)
+
+#
+summBase[1:3,]
+summCntrls[1:3,]
+summBase2[1:3,]
+summCntrls2[1:3,]
 
 # library(randomForest)
 # netStats = iData[[4]]
-# netStats$numConf = netStats$nConf
+# netStats$numConf = netStats$nConf2
 # netStats$n_actors = netStats$nActors
 # netStats$vic = netStats$civVicCount
 

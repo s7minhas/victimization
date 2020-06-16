@@ -17,11 +17,6 @@ loadPkg(c('MASS'
 load(paste0(abmPath, 'netStats.rda'))
 ################################################
 
-# peak at results ##############################
-# basic look at results
-cor(netStats[,1:12])
-################################################
-
 ################################################
 # run neg binom
 # mod = glm.nb(
@@ -39,7 +34,7 @@ cor(netStats[,1:12])
 vars = names(netStats)[1:11]
 perfVars = vars[c(1,3,6)]
 res = lapply(perfVars, function(v){
-  form=formula(paste0('vic~numConf+n_actors+graph_centrz+', v))
+  form=formula(paste0('vic~numConf+n_actors+', v))
   mod = glm.nb(form, data=netStats)
   out = summary(mod)$'coefficients'
   return(out)
@@ -62,7 +57,7 @@ perfRes = foreach(ii = 1:nrow(parDF), .packages=c('MASS')) %dopar% {
 	v = parDF[ii,1] ; f = parDF[ii,2]
 
 	# set up form
-	form=formula(paste0('vic~numConf+n_actors+graph_centrz+', v))
+	form=formula(paste0('vic~numConf+n_actors+', v))
 
 	# divide data
 	train = netStats[netStats$fold!=f,]

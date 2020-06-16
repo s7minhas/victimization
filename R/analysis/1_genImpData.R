@@ -25,17 +25,35 @@ cData$cname = cname(cData$country)
 cData$id = with(cData, paste(cname, year, sep="_"))
 data$nConf = cData$nConf[match(data$id, cData$id)]
 data$nConf[is.na(data$nConf)] = 0
+
+load(paste0(pathData, 'cntriesACLED_byAll.rda'))
+aData = aData[,c('COUNTRY', 'YEAR')]
+aData$cnt = 1
+aData = aData %>% group_by(COUNTRY, YEAR) %>%
+	summarize(nConf = sum(cnt)) %>% data.frame()
+aData$cname = cname(aData$COUNTRY)
+aData$id = with(aData, paste(cname, YEAR, sep='_'))
+data$nConf2 = aData$nConf[match(data$id, aData$id)]
+data$nConf2[is.na(data$nConf2)] = 0
 ########################################################
 
 ########################################################
 # impute
 loadPkg('sbgcop')
-if(!file.exists(paste0(pathData, 'imputedData_acledUndirected.rda'))){
-	impData = data.matrix(data[,c(5:6,10,18:19,22:38,42:43,47:48,51,53)])
+impVars = c(
+	'graph_trans', 'graph_dens', 'graph_avgDeg', 'graph_meanDist', 'graph_localTrans',
+	'polity2', 'gdpCapLog', 'popLog', 'cinc', 'govtStab', 'socEconCon', 'invProf',
+	'intConf', 'extConf', 'corr', 'milPol', 'relPol', 'lawOrd', 'ethTens', 'demAcct',
+	'burQual', 'civVicCount', 'ethfrac', 'exclgrps', 'exclpop', 'totalPeacekeepers',
+	'anyPeaceKeeper', 'rebsStronger', 'rebsFightCapHigh', 'rebSupportGov',
+	'govSupportGov'
+)
+if(!file.exists(paste0(pathData, 'imputedData_acledUndirected_v2.rda'))){
+	impData = data.matrix(data[,impVars])
 	sbgData = sbgcop.mcmc(Y=impData, seed=6886, nsamp=1000, verb=FALSE)
 	dimnames(sbgData$Y.impute)[[2]] = colnames(sbgData$Y.pmean)
-	save(sbgData, file=paste0(pathData, 'imputedData_acledUndirected.rda'))
-} else { load(file=paste0(pathData, 'imputedData_acledUndirected.rda')) }
+	save(sbgData, file=paste0(pathData, 'imputedData_acledUndirected_v2.rda'))
+} else { load(file=paste0(pathData, 'imputedData_acledUndirected_v2.rda')) }
 
 # randomly pick a few imputed datasets to use
 set.seed(6886)
@@ -43,11 +61,11 @@ set.seed(6886)
 iData = lapply(500:1000, function(i){
 	sbgFrom = sbgData$Y.impute[,,i]
 	data = cbind(
-		data[,c('cname','year','cnameYear','nActors','nConf')],
+		data[,c('cname','year','cnameYear','nActors','nConf', 'nConf2')],
 		sbgFrom
 		)
 	return(data)	})
 
 # save imputed data
 save(data, iData, file=paste0(pathData, 'iData_acled.rda'))
-########################################################s
+########################################################
