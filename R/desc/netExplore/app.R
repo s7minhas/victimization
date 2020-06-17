@@ -18,9 +18,8 @@ if(Sys.info()['user'] %in% c('cassydorff')){
 
 #################
 loadPkg(c(
-    'shiny', 'shinyWidgets', 
-    'scales', 'visNetwork',
-    'tidyr', 'ggplot2'
+    'shiny', 'shinyWidgets',
+    'scales', 'visNetwork'
 ))
 #################
 
@@ -37,7 +36,7 @@ load(paste0(pathData, 'iData_acled.rda')) # modeling file
 # get years
 yrs = sort(unique(unlist(lapply(yListAll, names))))
 
-# clean up countrynames in both acled and ucdp 
+# clean up countrynames in both acled and ucdp
 # for both the adjLists and netStats
 
 cleanListNames = function(x){
@@ -52,7 +51,7 @@ yListAll = cleanListNames(yListAll)
 # ucdp adj list
 # yListAll_GED = cleanListNames(yListAll_GED)
 
-# acled net stats 
+# acled net stats
 netStats = cleanListNames(netStats)
 
 # vector of graph stats from net stats
@@ -178,25 +177,25 @@ server <- function(input, output) {
 
     # extract network data from netStats
     prepNetTabData <- reactive({
-      
+
       # pull in cntrylevel results (at the level of actor)
       actorStats = netStats[[input$cntry]]
-      
+
       # calculate number of actors for every year
       nVec = tapply(actorStats$actor, actorStats$year, length)
-      
+
       # subset to relev unique rows and only graph level
       # columns
       cntryStats = unique(
         actorStats[,c('year', graphStats)] )
-      
+
       # merge nActors and reorg table order
       cntryStats = cbind(cntryStats, nActors=nVec)
       cntryStats = cntryStats[,c('year', 'nActors', graphStats)]
-      
+
       # cleanup
       cntryStats$year = as.integer(cntryStats$year)
-      
+
       #
       return(cntryStats)
     })
@@ -206,7 +205,7 @@ server <- function(input, output) {
 
         # get net stats for table
         cntryStatsForTab = prepNetTabData()
-      
+
         # cleanup
         cntryStatsForTab[,graphStats] = round(cntryStatsForTab[,graphStats], 2)
         rownames(cntryStatsForTab) = NULL
@@ -217,34 +216,34 @@ server <- function(input, output) {
 
   # make viz comparing net stats to vic
   output$vicCompare <- renderPlot({
-  
+
     # get vic data from iData_acled result (data)
     vicData = data[data$cname == input$cntry,
     c(
       'cname','year',
       'civVicCount'
       ) ]
-  
+
     # get net stats for plot
     cntryNetStats = prepNetTabData()
-    
+
     # merge
-    toMerge = setdiff(names(cntryNetStats), 'year') 
+    toMerge = setdiff(names(cntryNetStats), 'year')
     for(v in toMerge){
       vicData$tmp = cntryNetStats[match(vicData$year, cntryNetStats$year), v]
       names(vicData)[ncol(vicData)] = v }
-    
+
     # adj data for plotting
-    ggData = pivot_longer(vicData, 
+    ggData = pivot_longer(vicData,
       cols=civVicCount:graph_centrz,
       names_to = 'graphMeasure',
       values_to = 'value'
       )
-    
+
     # bring in user input to limit graph measures
     toPlot = c('civVicCount', input$vicGraphCompare)
     ggData = ggData[which(ggData$graphMeasure %in% toPlot),]
-    
+
     # plot
     ggplot(ggData, aes(x=year, y=value)) +
       geom_line() + geom_point() +
@@ -261,6 +260,6 @@ server <- function(input, output) {
 #################
 
 #################
-# Run the application 
+# Run the application
 shinyApp(ui = ui, server = server)
 #################
