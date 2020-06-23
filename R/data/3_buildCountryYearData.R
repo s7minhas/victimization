@@ -98,6 +98,19 @@ acledCiv = acledCiv[acledCiv$YEAR>=1993,c('YEAR','COUNTRY','FATALITIES')]
 acledCiv$cname = cname(acledCiv$COUNTRY)
 acledCiv$cnameYear = with(acledCiv, paste0(cname, '_', YEAR))
 data$civVicCount = acledCiv$FATALITIES[match(data$id, acledCiv$cnameYear)]
+
+names(acledCiv) %>% cbind()
+unique(acledCiv$COUNTRY) %>% cbind()
+slice = acledCiv[acledCiv$COUNTRY=='Somalia',]
+dim(slice)
+head(slice)
+sliceAgg = slice %>%
+	group_by(YEAR) %>%
+	summarize(
+		FATALITIES=sum(FATALITIES, na.rm=TRUE)
+	)
+dim(sliceAgg)
+sliceAgg
 ####
 
 ####
