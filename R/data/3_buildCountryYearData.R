@@ -89,7 +89,10 @@ rm(icrg)
 ####
 # civ victimization
 #### need to finish acled civ dv measure
-acled = readr::read_csv(paste0(pathData, 'ACLED-Version-7-All-Africa-1997-2016_csv_dyadic-file.csv'))
+acled = readr::read_csv(
+	paste0(
+		pathData,
+		'ACLED-Version-7-All-Africa-1997-2016_csv_dyadic-file.csv'))
 acledCiv = acled[which(acled$EVENT_TYPE=='Violence against civilians'),]
 acledCiv = acledCiv[acledCiv$YEAR>=1993,c('YEAR','COUNTRY','FATALITIES')]
 acledCiv$cname = cname(acledCiv$COUNTRY)
