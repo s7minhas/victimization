@@ -1,3 +1,4 @@
+############################
 if(Sys.info()['user'] %in% c('Owner','herme','S7M')){
 	source(paste0(
 		'C:/Users/',Sys.info()['user'],
@@ -7,44 +8,82 @@ if(Sys.info()['user'] %in% c('s7m', 'janus829')){
 if(Sys.info()['user'] %in% c('cassydorff')){
 	source('~/ProjectsGit/victimization/R/setup.R') }
 
+# load extra libs
 loadPkg('readr')
-acled = read_csv(
+############################
+
+############################
+# load data from acled
+acled = suppressMessages( read_csv(
 	paste0(
 		pathData,
-		"ACLED-Version-7-All-Africa-1997-2016_csv_dyadic-file.csv"))
+		"acled_raw_1997-01-01-2020-06-03.csv")))
+############################
 
+############################
+# subset by event types
 acledCiv = acled[
 	which(
-		acled$EVENT_TYPE=='Violence against civilians'),]
+		acled$event_type=='Violence against civilians'),]
 
-toKeep = c(
-	# 'Remote violence', 'Headquarters or base established',
-	'Battle-No change of territory',
-	'Battle-Government regains territory',
-	'Battle-Non-state actor overtakes territory')
+acled = acled[which(acled$event_type=='Battles'),]
+############################
 
-acled = acled[which(acled$EVENT_TYPE %in% toKeep),]
-acled$dyad_name = paste0(acled$ACTOR1, '_', acled$ACTOR2)
-
-#
-cntries = unique(acled$COUNTRY)
+############################
+# get some desc stats by country
+cntries = unique(acled$country)
 summStatsACLED = data.frame(
 	do.call(
 		'rbind', lapply(
 			cntries, function(c){
-		slice = acled[acled$COUNTRY==c,]
+		slice = acled[acled$country==c,]
 
 		# number of conflicts
 		cntConf = nrow(slice)
 
 		# length of conflict
-		yrCnt = max(slice$YEAR) - min(slice$YEAR)
+		yrCnt = max(slice$year) - min(slice$year)
+
+		# clean up actors
+		actors = data.frame(
+			dirty = unique( c(slice$actor1, slice$actor2) ),
+			stringsAsFactors=FALSE )
+
+		# combine military/police forces of country
+		govRefPattern = paste0(
+			c('Military Forces of ', 'Police Forces of '),
+			c ) %>% paste(., collapse='|')
+		actors$clean = actors$dirty
+		actors$clean[
+			grepl(govRefPattern, actors$dirty)
+			] = paste0('Gov Forces of ', c)
+
+		# get rid of military forces from other countries
+		actors$clean[grepl('Military Forces of',actors$clean)] = NA
+
+		# get rid of peacekeepers/observers
+		actors$clean[grepl('United Nations', actors$dirty)] = NA
+		actors$clean[grepl('African Union', actors$dirty)] = NA
+		actors$clean[grepl('Observer', actors$dirty)] = NA
+
+		# get rid of unidentified actors
+		actors$clean[grepl('Unidentified', actors$dirty)] = NA
+
+		# only keep actors that are not NA in clean
+		actors = actors[!is.na(actors$clean),]
 
 		# number of actors
-		cntActors = length(unique(c(slice$ACTOR1, slice$ACTOR2)))
+		cntActors = length(unique(actors$clean[!is.na(actors$clean)]))
 
-		# number of dyads
-		cntDyads = length(unique(slice$dyad_name))
+		# remove events that dont involve cleaned actors
+		# so that we can count unique dyads
+		slice$actor1Clean = actors$clean[match(slice$actor1, actors$dirty)]
+		slice$actor2Clean = actors$clean[match(slice$actor2, actors$dirty)]
+		slice = slice[!is.na(slice$actor1Clean) & !is.na(slice$actor2Clean),]
+		slice$dyadClean = with(slice, paste(actor1Clean, actor2Clean, sep='_'))
+
+		# count dyads
+		cntDyads = length(unique(slice$dyadClean))
 
 		# org
 		c(
@@ -56,56 +95,23 @@ summStatsACLED = data.frame(
 	})))
 summStatsACLED$cntry = cntries
 
-# descriptive stats across acled data
-getSumm = function(x){c(min=min(x), max=max(x), mean=mean(x), sd=sd(x))}
-t(apply(summStatsACLED[,-ncol(summStatsACLED)], 2, getSumm))
-getSumm(acledCiv$FATALITIES)
+# reorg
+summStatsACLED = summStatsACLED[order(
+	summStatsACLED$cntDyads, decreasing=TRUE),]
 
-# peer into horn of africa
-toFocus=summStatsACLED[
-	summStatsACLED$cntry %in% c(
-		'Sudan', 'South Sudan', 'Kenya', 'Somalia', 'Ethiopia'
-		), 'cntry']
-years = 2000:2016
+summStatsACLED
 
-summStatsACLED_toFocus = data.frame(
-	do.call('rbind', lapply(toFocus, function(c){
-	do.call('rbind', lapply(years, function(t){
-		slice = acled[acled$COUNTRY==c & acled$YEAR==t,]
-		cntConf = nrow(slice)
-		cntActors = length(unique(c(slice$ACTOR1, slice$ACTOR2)))
-		cntDyads = length(unique(slice$dyad_name))
-		sliceCiv = acledCiv[acledCiv$COUNTRY==c & acledCiv$YEAR==t,]
-		cntCivEvents = nrow(sliceCiv)
-		cntCivFatals = ifelse(nrow(sliceCiv)>0, sum(sliceCiv$FATALITIES), 0)
-		c(cntry=c, year=t,
-			cntConf=cntConf, cntActors=cntActors, cntDyads=cntDyads,
-			cntCivEvents=cntCivEvents, cntCivFatals=cntCivFatals)
-	}) )
-})), stringsAsFactors=FALSE)
+# write to csv to share info on
+# sample from acled
+write.csv( summStatsACLED,
+		file=paste0(pathData, 'acledSample.csv') )
 
-for(v in setdiff(names(summStatsACLED_toFocus), 'cntry')){
-	summStatsACLED_toFocus[,v]=num(summStatsACLED_toFocus[,v])}
-
-plotSumm = function(data, yVar, yLab, fName){
-	data$ggY = data[,yVar]
-	g=ggplot(data, aes(x=year, y=ggY, group=1)) +
-		geom_line() +
-		geom_point() +
-		ylab(yLab) +
-		scale_x_continuous('', breaks=seq(2000,2016,2)) +
-		facet_wrap(~cntry, scales='free_y', ncol=3) +
-		theme_bw() +
-		theme(
-			axis.text.x=element_text(angle=45, hjust=1, size=6),
-			axis.ticks=element_blank(),
-			panel.border=element_blank()
-			)
-	ggsave(g, file=paste0(pathDrop, fName), width=9, height=5)
-}
-
-##
+# get out country names
 cntriesACLED=summStatsACLED[order(
 	summStatsACLED$cntDyads, decreasing = TRUE),][,'cntry']
+############################
+
+############################
 aData = acled = data.frame(acled[which(acled$COUNTRY %in% cntriesACLED), ])
 save(aData, cntriesACLED, file=paste0(pathData, 'cntriesACLED_byAll.rda'))
+############################
