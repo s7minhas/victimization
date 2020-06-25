@@ -18,6 +18,8 @@ acled = suppressMessages( read_csv(
 	paste0(
 		pathData,
 		"acled_raw_1997-01-01-2020-06-03.csv")))
+
+acled = acled[which(acled$year<=2017),]
 ############################
 
 ############################
@@ -36,6 +38,9 @@ summStatsACLED = data.frame(
 	do.call(
 		'rbind', lapply(
 			cntries, function(c){
+
+# c= 'Somalia'
+
 		slice = acled[acled$country==c,]
 
 		# number of conflicts
@@ -72,34 +77,44 @@ summStatsACLED = data.frame(
 		# only keep actors that are not NA in clean
 		actors = actors[!is.na(actors$clean),]
 
-		# number of actors
-		cntActors = length(unique(actors$clean[!is.na(actors$clean)]))
-
-		# remove events that dont involve cleaned actors
-		# so that we can count unique dyads
 		slice$actor1Clean = actors$clean[match(slice$actor1, actors$dirty)]
 		slice$actor2Clean = actors$clean[match(slice$actor2, actors$dirty)]
 		slice = slice[!is.na(slice$actor1Clean) & !is.na(slice$actor2Clean),]
 		slice$dyadClean = with(slice, paste(actor1Clean, actor2Clean, sep='_'))
 
-		# count dyads
-		cntDyads = length(unique(slice$dyadClean))
+		aCntStats = lapply(unique(slice$year), function(t){
+			slice2 = slice[slice$year==t,]
+			sActors = unique(
+				c( slice2$actor1Clean, slice2$actor2Clean ) )
+			cnt = length(sActors)
+			return(cnt)
+			}) %>% unlist()
+
+		# number of actors
+		cntActorsMedian = median(aCntStats, na.rm=TRUE)
+		cntActorsMin = min(aCntStats, na.rm=TRUE)
+		cntActorsMean = mean(aCntStats, na.rm=TRUE)
+
+		# number of years with mult actors
+		yrsWithFiveActors =  sum(aCntStats>=5)
+		yrsWithTenActors =  sum(aCntStats>=10)
 
 		# org
 		c(
 			cntConf=cntConf,
 			yrCnt=yrCnt,
-			cntActors=cntActors,
-			cntDyads=cntDyads
+			cntActorsMedian=cntActorsMedian,
+			cntActorsMin=cntActorsMin,
+			cntActorsMean=cntActorsMean,
+			yrsWithFiveActors=yrsWithFiveActors,
+			yrsWithTenActors=yrsWithTenActors
 			)
 	})))
 summStatsACLED$cntry = cntries
 
 # reorg
 summStatsACLED = summStatsACLED[order(
-	summStatsACLED$cntDyads, decreasing=TRUE),]
-
-summStatsACLED
+	summStatsACLED$cntActorsMedian, decreasing=TRUE),]
 
 # write to csv to share info on
 # sample from acled
