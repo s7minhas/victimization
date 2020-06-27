@@ -9,7 +9,7 @@ if(Sys.info()['user'] %in% c('cassydorff')){
 	source('~/ProjectsGit/victimization/R/setup.R') }
 
 # load extra libs
-loadPkg('readr')
+loadPkg(c('readr', 'abind', 'doParallel', 'foreach'))
 ############################
 
 ############################
@@ -19,7 +19,7 @@ acled = suppressMessages( read_csv(
 		pathData,
 		"acled_raw_1997-01-01-2020-06-03.csv")))
 
-acled = acled[which(acled$year<=2017),]
+acled = acled[which(acled$year<=2019),]
 ############################
 
 ############################
@@ -34,96 +34,104 @@ acled = acled[which(acled$event_type=='Battles'),]
 ############################
 # get some desc stats by country
 cntries = unique(acled$country)
-summStatsACLED = data.frame(
-	do.call(
-		'rbind', lapply(
-			cntries, function(c){
+cores = 20
+cl = makeCluster(cores)
+registerDoParallel(cl)
+summStatsACLED = foreach(
+	c = cntries,
+	.packages=c('abind', 'dplyr')
+) %dopar% {
 
-# c= 'Somalia'
+# pick cntry
+slice = acled[acled$country==c,]
 
-		slice = acled[acled$country==c,]
+# number of conflicts
+cntConf = nrow(slice)
 
-		# number of conflicts
-		cntConf = nrow(slice)
+# length of conflict
+yrCnt = max(slice$year) - min(slice$year)
 
-		# length of conflict
-		yrCnt = max(slice$year) - min(slice$year)
+# get min and max active year from slice for every actor
+actors = abind(
+	slice[,c('actor1', 'year')],
+	slice[,c('actor2', 'year')],
+	along=1 ) %>% data.frame(.,stringsAsFactors=FALSE) %>%
+	group_by(actor2) %>%
+	summarize(
+		startYear = min(num(year)),
+		endYear = max(num(year)) )
+names(actors)[1] = 'dirty'
 
-		# clean up actors
-		actors = data.frame(
-			dirty = unique( c(slice$actor1, slice$actor2) ),
-			stringsAsFactors=FALSE )
+# combine military/police forces of country
+govRefPattern = paste0(
+	c('Military Forces of ', 'Police Forces of '),
+	c ) %>% paste(., collapse='|')
+actors$clean = actors$dirty
+actors$clean[
+	grepl(govRefPattern, actors$dirty)
+	] = paste0('Gov Forces of ', c)
 
-		# combine military/police forces of country
-		govRefPattern = paste0(
-			c('Military Forces of ', 'Police Forces of '),
-			c ) %>% paste(., collapse='|')
-		actors$clean = actors$dirty
-		actors$clean[
-			grepl(govRefPattern, actors$dirty)
-			] = paste0('Gov Forces of ', c)
+# get rid of military forces from other countries
+actors$clean[grepl('Military Forces of',actors$clean)] = NA
 
-		# get rid of military forces from other countries
-		actors$clean[grepl('Military Forces of',actors$clean)] = NA
+# get rid of peacekeepers/observers
+actors$clean[grepl('United Nations', actors$dirty)] = NA
+actors$clean[grepl('African Union', actors$dirty)] = NA
+actors$clean[grepl('Observer', actors$dirty)] = NA
 
-		# get rid of peacekeepers/observers
-		actors$clean[grepl('United Nations', actors$dirty)] = NA
-		actors$clean[grepl('African Union', actors$dirty)] = NA
-		actors$clean[grepl('Observer', actors$dirty)] = NA
+# get rid of unidentified actors
+actors$clean[grepl('Unidentified', actors$dirty)] = NA
 
-		# get rid of unidentified actors
-		actors$clean[grepl('Unidentified', actors$dirty)] = NA
+# drop actors not in clean
+actors = actors[!is.na(actors$clean),]
 
-		# only keep actors that are not NA in clean
-		actors = actors[!is.na(actors$clean),]
+# if no actors returned, exit
+# num NAs corresponds to length of out stats
+if(nrow(actors)==0){return(rep(NA, 7))}
 
-		slice$actor1Clean = actors$clean[match(slice$actor1, actors$dirty)]
-		slice$actor2Clean = actors$clean[match(slice$actor2, actors$dirty)]
-		slice = slice[!is.na(slice$actor1Clean) & !is.na(slice$actor2Clean),]
-		slice$dyadClean = with(slice, paste(actor1Clean, actor2Clean, sep='_'))
+# get counts of actors
+yrs = sort(unique(slice$year))
+actorRanges = lapply(1:nrow(actors), function(ii){actors$startYear[ii]:actors$endYear[ii]})
+aCntStats = lapply(yrs, function(yr){
+	lapply(actorRanges, function(tRange){ yr %in% tRange }) %>%
+		unlist() %>% sum() }) %>% unlist()
 
-		aCntStats = lapply(unique(slice$year), function(t){
-			slice2 = slice[slice$year==t,]
-			sActors = unique(
-				c( slice2$actor1Clean, slice2$actor2Clean ) )
-			cnt = length(sActors)
-			return(cnt)
-			}) %>% unlist()
+# number of actors
+cntActorsMedian = median(aCntStats, na.rm=TRUE)
+cntActorsMin = min(aCntStats, na.rm=TRUE)
+cntActorsMean = mean(aCntStats, na.rm=TRUE)
 
-		# number of actors
-		cntActorsMedian = median(aCntStats, na.rm=TRUE)
-		cntActorsMin = min(aCntStats, na.rm=TRUE)
-		cntActorsMean = mean(aCntStats, na.rm=TRUE)
+# number of years with mult actors
+yrsWithFiveActors =  sum(aCntStats>=5)
+yrsWithTenActors =  sum(aCntStats>=10)
 
-		# number of years with mult actors
-		yrsWithFiveActors =  sum(aCntStats>=5)
-		yrsWithTenActors =  sum(aCntStats>=10)
+# org
+c(
+	cntConf=cntConf,
+	yrCnt=yrCnt+1,
+	cntActorsMedian=cntActorsMedian,
+	cntActorsMin=cntActorsMin,
+	cntActorsMean=cntActorsMean,
+	yrsWithFiveActors=yrsWithFiveActors,
+	yrsWithTenActors=yrsWithTenActors
+	)
+} ; stopCluster(cl)
 
-		# org
-		c(
-			cntConf=cntConf,
-			yrCnt=yrCnt,
-			cntActorsMedian=cntActorsMedian,
-			cntActorsMin=cntActorsMin,
-			cntActorsMean=cntActorsMean,
-			yrsWithFiveActors=yrsWithFiveActors,
-			yrsWithTenActors=yrsWithTenActors
-			)
-	})))
+# org
+summStatsACLED = do.call('rbind', summStatsACLED) %>%
+	data.frame(., stringsAsFactors=FALSE)
 summStatsACLED$cntry = cntries
+summStatsACLED$continent = countrycode(
+	summStatsACLED$cntry, 'country.name', 'continent')
+summStatsACLED$continent[summStatsACLED$cntry=='Kosovo'] = 'Europe'
+summStatsACLED$continent[summStatsACLED$cntry=='eSwatini'] = 'Africa'
 
 # reorg
 summStatsACLED = summStatsACLED[order(
 	summStatsACLED$cntActorsMedian, decreasing=TRUE),]
 
-# write to csv to share info on
-# sample from acled
-write.csv( summStatsACLED,
-		file=paste0(pathData, 'acledSample.csv') )
-
 # get out country names
-cntriesACLED=summStatsACLED[order(
-	summStatsACLED$cntDyads, decreasing = TRUE),][,'cntry']
+cntriesACLED=summStatsACLED$cntry
 ############################
 
 ############################
