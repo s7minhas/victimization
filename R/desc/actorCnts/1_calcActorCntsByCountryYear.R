@@ -50,9 +50,51 @@ acled$actor2[
 ###########################
 
 ###########################
-# grepl to remove unidentified actors
-acled = acled[!grepl('Unidentified', acled$actor1), ]
-acled = acled[!grepl('Unidentified', acled$actor2), ]
+# military forces from other countries
+
+# # code to remove observations
+# acled = acled[!grepl('Military Forces of',acled$actor1),]
+# acled = acled[!grepl('Military Forces of',acled$actor2),]
+
+# code to set as NA so that we keep
+# the actors that were fighting against
+# military from other countries
+acled$actor1[grepl('Military Forces of', acled$actor1)] = NA
+acled$actor2[grepl('Military Forces of', acled$actor2)] = NA
+###########################
+
+###########################
+# peacekeepers/observers
+pkpObsTags = c(
+  'African Union', 'United Nations', 'Observer'
+)
+
+# cycle through tags and remove
+for(tag in pkpObsTags){
+  # # code to remove observations
+  # acled = acled[!grepl(tag, acled$actor1),]
+  # acled = acled[!grepl(tag, acled$actor2),]
+
+  # code to set as NA so that we keep
+  # the actors that were fighting against
+  # pkprs and obs from other countries
+  acled$actor1[grepl(tag, acled$actor1)] = NA
+  acled$actor2[grepl(tag, acled$actor2)] = NA
+}
+###########################
+
+###########################
+# unidentified actors
+
+# # code to remove observations
+# acled = acled[!grepl('Unidentified', acled$actor1), ]
+# acled = acled[!grepl('Unidentified', acled$actor2), ]
+
+# code to set as NA so that we keep
+# the actors that were fighting against
+# unidentified actors
+acled$actor1[grepl('Unidentified', acled$actor1)] = NA
+acled$actor2[grepl('Unidentified', acled$actor2)] = NA
 ###########################
 
 ###########################
