@@ -98,17 +98,6 @@ acled$actor2[grepl('Unidentified', acled$actor2)] = NA
 ###########################
 
 ###########################
-# remove some broad opposition labels
-toRemove = c(
-  'Opposition Rebels (Syria)',
-  'Former Opposition Rebels (Syria)',
-  'Opposition Parties'
-)
-acled = acled[which(!acled$actor1 %in% toRemove),]
-acled = acled[which(!acled$actor2 %in% toRemove),]
-###########################
-
-###########################
 # fatality threshold (at least )
 # across all events how many fatalities was an actor
 # involved in
