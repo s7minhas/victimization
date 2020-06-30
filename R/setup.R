@@ -78,6 +78,7 @@ loadPkg=function(toLoad){
 }
 
 pkgs = c(
+	'readr', 'abind',
 	'dplyr', 'tidyr', 'magrittr',
 	'network', 'igraph',
 	'ggplot2', 'RColorBrewer', 'latex2exp',

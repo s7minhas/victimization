@@ -18,8 +18,6 @@ acled = suppressMessages( read_csv(
 	paste0(
 		pathData,
 		"acled_raw_1997-01-01-2020-06-03.csv")))
-
-acled = acled[which(acled$year<=2019),]
 ############################
 
 ############################
@@ -52,15 +50,23 @@ cntConf = nrow(slice)
 yrCnt = max(slice$year) - min(slice$year)
 
 # get min and max active year from slice for every actor
+# also get total number of fatalities for events in
+# which they were involved
 actors = abind(
-	slice[,c('actor1', 'year')],
-	slice[,c('actor2', 'year')],
+	slice[,c('actor1', 'year', 'fatalities')],
+	slice[,c('actor2', 'year', 'fatalities')],
 	along=1 ) %>% data.frame(.,stringsAsFactors=FALSE) %>%
 	group_by(actor2) %>%
 	summarize(
 		startYear = min(num(year)),
-		endYear = max(num(year)) )
+		endYear = max(num(year)),
+		fatalities = sum(num(fatalities), na.rm=TRUE)
+	 )
 names(actors)[1] = 'dirty'
+
+# subset to actors that were involved in events
+# which produced at least 10 fatalities
+actors = actors[actors$fatalities>=10,]
 
 # combine military/police forces of country
 govRefPattern = paste0(
@@ -91,7 +97,8 @@ if(nrow(actors)==0){return(rep(NA, 7))}
 
 # get counts of actors
 yrs = sort(unique(slice$year))
-actorRanges = lapply(1:nrow(actors), function(ii){actors$startYear[ii]:actors$endYear[ii]})
+actorRanges = lapply(1:nrow(actors), function(ii){
+	actors$startYear[ii]:actors$endYear[ii]})
 aCntStats = lapply(yrs, function(yr){
 	lapply(actorRanges, function(tRange){ yr %in% tRange }) %>%
 		unlist() %>% sum() }) %>% unlist()
@@ -126,15 +133,36 @@ summStatsACLED$continent = countrycode(
 summStatsACLED$continent[summStatsACLED$cntry=='Kosovo'] = 'Europe'
 summStatsACLED$continent[summStatsACLED$cntry=='eSwatini'] = 'Africa'
 
+# get rid of countries that had NAs .. these are countries
+# that had zero actors after processing
+summStatsACLED = summStatsACLED[
+	!is.na(summStatsACLED$cntActorsMedian),]
+
 # reorg
 summStatsACLED = summStatsACLED[order(
 	summStatsACLED$cntActorsMedian, decreasing=TRUE),]
 
+# convert yr cnts to proportion
+summStatsACLED$yrsWithFiveActors = with(summStatsACLED,
+	yrsWithFiveActors/yrCnt)
+summStatsACLED$yrsWithTenActors = with(summStatsACLED,
+	yrsWithTenActors/yrCnt)
+
+# subset to countries in africa
+summStatsACLED = summStatsACLED[
+	summStatsACLED$continent=='Africa',]
+
 # get out country names
-cntriesACLED=summStatsACLED$cntry
+cntriesACLED_five=summStatsACLED$cntry[
+	summStatsACLED$cntActorsMedian>=5,]
+cntriesACLED_ten=summStatsACLED$cntry[
+	summStatsACLED$cntActorsMedian>=10,]
 ############################
 
 ############################
-aData = acled = data.frame(acled[which(acled$COUNTRY %in% cntriesACLED), ])
-save(aData, cntriesACLED, file=paste0(pathData, 'cntriesACLED_byAll.rda'))
+save(
+	aData,
+	cntriesACLED_five, cntriesACLED_ten, 
+	file=paste0(pathData, 'cntriesACLED_byAll.rda')
+)
 ############################
