@@ -115,9 +115,11 @@ sliceAgg
 
 ####
 # epr
-load(paste0(pathData, 'epr/epr.rda'))
+load(paste0(pathData, 'growup/epr.rda'))
 eprVars = c(
-	'ethfrac', 'exclgrps', 'exclpop'
+	'exclpop', 'egippop',
+	'exclpop', 'discrimpop',
+	'maxexclpop'	
 	)
 data = simpleMerge(data, epr, eprVars, 'id', 'cnameYear')
 rm(epr)
