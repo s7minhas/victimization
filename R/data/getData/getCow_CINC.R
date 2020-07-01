@@ -1,6 +1,10 @@
 ####
-if(Sys.info()['user'] %in% c('s7m', 'janus829')){ 
+if(Sys.info()['user'] %in% c('s7m', 'janus829')){
 	source('~/Research/victimization/R/setup.R') }
+if(Sys.info()['user'] %in% c('Owner','herme','S7M')){
+	source(paste0(
+		'C:/Users/',Sys.info()['user'],
+		'/Research/victimization/R/setup.R')) }
 ####
 
 ############################
@@ -9,7 +13,7 @@ cincURL = 'http://www.correlatesofwar.org/data-sets/national-material-capabiliti
 cincName = paste0(pathData, 'cow_cinc/cinc.zip')
 if(!file.exists(cincName)) { download.file(cincURL, cincName) }
 
-cinc = unzip(cincName, 
+cinc = unzip(cincName,
 	'NMC_5_0.dta') %>% foreign::read.dta()
 ############################
 

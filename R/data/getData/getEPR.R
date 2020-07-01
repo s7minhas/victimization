@@ -1,8 +1,12 @@
 ####
-if(Sys.info()['user'] %in% c('s7m', 'janus829')){ 
+if(Sys.info()['user'] %in% c('s7m', 'janus829')){
 	source('~/Research/victimization/R/setup.R') }
-if(Sys.info()['user'] %in% c('cassydorff')){ 
+if(Sys.info()['user'] %in% c('cassydorff')){
 	source('~/ProjectsGit/victimization/R/setup.R') }
+if(Sys.info()['user'] %in% c('Owner','herme','S7M')){
+	source(paste0(
+		'C:/Users/',Sys.info()['user'],
+		'/Research/victimization/R/setup.R')) }
 ####
 
 ############################
@@ -24,7 +28,7 @@ epr$cname=cname(epr$country)
 
 # Other country name fixes
 epr$cname[epr$cname=='Yugoslavia'] = 'SERBIA'
-  
+
 # Construct id from year + name
 epr$cnameYear=paste0(epr$cname, '_', epr$year)
 

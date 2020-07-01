@@ -32,16 +32,39 @@ cor(netStats[,c("numConf", 'graph_avgDeg', 'graph_dens', 'n_actors')])
 # summary(mod)$'coefficients'
 # summary(mod_pois)$'coefficients'
 
+head(netStats)
+
+cbind(names(netStats))
+
+loadPkg('glmmTMB')
+
 # run across relev net stat vars
+mean(netStats$vic)
+var(netStats$vic)
+
+netStats$game = factor(netStats$game)
+
 vars = names(netStats)[1:11]
 perfVars = vars[c(1,3,6)]
-res = lapply(perfVars, function(v){
-  form=formula(paste0('vic~numConf+n_actors+', v))
-  mod = glm.nb(form, data=netStats)
-  out = summary(mod)$'coefficients'
-  return(out)
-  })
+
+loadPkg(c('foreach','doParallel'))
+cores = length(perfVars)
+cl = makeCluster(cores)
+registerDoParallel(cl)
+
+res = foreach(
+	v = perfVars,
+	.packages=c('glmmTMB')
+) %dopar% {
+form=formula(paste0('vic~numConf+n_actors+', v, '+ (1|game)'))
+# mod = glm.nb(form, data=netStats)
+mod = glmmTMB(form, data=netStats, family='nbinom1')
+out = summary(mod)$'coefficients'
+return(out)
+}
+stopCluster(cl)
 names(res) = perfVars
+res
 
 # compare performance of metrics via cross val
 loadPkg(c('doParallel', 'foreach'))
@@ -52,7 +75,6 @@ netStats$fold = sample(folds, nrow(netStats), TRUE)
 parDF = expand.grid(perfVars, folds, stringsAsFactors=FALSE)
 
 #
-cbind(names(netStats))
 netStatsAgg = netStats %>%
 	group_by(game) %>%
 	summarize(
@@ -62,20 +84,28 @@ netStatsAgg = netStats %>%
 		graph_localTrans = mean(graph_localTrans, na.rm=TRUE),
 		numConf = sum(numConf, na.rm=TRUE),
 		n_actors = max(n_actors, na.rm=TRUE)
-	)
+	) %>% data.frame(.,stringsAsFactors=FALSE)
 
-netStatsAggStdz = apply(netStatsAgg, 2, function(x){(x-mean(x, na.rm=TRUE))/sd(x,na.rm=TRUE)})
-head(netStatsAggStdz)
+head(netStatsAgg)
+
+mean(netStatsAgg$vic)
+var(netStatsAgg$vic)
+netStatsAggStdz = apply(netStatsAgg[,-which('vic'==names(netStatsAgg))], 2,
+	function(x){(x-mean(x, na.rm=TRUE))/sd(x,na.rm=TRUE)})
+netStatsAggStdz = data.frame(netStatsAggStdz, stringsAsFactors=FALSE)
+netStatsAggStdz$vic = netStatsAgg[,'vic']
+
 vars = names(netStats)[1:11]
 perfVars = vars[c(1,3,6)]
 res = lapply(perfVars, function(v){
   form=formula(paste0('vic~numConf+n_actors+', v))
-  mod = lm(form, data=netStatsAggStdz)
+  mod = glm.nb(form, data=netStatsAggStdz)
   out = summary(mod)$'coefficients'
   return(out)
   })
 names(res) = perfVars
 res
+
 
 # run in parallel
 cl = makeCluster(20)
