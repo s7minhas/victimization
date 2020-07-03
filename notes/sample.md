@@ -20,7 +20,7 @@
 - aggregate military/police into gov
 - violence of any kind that led to at least 10 fatalities
   - so just do a group by actor and then sum of fatalities
-- include actors in the range of their event min and max year
+- include actors in the range of their event min and max year (this is the only difference in the actor rules from the counts analysis)
 - remove peacekeepers, election observers, militaries from other countries, and unidentified groups based on grepl searches
 
 ### country inclusion rules:

@@ -34,6 +34,20 @@ acled = acled[which(acled$event_type=='Battles'),]
 ############################
 
 ############################
+# identify african countries
+acled$continent = countrycode(
+	acled$country,
+	'country.name', 'continent' )
+
+# fix for kosovo
+acled$continent[acled$country=='Kosovo'] = 'Europe'
+acled$continent[acled$country=='eSwatini'] = 'Africa'
+
+# subset
+acled = acled[acled$continent=='Africa',]
+############################
+
+############################
 # function to turn semicol concat vec into vec
 actorVec = function(main, assoc){
 	side = paste(c(main, assoc), collapse='; ')
@@ -88,5 +102,6 @@ acled = rbind(
 
 ############################
 # save
-save(acled, file=paste0(pathData, 'acled.rda'))
+save(acled,
+	file=paste0(pathData, 'acled_wMelt_assocActors.rda') )
 ############################
