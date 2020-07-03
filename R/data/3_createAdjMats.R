@@ -125,6 +125,6 @@ toKeep = actCntsSumm$L1[actCntsSumm$cnt>0]
 # save
 save(
   actorDates, actorsCT, yListAll,
-  actCnts, actCntsSumm, toKeep, 
+  actCnts, actCntsSumm, toKeep,
   file=paste0(pathData, 'actorAdjList.rda'))
 ############################
