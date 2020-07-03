@@ -27,7 +27,7 @@ loadPkg(c(
 # load data
 load(paste0(pathData, 'actorAdjList.rda')) # yListAll
 load(paste0(pathData, 'netStats.rda')) # netStats
-load(paste0(pathData, 'iData_acled.rda')) # modeling file
+load(paste0(pathData, 'data.rda')) # modeling file
 #################
 
 #################
@@ -234,6 +234,9 @@ server <- function(input, output) {
     toPlot = c('civVicCount', input$vicGraphCompare)
     ggData = ggData[which(ggData$graphMeasure %in% toPlot),]
 
+    # convert variable types
+    ggData$year = factor(ggData$year)
+    
     # plot
     ggplot(ggData, aes(x=year, y=value)) +
       geom_line() + geom_point() +
