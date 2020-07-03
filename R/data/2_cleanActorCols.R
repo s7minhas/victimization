@@ -56,7 +56,8 @@ for(id in ids){
 # set peacekeepers/observers and
 # unidentified actors as NA
 tagsToRemove = c(
-  'African Union', 'United Nations', 'Observer',
+  'African Union', 'United Nations', 'NATO', 
+	'Observer',
 	'Unidentified' )
 
 for(tag in tagsToRemove){

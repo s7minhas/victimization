@@ -1,4 +1,4 @@
-# 6/29/20
+# 7/2/20
 
 ## actor inclusion rules for actor counts analysis
 
@@ -11,7 +11,7 @@
 
 ### country inclusion rules:
 
-- country must be in africa
+- global
 
 ## actor inclusion rules for empirical data (and for web app)
 
@@ -25,7 +25,7 @@
 
 ### country inclusion rules:
 
-- country must be in africa
+- country must be in africa ... many of our IVs only exist for africa
 - country must have at least three years of conflict
 - and testing out a few variants of median number of actors during conflict period criteria
   - no restriction

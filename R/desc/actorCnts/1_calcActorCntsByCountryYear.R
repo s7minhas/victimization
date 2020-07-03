@@ -12,16 +12,14 @@ if(Sys.info()['user'] %in% c('dorffc')){
 loadPkg(c('abind'))
 ###########################################################
 
-###########################
+###########################################################
 # load data
 load(
   paste0(
     pathData, 'acled_cleanedActorCols.rda')) # acled
-############################
-
 ###########################################################
 
-###########################
+###########################################################
 # fatality threshold (at least )
 # across all events how many fatalities was an actor
 # involved in
@@ -43,25 +41,17 @@ actors = data.frame(actors, stringsAsFactors=FALSE) %>%
   )
 
 actorVec = actors$actor2[actors$fatalities>=10]
-###########################
+###########################################################
 
-###########################
+###########################################################
 # take the actors identified in actorVec
 # and subset our acled dataset
-
-# include any event that involed
-# an actor at all from our parsed actor list
-# acledParsed = acled[
-#   acled$actor1 %in% actorVec |
-#   acled$actor2 %in% actorVec,]
 
 # only include events in which both
 # actors come from our parsed actor list
 acledParsed = acled[which(acled$actor1 %in% actorVec),]
 acledParsed = acledParsed[
   which(acledParsed$actor2 %in% actorVec),]
-###########################
-
 ###########################################################
 
 ###########################################################
@@ -108,6 +98,13 @@ actorCntsID$nCat = factor(
   actorCntsID$nCat,
   levels=rev(c('1-4','5-9','>10'))
 )
+
+head(actorCntsID)
+
+summary(actorCntsID$nActors)
+actorCntsID[actorCntsID$nActors==1,]
+ids
+which(ids=='Zimbabwe_2015')
 
 #
 save(actorCntsID, file=paste0(pathData, 'actorCntsID.rda'))
