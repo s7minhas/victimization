@@ -85,5 +85,5 @@ names(netStats) = names(yListAll)
 stopCluster(cl)
 
 save(netStats,
-	file=paste0(pathData, 'netStats_acled.rda'))
+	file=paste0(pathData, 'netStats.rda'))
 ############################

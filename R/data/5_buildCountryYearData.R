@@ -5,15 +5,14 @@ if(Sys.info()['user'] %in% c('Owner','herme','S7M')){
 		'/Research/victimization/R/setup.R')) }
 if(Sys.info()['user'] %in% c('s7m', 'janus829')){
 	source('~/Research/victimization/R/setup.R') }
-if(Sys.info()['user'] %in% c('cassydorff')){
-	source('~/ProjectsGit/victimization/R/setup.R') }
-if(Sys.info()['user'] %in% c('maxgallop')){
-  source('~/documents/victimization/R/setup.R') }
+
+#
+loadPkg('readr')
 ############################
 
 ############################
 # reorg to df
-load(paste0(pathData, 'netStats_acled.rda'))
+load(paste0(pathData, 'netStats.rda'))
 netDF = do.call('rbind', netStats)
 rownames(netDF) = NULL
 
@@ -52,7 +51,7 @@ data$cyear=paste(data$ccode, data$year, sep='')
 ############################
 # merge in vars
 ####
-# polity
+# polity - 2018
 load(paste0(pathData, 'polity/polity.rda'))
 polVars = c('polity2', 'xconst', 'polcomp')
 data = simpleMerge(data, polity, polVars, 'id', 'cnameYear')
@@ -60,7 +59,7 @@ rm(polity)
 ####
 
 ####
-# worldbank
+# worldbank - 2019
 load(paste0(pathData, 'worldBank/worldBank.rda'))
 wbVars = c('gdp','gdpCap','gdpGr','pop','gdpLog','gdpCapLog','popLog')
 data = simpleMerge(data, worldBank, wbVars, 'id', 'cnameYear')
@@ -68,7 +67,7 @@ rm(worldBank)
 ####
 
 ####
-# cow cinc
+# cow cinc - 2012
 load(paste0(pathData, 'cow_cinc/cinc.rda'))
 cincVars = c('milex','milper','cinc')
 data = simpleMerge(data, cinc, cincVars, 'id', 'cnameYear')
@@ -76,7 +75,7 @@ rm(cinc)
 ####
 
 ####
-# icrg
+# icrg - 2014
 load(paste0(pathData, 'icrg/icrg.rda'))
 icrgVars = c(
 	'govtStab', 'socEconCon', 'invProf', 'intConf',
@@ -87,46 +86,34 @@ rm(icrg)
 ####
 
 ####
-# civ victimization
-#### need to finish acled civ dv measure
-acled = readr::read_csv(
-	paste0(
-		pathData,
-		'ACLED-Version-7-All-Africa-1997-2016_csv_dyadic-file.csv'))
-acledCiv = acled[which(acled$EVENT_TYPE=='Violence against civilians'),]
-acledCiv = acledCiv[acledCiv$YEAR>=1993,c('YEAR','COUNTRY','FATALITIES')]
-acledCiv$cname = cname(acledCiv$COUNTRY)
-acledCiv$cnameYear = with(acledCiv, paste0(cname, '_', YEAR))
-data$civVicCount = acledCiv$FATALITIES[match(data$id, acledCiv$cnameYear)]
-
-names(acledCiv) %>% cbind()
-unique(acledCiv$COUNTRY) %>% cbind()
-slice = acledCiv[acledCiv$COUNTRY=='Somalia',]
-dim(slice)
-head(slice)
-sliceAgg = slice %>%
-	group_by(YEAR) %>%
-	summarize(
-		FATALITIES=sum(FATALITIES, na.rm=TRUE)
-	)
-dim(sliceAgg)
-sliceAgg
+# civ victimization -2020
+acledCiv = suppressMessages( read_csv( paste0( pathData,
+		"acled_1997-01-01-2020-07-02.csv"))) %>%
+		filter(event_type=='Violence against civilians') %>%
+		group_by(country, year) %>%
+		summarize( fatalities = sum(fatalities, na.rm=TRUE) )
+acledCiv$cname = cname(acledCiv$country)
+acledCiv$cnameYear = with(acledCiv, paste0(cname, '_', year))
+data$civVicCount = acledCiv$fatalities[match(data$id, acledCiv$cnameYear)]
+data$civVicCount[is.na(data$civVicCount)] = 0
 ####
 
 ####
-# epr
+# epr - 2017
 load(paste0(pathData, 'growup/epr.rda'))
+epr = data.frame(epr, stringsAsFactors=FALSE)
 eprVars = c(
 	'exclpop', 'egippop',
 	'exclpop', 'discrimpop',
-	'maxexclpop'	
+	'maxexclpop'
 	)
 data = simpleMerge(data, epr, eprVars, 'id', 'cnameYear')
 rm(epr)
 ####
 
 ####
-# add kathman cmps peacekeeper data at country-year level
+# add kathman cmps peacekeeper
+# data at country-year level - 2012
 load(paste0(pathData, 'kathman/kath.rda'))
 names(kath)[6] = 'totalPeacekeepers'
 kathVars = c(
@@ -144,7 +131,7 @@ data$anyPeaceKeeper[data$totalPeacekeepers>0] = 1
 ####
 
 ####
-# add nsa data at country-year level
+# add nsa data at country-year level - 2011
 load(paste0(pathData, 'nsa/nsa.rda'))
 nsaVars = names(nsa)[3:ncol(nsa)]
 data = simpleMerge(data, nsa, nsaVars, 'id', 'cnameYear')
@@ -153,5 +140,5 @@ rm(nsa)
 
 ############################
 # save
-save(data, file=paste0(pathData, 'data_acled.rda'))
+save(data, file=paste0(pathData, 'data.rda'))
 ############################

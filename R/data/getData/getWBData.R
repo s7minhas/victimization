@@ -1,7 +1,11 @@
-####
-if(Sys.info()['user'] %in% c('s7m', 'janus829')){ 
+############################
+if(Sys.info()['user'] %in% c('Owner','herme','S7M')){
+	source(paste0(
+		'C:/Users/',Sys.info()['user'],
+		'/Research/victimization/R/setup.R')) }
+if(Sys.info()['user'] %in% c('s7m', 'janus829')){
 	source('~/Research/victimization/R/setup.R') }
-####
+############################
 
 ############################
 # Download WB data using WDI package
@@ -16,9 +20,9 @@ wbVars = c(
 	)
 
 # Call WDI website
-wbData = WDI(country='all', 
-	indicator=wbVars, 
-	start=1993, end=2018, extra=TRUE )
+wbData = WDI(country='all',
+	indicator=wbVars,
+	start=1993, end=2019, extra=TRUE )
 write.csv(wbData, file=fName)
 
 # Change names

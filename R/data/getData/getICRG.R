@@ -1,7 +1,11 @@
-####
-if(Sys.info()['user'] %in% c('s7m', 'janus829')){ 
+############################
+if(Sys.info()['user'] %in% c('Owner','herme','S7M')){
+	source(paste0(
+		'C:/Users/',Sys.info()['user'],
+		'/Research/victimization/R/setup.R')) }
+if(Sys.info()['user'] %in% c('s7m', 'janus829')){
 	source('~/Research/victimization/R/setup.R') }
-####
+############################
 
 ###############################################################
 # Function to clean data data
@@ -33,7 +37,7 @@ icrgCleaner = function(data,sheetNum){
 	data[data$Country=='Serbia and Montenegro' & data$year>=2006, 'drop']=1
 	data[data$Country=='Serbia' & data$year<2006, 'drop']=1
 	data[data$Country=='Serbia & Montenegro *' & data$year>=2006, 'drop']=1
-	data[data$Country=='Serbia *' & data$year<2006, 'drop']=1	
+	data[data$Country=='Serbia *' & data$year<2006, 'drop']=1
 	data[data$Country=='Czechoslovakia' & data$year>=1993, 'drop']=1
 	data[data$Country=='Czech Republic' & data$year<1993, 'drop']=1
 	data=data[data$drop==0,]; data=data[,1:(ncol(data)-1)]
@@ -41,7 +45,7 @@ icrgCleaner = function(data,sheetNum){
 
 	# Create country + year id
 	data$cnameYear=paste(data$cname, data$year, sep='')
-	 
+
 	# Check for duplicates
 	cat(paste0('cyearDupe ',sheetNum, ': ')); cat( table(data$cnameYear)[table(data$cnameYear)>1] ) ; cat('\n')
 
@@ -83,8 +87,8 @@ for(ii in icrgL[2:length(icrgL)]){
 ###############################################################
 # Relabel variables
 shortNames = c(
-	'govtStab', 'socEconCon', 'invProf', 'intConf', 
-	'extConf', 'corr', 'milPol', 'relPol', 'lawOrd', 
+	'govtStab', 'socEconCon', 'invProf', 'intConf',
+	'extConf', 'corr', 'milPol', 'relPol', 'lawOrd',
 	'ethTens', 'demAcct', 'burQual')
 # Replace
 names(icrg)[c(3,8:ncol(icrg))] = shortNames

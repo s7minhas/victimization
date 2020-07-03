@@ -1,11 +1,15 @@
-####
-if(Sys.info()['user'] %in% c('s7m', 'janus829')){ 
+############################
+if(Sys.info()['user'] %in% c('Owner','herme','S7M')){
+	source(paste0(
+		'C:/Users/',Sys.info()['user'],
+		'/Research/victimization/R/setup.R')) }
+if(Sys.info()['user'] %in% c('s7m', 'janus829')){
 	source('~/Research/victimization/R/setup.R') }
-####
+############################
 
 ############################
 # Download file from INSCR site
-polURL = 'http://www.systemicpeace.org/inscr/p4v2016.sav'
+polURL = 'http://www.systemicpeace.org/inscr/p5v2018.sav'
 polName = paste0(pathData, 'polity/polity16.sav')
 if(!file.exists(polName)) { download.file(polURL, polName) }
 
@@ -27,6 +31,12 @@ polData$country[polData$country=='Germany East']="Germany Democratic Republic"
 # Convert to matching countrycodes
 polData$cname=cname(polData$country)
 
+# all cases of cname returning NA
+# are cases in which there is just
+# no data, so remove
+unique(polData$country[is.na(polData$cname)]) == NA
+polData = polData[!is.na(polData$cname),]
+
 # Other country name fixes
 polData$cname[polData$country=='Yemen South']="S. YEMEN"
 polData$cname[polData$country=='Vietnam South']="S. VIETNAM"
@@ -34,7 +44,7 @@ polData[polData$country=='Yugoslavia', 'cname']='SERBIA'
 polData[polData$country=='Czechoslovakia', 'cname']='CZECH REPUBLIC'
 polData[polData$country=='Germany Democratic Republic', 'cname']="German Democratic Republic"
 polData[polData$country=='South Sudan', 'cname']='SOUTH SUDAN'
-  
+
 # Construct id from year + name
 polData$cnameYear=paste0(polData$cname, '_', polData$year)
 

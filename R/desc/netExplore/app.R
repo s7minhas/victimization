@@ -26,10 +26,8 @@ loadPkg(c(
 #################
 # load data
 load(paste0(pathData, 'actorAdjList.rda')) # yListAll
-load(paste0(pathData, 'netStats_acled.rda')) # netStats
+load(paste0(pathData, 'netStats.rda')) # netStats
 load(paste0(pathData, 'iData_acled.rda')) # modeling file
-# load(paste0(pathData, 'actorAdjList_GED.rda')) # yListALL_GED
-# load(paste0(pathData, 'netStatsGED.rda')) # netStatsGED
 #################
 
 #################
@@ -47,9 +45,6 @@ cleanListNames = function(x){
 
 # acled adj list
 yListAll = cleanListNames(yListAll)
-
-# ucdp adj list
-# yListAll_GED = cleanListNames(yListAll_GED)
 
 # acled net stats
 netStats = cleanListNames(netStats)
@@ -106,11 +101,6 @@ ui <- fluidPage(
     )
 )
 #################
-
-# input = list(
-#   cntry='NIGERIA',
-#   plotYr=2000
-# )
 
 #################
 # Define server logic
