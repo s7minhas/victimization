@@ -1,3 +1,35 @@
+# 7/3/20
+
+- notable change, drop fatality threshold for events because it is too stringent according to qualitative case checks, specifically sierra leone
+
+## actor inclusion rules for actor counts analysis
+
+### actor rules:
+
+- aggregate military/police into gov
+- remove peacekeepers, election observers, militaries from other countries, and unidentified groups based on grepl searches
+
+### country inclusion rules:
+
+- global
+
+## actor inclusion rules for empirical data (and for web app)
+
+### actor rules:
+
+- aggregate military/police into gov
+- include actors in the range of their event min and max year (this is the only difference in the actor rules from the counts analysis)
+- remove peacekeepers, election observers, militaries from other countries, and unidentified groups based on grepl searches
+
+### country inclusion rules:
+
+- country must be in africa ... many of our IVs only exist for africa
+- country must have at least three years of conflict
+- and testing out a few variants of median number of actors during conflict period criteria
+  - no restriction
+  - five actors or more
+  - ten actors or more
+
 # 7/2/20
 
 ## actor inclusion rules for actor counts analysis

@@ -40,7 +40,7 @@ actors = data.frame(actors, stringsAsFactors=FALSE) %>%
     fatalities = sum(fatalities, na.rm=TRUE)
   )
 
-actorVec = actors$actor2[actors$fatalities>=10]
+actorVec = actors$actor2
 ###########################################################
 
 ###########################################################
@@ -98,13 +98,6 @@ actorCntsID$nCat = factor(
   actorCntsID$nCat,
   levels=rev(c('1-4','5-9','>10'))
 )
-
-head(actorCntsID)
-
-summary(actorCntsID$nActors)
-actorCntsID[actorCntsID$nActors==1,]
-ids
-which(ids=='Zimbabwe_2015')
 
 #
 save(actorCntsID, file=paste0(pathData, 'actorCntsID.rda'))

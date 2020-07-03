@@ -38,10 +38,6 @@ actorDates = abind(
 		fatalities = sum(num(fatalities), na.rm=TRUE)
 	 )
 
-# only include rows with greater than
-# 10 fatalities
-actorDates = actorDates[actorDates$fatalities>=10,]
-
 # remove NAs
 actorDates = actorDates[!is.na(actorDates$actor2),]
 ############################

@@ -234,9 +234,6 @@ server <- function(input, output) {
     toPlot = c('civVicCount', input$vicGraphCompare)
     ggData = ggData[which(ggData$graphMeasure %in% toPlot),]
 
-    # convert variable types
-    ggData$year = factor(ggData$year)
-    
     # plot
     ggplot(ggData, aes(x=year, y=value)) +
       geom_line() + geom_point() +
