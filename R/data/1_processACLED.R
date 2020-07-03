@@ -42,9 +42,6 @@ acled$continent = countrycode(
 # fix for kosovo
 acled$continent[acled$country=='Kosovo'] = 'Europe'
 acled$continent[acled$country=='eSwatini'] = 'Africa'
-
-# subset
-acled = acled[acled$continent=='Africa',]
 ############################
 
 ############################

@@ -72,7 +72,7 @@ catActorsFatals = actorCntsID %>%
 
 aovCiv = aov(civ_fatals ~ nCat, data=actorCntsID)
 aovBat = aov(bat_fatals ~ nCat, data=actorCntsID)
-# summary(aovCiv) ; summary(aovBat)
+summary(aovCiv) ; summary(aovBat)
 ###########################################################
 
 ###########################################################

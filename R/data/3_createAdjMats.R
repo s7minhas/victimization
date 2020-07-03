@@ -15,6 +15,10 @@ loadPkg(c('doParallel', 'foreach', 'abind', 'reshape2'))
 load(
   paste0(
     pathData, 'acled_cleanedActorCols.rda')) # acled
+
+# subset to just africa since
+# some of our IVs are only available for africa
+acled = acled[acled$continent=='Africa',]
 ############################
 
 ############################
