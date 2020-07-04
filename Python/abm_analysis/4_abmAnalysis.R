@@ -9,7 +9,7 @@ if(Sys.info()['user'] %in% c('maxgallop')){
 	source('~/Documents/victimization/R/setup.R') }
 
 loadPkg(c(
-	'MASS', 'glmmTMB'
+	'MASS', 'glmmTMB', 'foreach', 'doParallel'
 	))
 ################################################
 
@@ -34,37 +34,40 @@ vars = names(netStats)[1:11]
 perfVars = vars[c(1,3,6)]
 
 # run in parallel
-loadPkg(c('foreach','doParallel'))
 cores = length(perfVars)
 cl = makeCluster(cores)
 registerDoParallel(cl)
-
 res = foreach(
 	v = perfVars,
 	.packages=c('glmmTMB')
 ) %dopar% {
 form=formula(paste0('vic~numConf+n_actors+', v, '+ (1|game)'))
-# mod = glm.nb(form, data=netStats)
-mod = glmmTMB(form, data=netStats, family='nbinom1')
-out = summary(mod)$'coefficients'
-return(out)
+mod = glmmTMB(form, data=netStats, family='nbinom2')
+return(mod)
 }
 stopCluster(cl)
 names(res) = perfVars
-res
+lapply(res, function(x){summary(x)$'coefficients'})
 ################################################
 
 ################################################
 # compare performance of metrics via cross val
-loadPkg(c('doParallel', 'foreach'))
-nFolds = 10
-folds = letters[1:nFolds]
+
+# assign folds by game
 set.seed(6886)
-netStats$fold = sample(folds, nrow(netStats), TRUE)
+nFolds = 10 ; folds = letters[1:nFolds]
+gameFold = data.frame(
+	game=sort(num(unique(netStats$game))),
+	stringsAsFactors=FALSE )
+gameFold$folds = sample(folds, nrow(gameFold), replace=TRUE)
+netStats$folds = gameFold$folds[match(netStats$game, gameFold$game)]
+
+# create instructions for prlz
 parDF = expand.grid(perfVars, folds, stringsAsFactors=FALSE)
 
 # run in parallel
-cl = makeCluster(20)
+cores = detectCores() - 4
+cl = makeCluster(cores)
 registerDoParallel(cl)
 perfRes = foreach(
 	ii = 1:nrow(parDF),
@@ -74,15 +77,15 @@ perfRes = foreach(
 	v = parDF[ii,1] ; f = parDF[ii,2]
 
 	# set up form
-	form=formula(paste0('vic~numConf+n_actors+', v))
+	form=formula(paste0('vic~numConf+n_actors+', v, '+ (1|game)'))
 
 	# divide data
-	train = netStats[netStats$fold!=f,]
-	test = netStats[netStats$fold==f,]
+	train = netStats[netStats$folds!=f,]
+	test = netStats[netStats$folds==f,]
 	test = test[!is.na(test[,v]),]
 
 	# run model on train
-	mod = glm.nb(form, data=train)
+	mod = glmmTMB(form, data=train, family='nbinom2')
 
 	# eval
 	preds = predict(mod, test, type='response')
