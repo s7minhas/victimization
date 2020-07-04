@@ -47,12 +47,13 @@ return(mod)
 }
 stopCluster(cl)
 names(res) = perfVars
-lapply(res, function(x){summary(x)$'coefficients'})
+lapply(res, function(x){summary(x)$'coefficients'$cond})
 ################################################
 
 ########################################################
 # viz of results
-raw = summary(mod)$'coefficients'[-1,]
+mod = res$graph_dens
+raw = summary(mod)$'coefficients'$cond[-1,]
 coefData = raw %>%
 		data.frame(.,stringsAsFactors=FALSE) %>%
 		setNames(c('mean','sd','zstat','pval')) %>%
@@ -60,8 +61,8 @@ coefData = raw %>%
 			var=rownames(.),
 			varName=c(
 				'Graph Density',
-				'Number of\nConflicts',
-				'Number of\nActors'
+				'Number of\nActors',
+				'Number of\nConflicts'
 				),
 			model='ABM Simulation Model'
 			) %>%
@@ -71,8 +72,11 @@ coefData = raw %>%
 # org for plotting
 coefData$varName = factor(
 	coefData$varName,
-	levels=varKey$clean
-	)
+	levels=rev(c(
+		'Graph Density',
+		'Number of\nActors',
+		'Number of\nConflicts'
+	)) )
 
 # viz
 ggCoef = ggplot(
