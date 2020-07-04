@@ -50,57 +50,6 @@ names(res) = perfVars
 lapply(res, function(x){summary(x)$'coefficients'})
 ################################################
 
-################################################
-# compare performance of metrics via cross val
-
-# assign folds by game
-set.seed(6886)
-nFolds = 10 ; folds = letters[1:nFolds]
-gameFold = data.frame(
-	game=sort(num(unique(netStats$game))),
-	stringsAsFactors=FALSE )
-gameFold$folds = sample(folds, nrow(gameFold), replace=TRUE)
-netStats$folds = gameFold$folds[match(netStats$game, gameFold$game)]
-
-# create instructions for prlz
-parDF = expand.grid(perfVars, folds, stringsAsFactors=FALSE)
-
-# run in parallel
-cores = detectCores() - 4
-cl = makeCluster(cores)
-registerDoParallel(cl)
-perfRes = foreach(
-	ii = 1:nrow(parDF),
-	.packages=c('MASS', 'glmmTMB')
-	) %dopar% {
-	# get instr from parDF
-	v = parDF[ii,1] ; f = parDF[ii,2]
-
-	# set up form
-	form=formula(paste0('vic~numConf+n_actors+', v, '+ (1|game)'))
-
-	# divide data
-	train = netStats[netStats$folds!=f,]
-	test = netStats[netStats$folds==f,]
-	test = test[!is.na(test[,v]),]
-
-	# run model on train
-	mod = glmmTMB(form, data=train, family='nbinom2')
-
-	# eval
-	preds = predict(mod, test, type='response')
-	rmse = sqrt( mean( (preds-test$vic)^2 ) )
-
-	#
-	out = data.frame(
-		var=v, fold=f, rmse=rmse, stringsAsFactors=FALSE)
-	return(out) }
-stopCluster(cl)
-
-# org results
-perfRes = do.call('rbind', perfRes)
-########################################################
-
 ########################################################
 # viz of results
 raw = summary(mod)$'coefficients'[-1,]
