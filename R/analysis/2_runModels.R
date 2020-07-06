@@ -11,7 +11,39 @@ if(Sys.info()['user'] %in% c('cassydorff')){
 	source('~/ProjectsGit/victimization/R/setup.R') }
 
 # helpful pkgs
-loadPkg('MASS')
+loadPkg(c('MASS', 'glmmTMB'))
+########################################################
+
+########################################################
+load(paste0(pathData, 'data.rda'))
+
+cntries = unique(data$cname)
+coef=NULL
+
+for(cntry in cntries){
+		slice = data[data$cname!=cntry,]
+		modBase_noImp = glm.nb(
+			civVicCount ~  # dv
+				graph_dens + nActors + factor(cname) -1
+			, data=slice
+			)
+		summBase_noImp = summary(modBase_noImp)$'coefficients'
+		out = summBase_noImp[1,,drop=FALSE]
+		coef = rbind(coef, out)
+}
+
+head(coef)
+summary(coef)
+
+modBase_noImp = glm.nb(
+	civVicCount ~  # dv
+		graph_dens + nActors + factor(cname) -1
+	, data=data
+	)
+summBase_noImp = summary(modBase_noImp)$'coefficients'
+summBase_noImp[1,,drop=FALSE]
+
+
 ########################################################
 
 ########################################################
