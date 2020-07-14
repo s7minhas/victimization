@@ -47,7 +47,6 @@ return(mod)
 }
 stopCluster(cl)
 names(res) = perfVars
-lapply(res, function(x){summary(x)$'coefficients'$cond})
 ################################################
 
 ########################################################
@@ -60,9 +59,9 @@ coefData = raw %>%
 		mutate(
 			var=rownames(.),
 			varName=c(
-				'Graph Density',
+				'Number of\nConflicts',
 				'Number of\nActors',
-				'Number of\nConflicts'
+				'Graph Density'
 				),
 			model='ABM Simulation Model'
 			) %>%
