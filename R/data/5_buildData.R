@@ -19,25 +19,17 @@ rownames(netDF) = NULL
 # convert to country year
 netDF$id = with(netDF, paste0(country, '_', year))
 
-#
-data = netDF[,c('country','year','id')] %>%
-	group_by(id) %>%
-	summarize(
-		nActors = n()
-		) %>%
-	data.frame()
-data$country = char(unlist(lapply(strsplit(data$id,'_'), function(x){x[1]})))
-data$year = num(unlist(lapply(strsplit(data$id,'_'), function(x){x[2]})))
-############################
-
-############################
-# merge graph level measures
+# subset to graph level measures
 graphVars = c(
+	'nActors', 'nEvents',
 	'graph_trans','graph_dens',
 	'graph_avgDeg', 'graph_meanDist',
-	'graph_localTrans'
-)
-data = simpleMerge(data, netDF, graphVars, 'id', 'id', lagVars=FALSE)
+	'graph_localTrans' )
+data = netDF[,c('id', graphVars)] %>% unique()
+
+#
+data$country = char(unlist(lapply(strsplit(data$id,'_'), function(x){x[1]})))
+data$year = num(unlist(lapply(strsplit(data$id,'_'), function(x){x[2]})))
 ############################
 
 ############################

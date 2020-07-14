@@ -31,7 +31,7 @@ stat = function(expr, object){
 	return(x) }
 localTrans = function(x){
   igraph::transitivity(x, type='average') }
-
+cntry = names(yListAll)[1] ; t = yrs[1]
 cl = makeCluster(20)
 registerDoParallel(cl)
 netStats <- foreach(
@@ -51,6 +51,7 @@ netStats <- foreach(
 			matrix.type="adjacency", directed=FALSE)
 
     nActors = nrow(mat)
+		nEvents = sum(c(mat))/2
 		totDegree = igraph::degree(grph)
 		btwn = igraph::betweenness(grph)
 		totClose = igraph::closeness(grph)
@@ -68,6 +69,7 @@ netStats <- foreach(
 		graph_lubness = stat(sna::lubness, sgrph)
 		out = data.frame(
       nActors=nActors,
+			nEvents=nEvents,
 			totDegree, btwn,
 			totClose, eigenCent,
 			graph_trans, graph_dens,
