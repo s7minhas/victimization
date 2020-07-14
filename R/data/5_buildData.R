@@ -99,6 +99,20 @@ data$civVicCount[is.na(data$civVicCount)] = 0
 ####
 
 ####
+# number of conflicts -2020
+# civ victimization -2020
+acledConf = suppressMessages( read_csv( paste0( pathData,
+		"acled_1997-01-01-2020-07-02.csv"))) %>%
+		filter(event_type=='Battles') %>%
+		group_by(country, year) %>%
+		summarize( nConf = n() )
+acledConf$cname = cname(acledConf$country)
+acledConf$cnameYear = with(acledConf, paste0(cname, '_', year))
+data$nConf = acledConf$nConf[match(data$id, acledConf$cnameYear)]
+data$nConf[is.na(data$nConf)] = 0
+####
+
+####
 # epr - 2017
 load(paste0(pathData, 'growup/epr.rda'))
 epr = data.frame(epr, stringsAsFactors=FALSE)

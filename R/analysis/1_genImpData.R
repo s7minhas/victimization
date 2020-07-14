@@ -14,8 +14,10 @@ loadPkg('MASS')
 
 ########################################################
 # load data
-load(paste0(pathData, 'data_acled.rda'))
-load(paste0(pathData, 'cntriesGED_byAll.rda'))
+load(paste0(pathData, 'data.rda'))
+
+cbind(names(data))
+
 cData = cData[,c('country','year')]
 cData$cnt = 1
 cData = cData %>% group_by(country, year) %>%
