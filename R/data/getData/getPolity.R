@@ -9,11 +9,9 @@ if(Sys.info()['user'] %in% c('s7m', 'janus829')){
 
 ############################
 # Download file from INSCR site
-polURL = 'http://www.systemicpeace.org/inscr/p5v2018.sav'
-polName = paste0(pathData, 'polity/polity16.sav')
-if(!file.exists(polName)) { download.file(polURL, polName) }
-
-polData = foreign::read.spss(polName, to.data.frame=TRUE)
+polData = read.csv(
+	paste0(pathData, 'polity/p5v2018.csv'),
+	stringsAsFactors=FALSE )
 ############################
 
 ############################
@@ -31,11 +29,8 @@ polData$country[polData$country=='Germany East']="Germany Democratic Republic"
 # Convert to matching countrycodes
 polData$cname=cname(polData$country)
 
-# all cases of cname returning NA
-# are cases in which there is just
-# no data, so remove
-unique(polData$country[is.na(polData$cname)]) == NA
-polData = polData[!is.na(polData$cname),]
+# check for NAs
+polData$country[is.na(polData$cname)]
 
 # Other country name fixes
 polData$cname[polData$country=='Yemen South']="S. YEMEN"

@@ -140,6 +140,28 @@ data$anyPeaceKeeper[data$totalPeacekeepers>0] = 1
 # add nsa data at country-year level - 2011
 load(paste0(pathData, 'nsa/nsa.rda'))
 nsaVars = names(nsa)[3:ncol(nsa)]
+
+length(unique(nsa$cname))
+length(unique(data$cname))
+hmm=intersect(unique(nsa$cname), unique(data$cname))
+length(hmm)
+summary(nsa$year)
+
+setdiff(data$id[data$year<=2011], nsa$cnameYear)
+
+x = nsa[nsa$cname %in% hmm,]
+dim(x)
+
+nsa[nsa$cname=='ANGOLA',]
+
+setdiff(x$cname, data$cname)
+
+dim(x)
+dim(data)
+head(x)
+
+
+
 data = simpleMerge(data, nsa, nsaVars, 'id', 'cnameYear')
 rm(nsa)
 ############################
