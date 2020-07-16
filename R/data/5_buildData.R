@@ -20,6 +20,8 @@ rownames(netDF) = NULL
 netDF$id = with(netDF, paste0(country, '_', year))
 
 # subset to graph level measures
+# years without events according
+# to acled get dropped
 graphVars = c(
 	'nActors', 'nEvents',
 	'graph_trans','graph_dens',
@@ -110,8 +112,7 @@ load(paste0(pathData, 'growup/epr.rda'))
 epr = data.frame(epr, stringsAsFactors=FALSE)
 eprVars = c(
 	'exclpop', 'egippop',
-	'exclpop', 'discrimpop',
-	'maxexclpop'
+	'discrimpop', 'maxexclpop'
 	)
 data = simpleMerge(data, epr, eprVars, 'id', 'cnameYear')
 rm(epr)
@@ -134,34 +135,18 @@ for(v in kathVars){ data[is.na(data[,v]),v] = 0 }
 # create binary indicator for any intervention
 data$anyPeaceKeeper = 0
 data$anyPeaceKeeper[data$totalPeacekeepers>0] = 1
+
+# set everything after 2013 to NA
+# (data ends at 2012, so as lag
+# last set of info we have is 2013)
+for(v in c(kathVars, 'anyPeaceKeeper')){
+		data[which(data$year>2013),v] = NA }
 ####
 
 ####
 # add nsa data at country-year level - 2011
 load(paste0(pathData, 'nsa/nsa.rda'))
 nsaVars = names(nsa)[3:ncol(nsa)]
-
-length(unique(nsa$cname))
-length(unique(data$cname))
-hmm=intersect(unique(nsa$cname), unique(data$cname))
-length(hmm)
-summary(nsa$year)
-
-setdiff(data$id[data$year<=2011], nsa$cnameYear)
-
-x = nsa[nsa$cname %in% hmm,]
-dim(x)
-
-nsa[nsa$cname=='ANGOLA',]
-
-setdiff(x$cname, data$cname)
-
-dim(x)
-dim(data)
-head(x)
-
-
-
 data = simpleMerge(data, nsa, nsaVars, 'id', 'cnameYear')
 rm(nsa)
 ############################
