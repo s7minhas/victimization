@@ -39,15 +39,25 @@ cl = makeCluster(cores)
 registerDoParallel(cl)
 res = foreach(
 	v = perfVars,
-	.packages=c('glmmTMB')
+	.packages=c(
+		# 'glmmTMB'
+		'MASS'
+	)
 ) %dopar% {
-form=formula(paste0('vic~numConf+n_actors+', v, '+ (1|game)'))
-mod = glmmTMB(form, data=netStats, family='nbinom2')
+
+# form=formula(paste0('vic~numConf+n_actors+', v, '+ (1|game)'))
+# mod = glmmTMB(form, data=netStats, family='nbinom2')
+
+form=formula(paste0('vic~numConf+n_actors+', v, '+ factor(game)-1'))
+mod = glm.nb(form, data=netStats)
+
 return(mod)
 }
 stopCluster(cl)
 names(res) = perfVars
 ################################################
+
+lapply(res, function(x){summary(x)$'coefficients'[1:5,]})
 
 ########################################################
 # viz of results
