@@ -9,7 +9,7 @@ if(Sys.info()['user'] %in% c('maxgallop')){
 	source('~/Documents/victimization/R/setup.R') }
 
 loadPkg(c(
-	'MASS', 'glmmTMB', 'foreach', 'doParallel'
+	'glmmTMB', 'foreach', 'doParallel'
 	))
 ################################################
 
@@ -26,12 +26,14 @@ var(netStats$vic)
 
 ################################################
 # convert game counter to factor
-# for RE model
 netStats$game = factor(netStats$game)
 
 # choose vars to test
 vars = names(netStats)[1:11]
 perfVars = vars[c(1,3,6)]
+
+# run code if file does not exist
+if(!file.exists(paste0(pathResults, 'abm_reMods.rda'))){
 
 # run in parallel
 cores = length(perfVars)
@@ -39,30 +41,33 @@ cl = makeCluster(cores)
 registerDoParallel(cl)
 res = foreach(
 	v = perfVars,
-	.packages=c(
-		# 'glmmTMB'
-		'MASS'
-	)
-) %dopar% {
+	.packages=c( 'glmmTMB' ) ) %dopar% {
 
-# form=formula(paste0('vic~numConf+n_actors+', v, '+ (1|game)'))
-# mod = glmmTMB(form, data=netStats, family='nbinom2')
+form=formula(paste0('vic~numConf+n_actors+', v, '+ (1|game)'))
+mod = glmmTMB(form, data=netStats, family='nbinom2')
 
-form=formula(paste0('vic~numConf+n_actors+', v, '+ factor(game)-1'))
-mod = glm.nb(form, data=netStats)
-
-return(mod)
-}
+return(mod) }
 stopCluster(cl)
 names(res) = perfVars
+
+# save full models
+save(res,
+	file=paste0(pathResults, 'abm_reMods.rda')
+	)
+
+# save coefs
+coefs = lapply(res, function(x){summary(x)$'coefficients'$cond})
+save(coefs,
+	file=paste0(pathResults, 'abm_reCoefs.rda')
+	)
+} else {
+	load(paste0(pathResults, 'abm_reCoefs.rda'))
+}
 ################################################
 
-lapply(res, function(x){summary(x)$'coefficients'[1:5,]})
-
-########################################################
+################################################
 # viz of results
-mod = res$graph_dens
-raw = summary(mod)$'coefficients'$cond[-1,]
+raw = coefs$graph_dens[-1,]
 coefData = raw %>%
 		data.frame(.,stringsAsFactors=FALSE) %>%
 		setNames(c('mean','sd','zstat','pval')) %>%
@@ -116,8 +121,7 @@ ggCoef = ggplot(
 	)
 ggsave(ggCoef,
 	width=7, height=4,
-	file=paste0(pathGraphics, 'abm_coefPlot.pdf'),
+	file=paste0(pathGraphics, 'abm_re_coefPlot.pdf'),
 	device=cairo_pdf
 	)
-########################################################
-ggCoef
+################################################
