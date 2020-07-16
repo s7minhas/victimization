@@ -15,7 +15,9 @@ loadPkg(c('MASS', 'glmmTMB'))
 ########################################################
 
 ########################################################
-load(paste0(pathData, 'data.rda'))
+load(paste0(pathData, 'rawModelData.rda'))
+
+########################################################
 
 cntries = unique(data$cname)
 coef=NULL
