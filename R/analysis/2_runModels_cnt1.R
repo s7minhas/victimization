@@ -46,7 +46,7 @@ reModCnt1Coef = summary(reModCnt1)$'coefficients'$cond[1:(p+1),]
 
 # randomly sample iData
 set.seed(6886)
-toSamp = sample(1:length(iData), 5, replace=FALSE)
+toSamp = sample(1:length(iData), 10, replace=FALSE)
 dataList = iData[toSamp]
 
 # iterate across imputed datasets
