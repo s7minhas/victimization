@@ -95,17 +95,15 @@ smTheme = theme(
   axis.ticks=element_blank(),
   panel.border=element_blank()
 )
+
+# warnings
+options(warn=-1)
 ########
 
 ########
 # combine model results from imputed data using
 # rubin's rules
-rubinCoef = function(mod, matrixFormat=FALSE){
-  modCoef = lapply(mod, function(x){
-    beta = coef(x)
-    se = sqrt(diag(vcov(x)))
-    return( cbind(beta, se) )
-    }) %>% do.call('rbind',.)
+rubinCoef = function(modCoef, matrixFormat=FALSE){
 
   modSumm = Amelia::mi.meld(
     q=matrix(modCoef[,1],ncol=length(unique(rownames(modCoef))), byrow=TRUE),
