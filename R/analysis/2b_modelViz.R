@@ -46,19 +46,11 @@ varKey$clean = c(
 
 coefProcess = function(coefList, labs=mLabs, vKey=varKey){
 	out = lapply(1:length(coefList), function(ii){
-		# extract
-		x = coefList[[ii]]
-		lab = labs[ii]
-
-		# set colnames
+		x = coefList[[ii]] ; lab = labs[ii]
 		colnames(x)[1:3] = c('mean', 'sd', 'tstat')
-
-		# add var col if it doesnt exist
 		if( !('var' %in% names(x)) ){
 			x = data.frame(x[,1:3], stringsAsFactors=FALSE)
 			x$var = rownames(x) ; rownames(x) = NULL }
-
-		# add conf ints, sig cols, and model col
 		x = x %>% getCIVecs(.) %>%
 			getSigVec(.) %>%
 			mutate(model=lab)
@@ -88,20 +80,16 @@ coefViz = function(coefData, fName, path=pathGraphics){
 		geom_linerange(aes(ymin=lo90, ymax=hi90),alpha = 1, size = 1) +
 		geom_linerange(aes(ymin=lo95,ymax=hi95),alpha = 1, size = .5) +
 		scale_colour_manual(values = coefp_colors, guide=FALSE) +
-		ylab('') + xlab('') +
-		facet_wrap(~model) +
-		coord_flip() +
-		theme_light(base_family="Source Sans Pro") +
+		ylab('') + xlab('') + facet_wrap(~model) +
+		coord_flip() + theme_light(base_family="Source Sans Pro") +
 		theme(
 			legend.position='top', legend.title=element_blank(),
-			panel.border=element_blank(),
-			axis.ticks=element_blank(),
+			panel.border=element_blank(), axis.ticks=element_blank(),
 			axis.text.y=element_text(hjust=0),
 			strip.text.x = element_text(size = 9, color='white'),
 			strip.background = element_rect(
 				fill = "#525252", color='#525252'))
-	ggsave(ggCoef,
-		width=8, height=6,
+	ggsave(ggCoef, width=8, height=6,
 		file=paste0(path, fName), device=cairo_pdf) }
 
 coefViz(ggDataMissFE, fName='coefPlotMissFE.pdf')
