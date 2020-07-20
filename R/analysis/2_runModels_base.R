@@ -19,6 +19,7 @@ load(paste0(pathData, 'rawModelData.rda'))
 # set up spec
 dv = 'civVicCount'
 ivs = c('graph_dens', 'nConf', 'nActors')
+p = length(ivs)
 feF = formula(paste0(
   dv, '~', paste(ivs, collapse='+'), '+factor(cname)-1'))
 reF = formula(paste0(
@@ -31,8 +32,8 @@ feModBase = glm.nb(feF, data=dataBase)
 reModBase = glmmTMB(reF, data=dataBase, family='nbinom2')
 
 # get coefs
-feModBaseCoef = summary(feModBase)$'coefficients'
-reModBaseCoef = summary(reModBase)$'coefficients'$cond
+feModBaseCoef = summary(feModBase)$'coefficients'[1:p,]
+reModBaseCoef = summary(reModBase)$'coefficients'$cond[1:(p+1),]
 ########################################################
 
 ########################################################
