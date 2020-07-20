@@ -28,7 +28,7 @@ ivsBase = c(
 )
 ivCnt1 = c(
 	'polity2', # -2019
-	'popLog', 'gdpCapLog', # -2020
+	'gdp', 'pop', 'gdpCap', 'gdpLog', 'popLog', 'gdpCapLog', # -2020
 	'exclpop' # -2018
 )
 ivCnt2 = c(
@@ -55,6 +55,10 @@ getImps = function(data, remVars, fileName){
 	idData = data[,remVars]
 	impData = data.matrix(data[,keepVars])
 
+	# for wb vars impute raw data
+	toDrop = match(c('gdpLog','gdpCapLog','popLog'),colnames(impData))
+	impData = impData[,-toDrop]
+
 	# run sbgcop
 	sbgData = sbgcop.mcmc(Y=impData, seed=6886, nsamp=1000, verb=FALSE)
 	dimnames(sbgData$Y.impute)[[2]] = colnames(sbgData$Y.pmean)
@@ -63,9 +67,16 @@ getImps = function(data, remVars, fileName){
 	iData = lapply(500:1000, function(i){
 		data = cbind( idData, sbgData$Y.impute[,,i] )
 		out = data.frame(as_tibble(data), stringsAsFactors=FALSE)
+
+		# create logged versions of wbvars
+		out$gdpCapLog = log(out$gdpCap + 1)
+		out$popLog = log(out$pop + 1)
+		out$gdpLog = log(out$gdp + 1)
+
+		# return
 		return( out ) })
 
-	save(iData, data, file=paste0(pathData, fileName))
+	save(iData, data, sbgData, file=paste0(pathData, fileName))
 }
 
 # run imp on cnt1

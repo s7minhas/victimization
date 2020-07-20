@@ -17,6 +17,9 @@ loadPkg(c('MASS'))
 ########################################################
 # load imputed data for cnt1
 load(paste0(pathData, 'modelDataCnt1.rda'))
+
+names(iData[[1]]) %>% cbind()
+
 dataCnt1 = data
 ########################################################
 
