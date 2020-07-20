@@ -1,3 +1,7 @@
+# 7/17/2020
+
+abm results hold with fixed and random effects for game. just note that the fixed effect model takes about 18 hours to run.
+
 # 7/1/2020
 
 - final model for abm will be a negative binomial with random effects, mean of dv is about 2.4 and var is about 6.8 so we're justified in our choice of negative binomial over poisson

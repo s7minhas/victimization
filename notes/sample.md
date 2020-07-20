@@ -1,3 +1,7 @@
+# 7/17/20
+
+empirical sample gets cut to only country-years that had at least one event based on our actor inclusion rules. this cut takes place in the 5_buildData.R file. 
+
 # 7/3/20
 
 - notable change, drop fatality threshold for events because it is too stringent according to qualitative case checks, specifically sierra leone
