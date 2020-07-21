@@ -92,8 +92,10 @@ coefViz = function(coefData, fName, path=pathGraphics){
 	ggsave(ggCoef, width=8, height=6,
 		file=paste0(path, fName), device=cairo_pdf) }
 
-coefViz(ggDataMissFE, fName='coefPlotMissFE.pdf')
-coefViz(ggDataMissRE, fName='coefPlotMissRE.pdf')
 coefViz(ggDataImpFE, fName='coefPlotImpFE.pdf')
 coefViz(ggDataImpRE, fName='coefPlotImpRE.pdf')
+coefViz(ggDataMissFE[ggDataMissFE$model!=mLabs[1],],
+	fName='coefPlotMissFE.pdf')
+coefViz(ggDataMissRE[ggDataMissRE$model!=mLabs[1],],
+	fName='coefPlotMissRE.pdf')
 ########################################################
