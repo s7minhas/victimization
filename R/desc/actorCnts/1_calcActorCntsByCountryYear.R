@@ -40,6 +40,7 @@ actors = data.frame(actors, stringsAsFactors=FALSE) %>%
     fatalities = sum(fatalities, na.rm=TRUE)
   )
 
+# 
 actorVec = actors$actor2
 ###########################################################
 
@@ -88,9 +89,6 @@ actorCntsID = lapply( ids, function(id){
 # fix up object types
 actorCntsID$year = num(actorCntsID$year)
 actorCntsID$nActors = num(actorCntsID$nActors)
-
-# create categorical summary of actors over time
-actorCntsID$grFive = 1*(actorCntsID$nActors>5)
 
 #
 save(actorCntsID, file=paste0(pathData, 'actorCntsID.rda'))
