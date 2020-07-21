@@ -59,7 +59,13 @@ simpleMerge = function(toData, fromData, vars, toID, fromID, lagVars=TRUE){
 		toData$tmp = fromData[match(toData[,toID], fromData[,fromID]), v]
 		names(toData)[ncol(toData)] = v }
 	return(toData) }
-options(warn=-1)
+addCat = function(baseVar, labs, breaks){
+	catVar = rep(labs[1], length(baseVar))
+	for(ii in 1:length(breaks)){
+		catVar[baseVar>=breaks[ii]] = labs[ii+1] }
+	catVar = factor(catVar,
+		levels = labs)
+	return(catVar) }
 ########
 
 ########

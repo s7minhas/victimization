@@ -91,13 +91,6 @@ actorCntsID$nActors = num(actorCntsID$nActors)
 
 # create categorical summary of actors over time
 actorCntsID$grFive = 1*(actorCntsID$nActors>5)
-actorCntsID$nCat = '1-4'
-actorCntsID$nCat[actorCntsID$nActors>5] = '5-9'
-actorCntsID$nCat[actorCntsID$nActors>10] = '>10'
-actorCntsID$nCat = factor(
-  actorCntsID$nCat,
-  levels=rev(c('1-4','5-9','>10'))
-)
 
 #
 save(actorCntsID, file=paste0(pathData, 'actorCntsID.rda'))
