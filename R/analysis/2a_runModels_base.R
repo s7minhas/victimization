@@ -16,13 +16,6 @@ loadPkg(c('MASS', 'glmmTMB'))
 # load raw model data (dataBase, dataCnt1, dataCnt2)
 load(paste0(pathData, 'rawModelData.rda'))
 
-dataList = list(base=dataBase, cnt1=dataCnt1, cnt2=dataCnt2)
-lapply(dataList, function(x){
-	time=summary(x$year)
-	units = length(unique(x$cname))
-	return(list(time,units))
-})
-
 # set up spec
 dv = 'civVicCount'
 ivs = c('graph_dens', 'nConf', 'nActors')
