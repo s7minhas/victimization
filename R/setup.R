@@ -160,3 +160,50 @@ getSigVec = function(beta){
 	return(beta)
 }
 ########
+
+########
+# process coefs
+coefProcess = function(coefList, labs=mLabs, vKey=varKey){
+	out = lapply(1:length(coefList), function(ii){
+		x = coefList[[ii]] ; lab = labs[ii]
+		colnames(x)[1:3] = c('mean', 'sd', 'tstat')
+		if( !('var' %in% names(x)) ){
+			x = data.frame(x[,1:3], stringsAsFactors=FALSE)
+			x$var = rownames(x) ; rownames(x) = NULL }
+		x = x %>% getCIVecs(.) %>%
+			getSigVec(.) %>%
+			mutate(model=lab)
+		return(x) })
+
+	# combine
+	out = do.call('rbind', out)
+
+	# clean variable labels
+	out$model = factor(out$model, levels=mLabs)
+	out$varName = vKey$clean[match(out$var, vKey$dirty)]
+	out = out[!is.na(out$varName),]
+	out$varName = factor(out$varName, levels=rev(vKey$clean))
+	return(out) }
+########
+
+########
+# viz coefs
+coefViz = function(coefData, fName, path=pathGraphics){
+	ggCoef = ggplot(coefData, aes(x=varName, y=mean, color=sig)) +
+		geom_hline(aes(yintercept=0), linetype=2, color = "black") +
+		geom_point(size=4) +
+		geom_linerange(aes(ymin=lo90, ymax=hi90),alpha = 1, size = 1) +
+		geom_linerange(aes(ymin=lo95,ymax=hi95),alpha = 1, size = .5) +
+		scale_colour_manual(values = coefp_colors, guide=FALSE) +
+		ylab('') + xlab('') + facet_wrap(~model) +
+		coord_flip() + theme_light(base_family="Source Sans Pro") +
+		theme(
+			legend.position='top', legend.title=element_blank(),
+			panel.border=element_blank(), axis.ticks=element_blank(),
+			axis.text.y=element_text(hjust=0),
+			strip.text.x = element_text(size = 9, color='white'),
+			strip.background = element_rect(
+				fill = "#525252", color='#525252'))
+	ggsave(ggCoef, width=8, height=6,
+		file=paste0(path, fName), device=cairo_pdf) }
+########
