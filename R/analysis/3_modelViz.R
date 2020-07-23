@@ -6,9 +6,9 @@ if(Sys.info()['user'] %in% c('Owner','herme','S7M')){
 ########################################################
 
 ########################################################
-load(paste0(pathResults, 'baseMods.rda'))
-load(paste0(pathResults, 'cnt1Mods.rda'))
-load(paste0(pathResults, 'cnt2Mods.rda'))
+load(paste0(pathResults, 'baseMods_v3.rda'))
+load(paste0(pathResults, 'cnt1Mods_v3.rda'))
+load(paste0(pathResults, 'cnt2Mods_v3.rda'))
 ########################################################
 
 ########################################################
@@ -92,10 +92,10 @@ coefViz = function(coefData, fName, path=pathGraphics){
 	ggsave(ggCoef, width=8, height=6,
 		file=paste0(path, fName), device=cairo_pdf) }
 
-coefViz(ggDataImpFE, fName='coefPlotImpFE.pdf')
-coefViz(ggDataImpRE, fName='coefPlotImpRE.pdf')
+coefViz(ggDataImpFE, fName='coefPlotImpFE_v3.pdf')
+coefViz(ggDataImpRE, fName='coefPlotImpRE_v3.pdf')
 coefViz(ggDataMissFE[ggDataMissFE$model!=mLabs[1],],
-	fName='coefPlotMissFE.pdf')
+	fName='coefPlotMissFE_v3.pdf')
 coefViz(ggDataMissRE[ggDataMissRE$model!=mLabs[1],],
-	fName='coefPlotMissRE.pdf')
+	fName='coefPlotMissRE_v3.pdf')
 ########################################################

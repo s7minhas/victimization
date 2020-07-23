@@ -14,7 +14,7 @@ loadPkg(c('MASS', 'glmmTMB'))
 
 ########################################################
 # load raw model data (dataBase, dataCnt1, dataCnt2)
-load(paste0(pathData, 'rawModelData.rda'))
+load(paste0(pathData, 'rawModelData_v3.rda'))
 
 # set up spec
 dv = 'civVicCount'
@@ -41,6 +41,6 @@ reModBaseCoef = summary(reModBase)$'coefficients'$cond[1:(p+1),]
 save(
   feModBase, reModBase,
   feModBaseCoef, reModBaseCoef,
-  file=paste0(pathResults, 'baseMods.rda')
+  file=paste0(pathResults, 'baseMods_v3.rda')
 )
 ########################################################

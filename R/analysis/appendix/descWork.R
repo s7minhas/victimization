@@ -142,7 +142,6 @@ dataImpList = list(base=dataBase, cnt1=dataCnt1, cnt2=dataCnt2)
 cntryCntsImp = lapply(dataImpList, function(x){
 	vars = intersect(names(x), c('cname',modVars))
 	x = x[,c('cname',vars)]
-	x = na.omit(x)
 	out = x %>% group_by(cname) %>% summarize(cnt=n())
 	return(out) })
 cntryCntsImp

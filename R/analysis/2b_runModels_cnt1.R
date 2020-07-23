@@ -17,7 +17,7 @@ loadPkg(c('MASS', 'glmmADMB', 'glmmTMB'))
 # data = unimputed data for cnt1
 # iData = list of imputed datasets
 # sbgData = imputation model results
-load(paste0(pathData, 'modelDataCnt1.rda'))
+load(paste0(pathData, 'modelDataCnt1_v3.rda'))
 
 # set up spec
 dv = 'civVicCount'
@@ -73,6 +73,6 @@ save(
   feModCnt1Coef, reModCnt1Coef,
   feModCnt1_imp, reModCnt1_imp,
   feModCnt1Coef_imp, reModCnt1Coef_imp,
-  file=paste0(pathResults, 'cnt1Mods.rda')
+  file=paste0(pathResults, 'cnt1Mods_v3.rda')
 )
 ########################################################
