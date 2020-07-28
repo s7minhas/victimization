@@ -32,6 +32,9 @@ data = netDF[,c('id', graphVars)] %>% unique()
 #
 data$country = char(unlist(lapply(strsplit(data$id,'_'), function(x){x[1]})))
 data$year = num(unlist(lapply(strsplit(data$id,'_'), function(x){x[2]})))
+
+# check which countries get dropped
+setdiff(names(netStats), unique(data$country))
 ############################
 
 ############################
