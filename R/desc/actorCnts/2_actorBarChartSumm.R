@@ -21,6 +21,9 @@ actorCntsID$nCat3 = addCat(
 	c('4 or\nless','5-9','10 or\nmore'), c(5,10))
 ###########################################################
 
+actorCntsID %>% group_by(year) %>% summarize(cnt=length(unique(country)))
+
+actorCntsID %>% group_by(year) %>% summarize(mu = mean(nActors))
 ###########################################################
 # viz diff in # actors over time via cat variable
 actorCats = ggplot(actorCntsID,
@@ -32,7 +35,7 @@ actorCats = ggplot(actorCntsID,
   scale_fill_brewer(palette='Greys') +
   labs(
     x='',
-    y='# Active Armed Groups',
+    y='# Countries',
     fill=''
   ) +
 	theme_light(base_family="Source Sans Pro") +
@@ -40,8 +43,33 @@ actorCats = ggplot(actorCntsID,
   theme(
     axis.text.x=element_text(angle=45),
 	 	legend.position='top' )
-
 ggsave(actorCats,
   file=paste0(pathGraphics, 'actorCntCats.pdf'),
+  width=8, height=6, device=cairo_pdf)
+###########################################################
+
+###########################################################
+# viz diff in # actors over time via cat variable
+actorCatsProp = ggplot(actorCntsID,
+  aes(
+    x=factor(year),
+    fill=factor(nCat3)
+  )) +
+  geom_bar(colour='grey40', position='fill') +
+	geom_hline(aes(yintercept=.5), linetype='dashed') +
+  scale_fill_brewer(palette='Greys') +
+	scale_y_continuous(labels=scales::percent) +
+  labs(
+    x='',
+    y='Proportion of Countries',
+    fill=''
+  ) +
+	theme_light(base_family="Source Sans Pro") +
+  smTheme +
+  theme(
+    axis.text.x=element_text(angle=45),
+	 	legend.position='top' )
+ggsave(actorCatsProp,
+  file=paste0(pathGraphics, 'actorCntCatsProp.pdf'),
   width=8, height=6, device=cairo_pdf)
 ###########################################################
