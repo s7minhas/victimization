@@ -16,10 +16,10 @@ set.seed(12345)
 #low vic
 gFirst <- graph.formula(1-2, 3-4, 5-6,  7-8, 8, 9, 8-10)
 V(gFirst)$color <- "gray26"
-s <- layout_with_fr(gFirst) #get this layout and use it elsewhere
+s = coords <- layout_with_fr(gFirst) #get this layout and use it elsewhere
 gFirst$layout <- coords
-E(gSec)$weight <-c(1, 1, .5, 1,1)
-plot(gFirst, vertex.label=NA, main="Low Victimization", edge.width=E(gSec)$weight*3, layout=s, edge.curved=0.1)
+E(gFirst)$weight <-c(1, 1, .5, 1,1)
+plot(gFirst, vertex.label=NA, main="Low Victimization", edge.width=E(gFirst)$weight*3, layout=s, edge.curved=0.1)
 
 #med vic
 gSec <- graph.formula(2-4, 3-4, 4-5, 4-6, 5-4, 6-5, 7-5, 8-4, 9-4, 10-4)
