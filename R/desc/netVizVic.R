@@ -40,3 +40,9 @@ E(gLast)$weight <- runif(ecount(gLast)) #random value from uniform for each edge
 plot(gLast, vertex.label=NA, main="High Victimization",
 		layout=s, edge.width=E(gLast)$weight, edge.curved=0.1)
 dev.off()
+
+adjFirst = data.matrix(as_adjacency_matrix(gFirst))
+adjLast = data.matrix(as_adjacency_matrix(gLast))
+
+sum(c(adjFirst))
+sum(c(adjLast))
