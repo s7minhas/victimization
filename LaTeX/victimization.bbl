@@ -96,11 +96,17 @@ Hoff, Peter~D. 2007.
 \newblock ``{Extending the Rank Likelihood for Semiparametric {Copula}
   Estimation}.'' {\em Annals of Applied Statistics} 1(1):265--283.
 
-\harvarditem{Hollenbach}{2014}{hollenbach:2014}
-Hollenbach, Florian~M. 2014.
-\newblock ``Raising Robinhood: {T}he Political Economy of Tax Capacity
-  Investments in Authoritarian Regimes.'' Dissertation Chapter.
-  \url{http://sites.duke.edu/fmh3/research/}.
+\harvarditem[Hollenbach et~al.]{Hollenbach, Bojinov, Minhas, Metternich, Ward
+  \harvardand\ Volfovsky}{2018}{hollenbach:etal:2018}
+Hollenbach, Florian~M., Iavor Bojinov, Shahryar Minhas, Nils~W. Metternich,
+  Michael~D. Ward \harvardand\ Alexander Volfovsky. 2018.
+\newblock ``Multiple Imputation Using Gaussian Copulas.'' {\em Sociological
+  Methods and Research} .
+
+\harvarditem{Honaker \harvardand\ King}{2010}{honaker:king:2010}
+Honaker, James \harvardand\ Gary King. 2010.
+\newblock ``{What to Do About Missing Values in Time-Series Cross-Section
+  Data}.'' {\em American Journal of Political Science} 54:561--581.
 
 \harvarditem{Kalyvas}{2006}{kalyvas:2006}
 Kalyvas, Stathis. 2006.
