@@ -26,7 +26,7 @@ cleaner = function(x){
 
 # load in data #################################
 abmPyPath = paste0(pathGit, '/Python/')
-abmData = read.csv(paste0(abmPyPath, 'abmEpsilonLow.csv'), header = F)
+# abmData = read.csv(paste0(abmPyPath, 'abmEpsilonLow.csv'), header = F)
 save(abmData, file=paste0(abmPath, 'abmData.rda'))
 ################################################
 
