@@ -11,6 +11,11 @@ Arjona, Ana. 2017.
   Groups: {T}he Centrality of Obedience and Resistance.'' {\em Small Wars \&
   Insurgencies} 28(4-5):755--778.
 
+\harvarditem{Autesserre}{2012}{autesserre:2012}
+Autesserre, S{\'e}verine. 2012.
+\newblock ``Dangerous tales: Dominant narratives on the Congo and their
+  unintended consequences.'' {\em African Affairs} 111(443):202--222.
+
 \harvarditem{Azam \harvardand\ Hoeffler}{2002{\em a}}{azam:anke:2002}
 Azam, Jean-Paul \harvardand\ Anke Hoeffler. 2002{\em a}.
 \newblock ``Violence against civilians in civil wars: looting or terror?'' {\em
@@ -21,22 +26,21 @@ Azam, Jean-Paul \harvardand\ Anke Hoeffler. 2002{\em b}.
 \newblock ``Violence against civilians in civil wars: {L}ooting or terror?''
   {\em Journal of Peace Research} 39(4):461--485.
 
-\harvarditem[Bakke, Cunningham \harvardand\ Seymour]{Bakke, Cunningham
-  \harvardand\ Seymour}{2012}{bakke:etal:2012}
-Bakke, Kristin~M., Kathleen~Gallagher Cunningham \harvardand\ Lee~J.M. Seymour.
-  2012.
-\newblock ``A plague of initials: {F}ragmentation, cohesion, and infighting in
-  civil wars.'' {\em Perspectives on Politics} 10(2):265--283.
-
-\harvarditem{Bellows \harvardand\ Miguel}{2009}{bellows:miguel:2009}
-Bellows, John \harvardand\ Edward Miguel. 2009.
-\newblock ``War and local collective action in Sierra Leone.'' {\em Journal of
-  Public Economics} 93(11):1144--1157.
-
 \harvarditem{Berman \harvardand\ Matanock}{2015}{berman:matanock:2015}
 Berman, Eli \harvardand\ Aila~M. Matanock. 2015.
 \newblock ``The Empiricists' Insurgency.'' {\em Annual Review of Political
   Science} 18:443--464.
+
+\harvarditem[Cederman, Wimmer \harvardand\ Min]{Cederman, Wimmer \harvardand\
+  Min}{2010}{cederman:etal:2010a}
+Cederman, Lars-Erik, Andreas Wimmer \harvardand\ Brian Min. 2010.
+\newblock ``Why do ethnic groups rebel? {N}ew data and analysis.'' {\em World
+  Politics} 62(1):87--119.
+
+\harvarditem{Christia}{2012}{fotini:2012}
+Christia, Fotini. 2012.
+\newblock {\em Alliance formation in civil wars}.
+\newblock Cambridge University Press.
 
 \harvarditem{Condra \harvardand\ Shapiro}{2012}{condra:shapiro:2012}
 Condra, Luke~N. \harvardand\ Jacob~N. Shapiro. 2012.
@@ -49,10 +53,13 @@ Cunningham, David, Kristian~Skrede Gleditsch \harvardand\ Idean Salehyan. 2013.
 \newblock ``Non-State Actors in Civil Wars: {A} New Dataset.'' {\em Conflict
   Management and Peace Science} 30(5):516--531.
 
-\harvarditem{Dorff}{2017}{dorff:2017}
-Dorff, Cassy. 2017.
-\newblock ``Violence, Kinship Networks, and Political Resilience: {E}vidence
-  from {M}exico.'' {\em Journal of Peace Research} Forthcoming.
+\harvarditem[Cunningham, Bakke \harvardand\ Seymour]{Cunningham, Bakke
+  \harvardand\ Seymour}{2012}{cunningham:etal:2012}
+Cunningham, Kathleen~Gallagher, Kristin~M Bakke \harvardand\ Lee~JM Seymour.
+  2012.
+\newblock ``Shirts today, skins tomorrow: Dual contests and the effects of
+  fragmentation in self-determination disputes.'' {\em Journal of Conflict
+  Resolution} 56(1):67--93.
 
 \harvarditem{Dorff}{2019}{dorff:2019}
 Dorff, Cassy. 2019.
@@ -65,15 +72,27 @@ Dorff, Cassy \harvardand\ Jessica~M. Braithwaite. 2018.
 \newblock ``Fear of Nonviolent Organizing in {M}exico's Criminal Conflict.''
   {\em Journal of Global Security Studies} 3(3):271--284.
 
+\harvarditem[Dorff, Gallop \harvardand\ Minhas]{Dorff, Gallop \harvardand\
+  Minhas}{2020}{dorff:etal:2020}
+Dorff, Cassy, Max Gallop \harvardand\ Shahryar Minhas. 2020.
+\newblock ``Networks of violence: Predicting conflict in Nigeria.'' {\em The
+  Journal of Politics} 82(2):476--493.
+
+\harvarditem{Dowd}{2015}{dowd:2015}
+Dowd, Caitriona. 2015.
+\newblock ``Actor proliferation and the fragmentation of violent groups in
+  conflict.'' {\em Research \& Politics} 2(4):2053168015607891.
+
+\harvarditem{Dowd}{2019}{dowd:2019}
+Dowd, Caitriona. 2019.
+\newblock ``Fragmentation, conflict, and competition: Islamist anti-civilian
+  violence in sub-Saharan Africa.'' {\em Terrorism and Political Violence}
+  31(3):433--453.
+
 \harvarditem{Eck \harvardand\ Hultman}{2007}{eck:hultman:2007}
 Eck, Kristine \harvardand\ Lisa Hultman. 2007.
 \newblock ``One-sided violence against civilians in war: {I}nsights from new
   fatality data.'' {\em Journal of Peace Research} 44(2):233--246.
-
-\harvarditem{Fjelde \harvardand\ Nilsson}{2012}{fjelde:nilsson:2012}
-Fjelde, Hanne \harvardand\ Desir{\'e}e Nilsson. 2012.
-\newblock ``Rebels against Rebels: {E}xplaining Violence between Rebel
-  Groups.'' {\em The Journal of Conflict Resolution} 56(4):604--628.
 
 \harvarditem{Fjelde \harvardand\ Hultman}{2014}{fjelde:2014}
 Fjelde, Hanne \harvardand\ Lisa Hultman. 2014.
@@ -86,16 +105,17 @@ Gallop, Max. 2017.
 \newblock ``More Dangerous Than Dyads: {H}ow a Third Party Enables Rationalist
   Explanations for War.'' {\em Journal of Peace Research} .
 
-\harvarditem{Hoff}{2007}{hoff:2007}
-Hoff, Peter~D. 2007.
-\newblock ``{Extending the Rank Likelihood for Semiparametric {Copula}
-  Estimation}.'' {\em Annals of Applied Statistics} 1(1):265--283.
+\harvarditem[Hollenbach et~al.]{Hollenbach, Bojinov, Minhas, Metternich, Ward
+  \harvardand\ Volfovsky}{2018}{hollenbach:etal:2018}
+Hollenbach, Florian~M., Iavor Bojinov, Shahryar Minhas, Nils~W. Metternich,
+  Michael~D. Ward \harvardand\ Alexander Volfovsky. 2018.
+\newblock ``Multiple Imputation Using Gaussian Copulas.'' {\em Sociological
+  Methods and Research} .
 
-\harvarditem{Hollenbach}{2014}{hollenbach:2014}
-Hollenbach, Florian~M. 2014.
-\newblock ``Raising Robinhood: {T}he Political Economy of Tax Capacity
-  Investments in Authoritarian Regimes.'' Dissertation Chapter.
-  \url{http://sites.duke.edu/fmh3/research/}.
+\harvarditem{Honaker \harvardand\ King}{2010}{honaker:king:2010}
+Honaker, James \harvardand\ Gary King. 2010.
+\newblock ``{What to Do About Missing Values in Time-Series Cross-Section
+  Data}.'' {\em American Journal of Political Science} 54:561--581.
 
 \harvarditem{Kalyvas}{2006}{kalyvas:2006}
 Kalyvas, Stathis. 2006.
@@ -123,8 +143,16 @@ Kathman, Jacob~D. \harvardand\ Reed~M. Wood. 2015.
 \newblock ``Competing for the crown: {I}nter-rebel competition and civilian
   targeting in Civil War.'' {\em Political Research Quarterly} 68(1):167--179.
 
+\harvarditem[Larson et~al.]{Larson, Nagler, Ronen \harvardand\
+  Tucker}{2019}{larson:etal:2019}
+Larson, Jennifer~M, Jonathan Nagler, Jonathan Ronen \harvardand\ Joshua~A
+  Tucker. 2019.
+\newblock ``Social networks and protest participation: Evidence from 130
+  million Twitter users.'' {\em American Journal of Political Science}
+  63(3):690--705.
+
 \harvarditem[Laver, De~Marchi \harvardand\ Mutlu]{Laver, De~Marchi \harvardand\
-  Mutlu}{2011}{laver:demarchi:mutlu:2011}
+  Mutlu}{2011}{laver:etal:2011}
 Laver, Michael, Scott De~Marchi \harvardand\ Hande Mutlu. 2011.
 \newblock ``Negotiation in legislatures over government formation.'' {\em
   Public Choice} 147(3-4):285--304.
@@ -142,21 +170,33 @@ Lyall, Jason, Yuki Shiraito \harvardand\ Kosuke Imai. 2015.
 \newblock ``Coethnic bias and wartime informing.'' {\em The Journal of
   Politics} 77(3):833--848.
 
+\harvarditem{Mampilly}{2012}{mampilly:2012}
+Mampilly, Zachariah~Cherian. 2012.
+\newblock {\em Rebel rulers: {I}nsurgent governance and civilian life during
+  war}.
+\newblock Cornell University Press.
+
 \harvarditem[Marshall, Jaggers \harvardand\ Gurr]{Marshall, Jaggers
   \harvardand\ Gurr}{2009}{marshall:etal:2009}
 Marshall, Monty~G., Keith Jaggers \harvardand\ Ted~Robert Gurr. 2009.
 \newblock ``Polity {IV} Project: {P}olitical Regime Characteristics and
   Transition 1800-2007.'' CIDCM: {U}niversity of Maryland, MD.
 
-\harvarditem{Nyg{\aa}rd \harvardand\ Weintraub}{2015}{nygaard:weintraub:2015}
-Nyg{\aa}rd, H{\aa}vard~Mokleiv \harvardand\ Michael Weintraub. 2015.
-\newblock ``Bargaining between rebel groups and the outside option of
-  violence.'' {\em Terrorism and Political Violence} 27(3):557--580.
+\harvarditem{Masullo}{2020}{masullo:2020}
+Masullo, Juan. 2020.
+\newblock ``Civilian Contention in Civil War: {H}ow Ideational Factors Shape
+  Community Responses to Armed Groups.'' {\em Comparative Political Studies}
+  p.~0010414020912285.
 
-\harvarditem{Oppenheim \harvardand\ Weintraub}{2017}{oppenheim:weintraub:2017}
-Oppenheim, Ben \harvardand\ Michael Weintraub. 2017.
-\newblock ``Doctrine and violence: The impact of combatant training on civilian
-  killings.'' {\em Terrorism and Political Violence} 29(6):1126--1148.
+\harvarditem{Mustapha}{2014}{mustapha:2014}
+Mustapha, Abdul~Raufu. 2014.
+\newblock ``Understanding Boko Haram.'' {\em Sects \& Social Disorder: Muslim
+  Identities \& Conflict in Northern Nigeria, Ed. by AR Mustapha} pp.~147--198.
+
+\harvarditem{Obi}{2009}{obi:2009}
+Obi, Cyril. 2009.
+\newblock ``Nigeria’s Niger Delta: Understanding the complex drivers of
+  violent oil-related conflict.'' {\em Africa Development} 34(2).
 
 \harvarditem[Patty et~al.]{Patty, Snyder, Ting et~al.}{2009}{patty:etal:2009}
 Patty, John~W., James~M. Snyder, M. Ting et~al. 2009.
@@ -189,10 +229,21 @@ Salehyan, Idean, David Siroky \harvardand\ Reed Wood. 2015.
   analysis of wartime atrocities.'' {\em International Organization}
   68(3):633--661.
 
+\harvarditem{Stanton}{2016}{stanton:2016}
+Stanton, Jessica~A. 2016.
+\newblock {\em Violence and restraint in civil war: {C}ivilian targeting in the
+  shadow of international law}.
+\newblock Cambridge University Press.
+
 \harvarditem{Steele}{2011}{steele:2011}
 Steele, Abbey. 2011.
 \newblock ``{Electing Displacement: {P}olitical Cleansing in Apartado,
   Colombia}.'' {\em Journal of Conflict Resolution} 55(3):423--445.
+
+\harvarditem{Steele}{2017}{steele:2017}
+Steele, Abbey. 2017.
+\newblock {\em Democracy and Displacement in {C}olombia's Civil War}.
+\newblock Cornell University Press.
 
 \harvarditem{Valentino}{2014}{valentino:2014}
 Valentino, Benjamin~A. 2014.
