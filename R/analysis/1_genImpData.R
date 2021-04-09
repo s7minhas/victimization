@@ -24,7 +24,7 @@ ids = c('id', 'cname', 'ccode', 'year')
 dv = 'civVicCount'
 ivsBase = c(
 	'graph_dens', 'graph_avgDeg',
-	'nActors', 'nEvents', 'nConf'
+	'nActors', 'nEvents', 'nConf', 'herf'
 )
 ivCnt1 = c(
 	'polity2', # -2019
@@ -104,13 +104,13 @@ getImps = function(data, remVars, fileName){
 }
 
 # run imp on cnt1
-getImps(dataCnt1, ids[1:2], 'modelDataCnt1.rda')
+getImps(dataCnt1, ids[1:2], 'modelDataCnt1_v2.rda')
 
 # run imp on cnt2
-getImps(dataCnt2, ids[1:2], 'modelDataCnt2.rda')
+getImps(dataCnt2, ids[1:2], 'modelDataCnt2_v2.rda')
 
 # save raw
 save(
 	dataBase, dataCnt1, dataCnt2,
-	file=paste0(pathData, 'rawModelData.rda'))
+	file=paste0(pathData, 'rawModelData_v2.rda'))
 ##########################

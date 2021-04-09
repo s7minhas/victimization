@@ -24,6 +24,7 @@ netDF$id = with(netDF, paste0(country, '_', year))
 # to acled get dropped
 graphVars = c(
 	'nActors', 'nEvents',
+	'herf',
 	'graph_trans','graph_dens',
 	'graph_avgDeg', 'graph_meanDist',
 	'graph_localTrans' )

@@ -29,9 +29,11 @@ stat = function(expr, object){
 	x=try(expr(object),TRUE)
 	if(class(x)=='try-error'){x=NA}
 	return(x) }
+
 localTrans = function(x){
   igraph::transitivity(x, type='average') }
 cntry = names(yListAll)[1] ; t = yrs[1]
+
 cl = makeCluster(20)
 registerDoParallel(cl)
 netStats <- foreach(
@@ -50,8 +52,16 @@ netStats <- foreach(
 		sgrph = network::network(mat,
 			matrix.type="adjacency", directed=FALSE)
 
+		# gen desc stats
     nActors = nrow(mat)
 		nEvents = sum(c(mat))/2
+
+		# herf index
+		aCnts = apply(mat, 1, sum)
+		aShare = aCnts/sum(c(mat))
+		herf = sum(aShare^2)
+
+		# net stats
 		totDegree = igraph::degree(grph)
 		btwn = igraph::betweenness(grph)
 		totClose = igraph::closeness(grph)
@@ -70,6 +80,7 @@ netStats <- foreach(
 		out = data.frame(
       nActors=nActors,
 			nEvents=nEvents,
+			herf=herf,
 			totDegree, btwn,
 			totClose, eigenCent,
 			graph_trans, graph_dens,
