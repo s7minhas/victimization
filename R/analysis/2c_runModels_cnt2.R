@@ -17,15 +17,16 @@ loadPkg(c('MASS', 'glmmADMB', 'glmmTMB'))
 # data = unimputed data for cnt1
 # iData = list of imputed datasets
 # sbgData = imputation model results
-load(paste0(pathData, 'modelDataCnt2.rda'))
+load(paste0(pathData, 'modelDataCnt2_v2.rda'))
 
 # set up spec
 dv = 'civVicCount'
 ivs = c(
-  'graph_dens', 'nConf', 'nActors',
+  'herf', 'nConf', 'nActors',
   'polity2', 'popLog', 'gdpCapLog', 'exclpop',
- 	'anyPeaceKeeper',
-	'rebsStronger', 'rebSupportGov', 'govSupportGov')
+ 	'anyPeaceKeeper'
+	# ,'rebsStronger', 'rebSupportGov', 'govSupportGov')
+)
 p = length(ivs)
 feF = formula(paste0(
   dv, '~', paste(ivs, collapse='+'), '+factor(cname)-1'))
@@ -68,6 +69,11 @@ reModCnt2Coef_imp = lapply(reModCnt2_imp,
   do.call('rbind', .) %>% rubinCoef(.)
 ########################################################
 
+feModCnt2Coef
+reModCnt2Coef
+feModCnt2Coef_imp
+reModCnt2Coef_imp
+
 ########################################################
 # save
 save(
@@ -75,6 +81,6 @@ save(
   feModCnt2Coef, reModCnt2Coef,
   feModCnt2_imp, reModCnt2_imp,
   feModCnt2Coef_imp, reModCnt2Coef_imp,
-  file=paste0(pathResults, 'cnt2Mods.rda')
+  file=paste0(pathResults, 'cnt2Mods_v2.rda')
 )
 ########################################################

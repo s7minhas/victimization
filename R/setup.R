@@ -66,6 +66,7 @@ addCat = function(baseVar, labs, breaks){
 	catVar = factor(catVar,
 		levels = labs)
 	return(catVar) }
+options(warn=-1)
 ########
 
 ########

@@ -49,7 +49,9 @@ dataCnt2 = data[
 ##########################
 # limit countries with too few cyears
 dataList = list(base=dataBase, cnt1=dataCnt1, cnt2=dataCnt2)
-modVars = names(dataCnt2)[-c(1:4,7,9,12:15)]
+toRemove = c(
+	ids, "graph_avgDeg", "nEvents", "gdp", "pop", "gdpCap", "gdpLog" )
+modVars = names(dataCnt2)[-which(names(dataCnt2) %in% toRemove)]
 
 cntryCnts = lapply(dataList, function(x){
 	vars = intersect(names(x), c('cname',modVars))

@@ -146,6 +146,16 @@ out = lapply(1:length(gameList), function(turn){
 		mode='directed', weighted=NULL )
 	sgrph = network::network(
 		mat, matrix.type="adjacency",directed=TRUE)
+
+	# gen desc stats
+  n_actors = nrow(mat)
+	nEvents = sum(c(mat))/2
+
+	# herf index
+	aCnts = apply(mat, 1, sum)
+	aShare = aCnts/sum(c(mat))
+	herf = sum(aShare^2)
+
   graph_avgDeg = mean(stat(sna::degree, sgrph))
   graph_globalTrans = stat(igraph::transitivity, grph)
   graph_localTrans = stat(localTrans, grph)
@@ -157,7 +167,6 @@ out = lapply(1:length(gameList), function(turn){
 	graph_eff_krack = stat(sna::efficiency, sgrph)
 	graph_centrz = centr_degree(grph)$centralization
 	graph_lubness = stat(sna::lubness, sgrph)
-	n_actors = nrow(mat)
 	out = c(
     graph_avgDeg = graph_avgDeg,
     graph_globalTrans = graph_globalTrans,
@@ -170,7 +179,7 @@ out = lapply(1:length(gameList), function(turn){
 		graph_eff_krack = graph_eff_krack,
 		graph_centrz = graph_centrz,
 		graph_lubness = graph_lubness,
-		n_actors=n_actors,
+		n_actors=n_actors, herf=herf,
 		game=game, turn=turn
 		)
 })
@@ -181,5 +190,5 @@ stopCluster(cl)
 netStats = do.call('rbind', netStats)
 netStats[,"turn"] = netStats[,"turn"] + 1
 netStats = netStats[!is.nan(netStats[,"graph_dens"]),]
-save(netStats, file=paste0(abmPath, 'abmNetStats.rda'))
+save(netStats, file=paste0(abmPath, 'abmNetStats_v2.rda'))
 ################################################

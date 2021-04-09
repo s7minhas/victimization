@@ -12,7 +12,7 @@ loadPkg(c('MASS', 'foreach', 'doParallel'))
 ################################################
 
 # load in data #################################
-load(paste0(abmPath, 'netStats.rda'))
+load(paste0(abmPath, 'netStats_v2.rda'))
 ################################################
 
 ################################################
@@ -23,9 +23,9 @@ var(netStats$vic)
 ################################################
 
 ################################################
-# choose vars to test
-vars = names(netStats)[1:11]
-perfVars = vars[c(1,3,6)]
+# choose vars to testf
+vars = names(netStats)[c(1:11,13)]
+perfVars = vars[c(1,3,6,12)]
 
 # run in parallel
 cores = length(perfVars)
@@ -44,10 +44,10 @@ names(res) = perfVars
 
 # save full models
 save(res,
-	file=paste0(pathResults, 'abm_feMods.rda'))
+	file=paste0(pathResults, 'abm_feMods_v2.rda'))
 
 # save just coefs
 coefs = lapply(res, function(x){summary(x)$'coefficients'})
 save(coefs,
-	file=paste0(pathResults, 'abm_feCoefs.rda') )
+	file=paste0(pathResults, 'abm_feCoefs_v2.rda') )
 ################################################

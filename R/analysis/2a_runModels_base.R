@@ -14,11 +14,11 @@ loadPkg(c('MASS', 'glmmTMB'))
 
 ########################################################
 # load raw model data (dataBase, dataCnt1, dataCnt2)
-load(paste0(pathData, 'rawModelData.rda'))
+load(paste0(pathData, 'rawModelData_v2.rda'))
 
 # set up spec
 dv = 'civVicCount'
-ivs = c('graph_dens', 'nConf', 'nActors')
+ivs = c('herf', 'nConf', 'nActors')
 p = length(ivs)
 feF = formula(paste0(
   dv, '~', paste(ivs, collapse='+'), '+factor(cname)-1'))
@@ -34,6 +34,8 @@ reModBase = glmmTMB(reF, data=dataBase, family='nbinom2')
 # get coefs
 feModBaseCoef = summary(feModBase)$'coefficients'[1:p,]
 reModBaseCoef = summary(reModBase)$'coefficients'$cond[1:(p+1),]
+feModBaseCoef
+reModBaseCoef
 ########################################################
 
 ########################################################
@@ -41,6 +43,6 @@ reModBaseCoef = summary(reModBase)$'coefficients'$cond[1:(p+1),]
 save(
   feModBase, reModBase,
   feModBaseCoef, reModBaseCoef,
-  file=paste0(pathResults, 'baseMods.rda')
+  file=paste0(pathResults, 'baseMods_v2.rda')
 )
 ########################################################

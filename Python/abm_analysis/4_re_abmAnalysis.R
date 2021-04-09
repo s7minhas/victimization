@@ -27,8 +27,8 @@ var(netStats$vic)
 netStats$game = factor(netStats$game)
 
 # choose vars to test
-vars = names(netStats)[1:11]
-perfVars = vars[c(1,3,6)]
+vars = names(netStats)[c(1:11,13)]
+perfVars = vars[c(1,3,6,12)]
 
 # run in parallel
 cores = length(perfVars)
@@ -47,10 +47,10 @@ names(res) = perfVars
 
 # save full models
 save(res,
-	file=paste0(pathResults, 'abm_reMods.rda'))
+	file=paste0(pathResults, 'abm_reMods_v2.rda'))
 
 # save coefs
 coefs = lapply(res, function(x){summary(x)$'coefficients'$cond})
 save(coefs,
-	file=paste0(pathResults, 'abm_reCoefs.rda'))
+	file=paste0(pathResults, 'abm_reCoefs_v2.rda'))
 ################################################
