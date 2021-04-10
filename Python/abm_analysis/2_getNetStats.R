@@ -130,9 +130,6 @@ localTrans = function(x){
   igraph::transitivity(x, type='average')
 }
 
-game = 1
-turn=1
-
 #
 cores = detectCores()-4
 cl = makeCluster(cores)
@@ -153,16 +150,25 @@ out = lapply(1:length(gameList), function(turn){
 	# gen desc stats
   n_actors = nrow(mat)
 
-	# herf index
+	# herf index ... denom problem in this one
 	aCnts = rowSums(mat, na.rm=TRUE) + colSums(mat, na.rm=TRUE)
-	aShare = aCnts/sum(c(mat), na.rm=TRUE)
+	aShare = aCnts/(sum(c(mat), na.rm=TRUE)*2)
 	herf_gen = sum(aShare^2)
-	herf_gen = min(herf_gen, 1)
+	# herf_gen = min(herf_gen, 1)
 
 	# herf 2
 	aCnts = rowSums(mat, na.rm=TRUE)
 	aShare = aCnts/sum(c(mat), na.rm=TRUE)
 	herf_sen = sum(aShare^2)
+
+	# herf 3
+	# create undirected version
+	ugrph = as.undirected(grph, mode='each')
+	umat = data.matrix(as_adj(ugrph))
+	umat[umat>1] = 1
+	aCnts = apply(umat, 1, sum, na.rm=TRUE)
+	aShare = aCnts/sum(c(umat), na.rm=TRUE)
+	herf_und = sum(aShare^2)
 
   graph_avgDeg = mean(stat(sna::degree, sgrph))
   graph_globalTrans = stat(igraph::transitivity, grph)
@@ -190,6 +196,7 @@ out = lapply(1:length(gameList), function(turn){
 		n_actors=n_actors,
 		herf_gen=herf_gen,
 		herf_sen=herf_sen,
+		herf_und=herf_und,
 		game=game, turn=turn
 		)
 })
