@@ -14,9 +14,9 @@ if(Sys.info()['user'] %in% c('maxgallop')){
 cleanVars = c(
 	'Number of\nConflicts','Number of\nActors', 'Graph Density')
 coefData = lapply(c('fe','re'), function(est){
-	load(paste0(pathResults, 'abm_',est,'Coefs.rda'))
-	if(est=='fe'){ coefs = coefs$graph_dens[1:3,]}
-	if(est=='re'){ coefs = coefs$graph_dens[-1,]}
+	load(paste0(pathResults, 'abm_',est,'Coefs_v2.rda'))
+	if(est=='fe'){ coefs = coefs$herf_sen[1:3,]}
+	if(est=='re'){ coefs = coefs$herf_sen[-1,]}
 	coefs = data.frame(coefs, stringsAsFactors=FALSE)
 	coefs$var = rownames(coefs) ; rownames(coefs) = NULL
 	coefs$varName = cleanVars

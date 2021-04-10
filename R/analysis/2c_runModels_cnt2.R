@@ -23,8 +23,8 @@ load(paste0(pathData, 'modelDataCnt2_v2.rda'))
 dv = 'civVicCount'
 ivs = c(
   'herf', 'nConf', 'nActors',
-  'polity2', 'popLog', 'gdpCapLog', 'exclpop',
- 	'anyPeaceKeeper'
+  'polity2', 'popLog', 'gdpCapLog', 'exclpop'
+ 	# 'anyPeaceKeeper'
 	# ,'rebsStronger', 'rebSupportGov', 'govSupportGov')
 )
 p = length(ivs)

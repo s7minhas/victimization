@@ -24,8 +24,8 @@ var(netStats$vic)
 
 ################################################
 # choose vars to testf
-vars = names(netStats)[c(1:11,13)]
-perfVars = vars[c(1,3,6,12)]
+vars = names(netStats)[c(1:11,13,14)]
+perfVars = vars[c(1,3,6,12,13)]
 
 # run in parallel
 cores = length(perfVars)
@@ -34,10 +34,9 @@ registerDoParallel(cl)
 res = foreach(
 	v = perfVars,
 	.packages=c( 'MASS' ) ) %dopar% {
-
 form=formula(paste0('vic~numConf+n_actors+', v, '+ factor(game)-1'))
 mod = glm.nb(form, data=netStats)
-
+summary(netStats)
 return(mod) }
 stopCluster(cl)
 names(res) = perfVars

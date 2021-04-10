@@ -119,8 +119,8 @@ for(i in 1:nrow(dyadConf)){
 ################################################
 
 # calc net measures ############################
-########parallelize this
 loadPkg(c('sna','igraph','network','doParallel','foreach'))
+
 stat = function(expr, object){
 	x=suppressWarnings(try(expr(object),TRUE))
 	if(class(x)=='try-error'){x=NA}
@@ -129,6 +129,9 @@ stat = function(expr, object){
 localTrans = function(x){
   igraph::transitivity(x, type='average')
 }
+
+game = 1
+turn=1
 
 #
 cores = detectCores()-4
@@ -149,12 +152,17 @@ out = lapply(1:length(gameList), function(turn){
 
 	# gen desc stats
   n_actors = nrow(mat)
-	nEvents = sum(c(mat))/2
 
 	# herf index
-	aCnts = apply(mat, 1, sum)
-	aShare = aCnts/sum(c(mat))
-	herf = sum(aShare^2)
+	aCnts = rowSums(mat, na.rm=TRUE) + colSums(mat, na.rm=TRUE)
+	aShare = aCnts/sum(c(mat), na.rm=TRUE)
+	herf_gen = sum(aShare^2)
+	herf_gen = min(herf_gen, 1)
+
+	# herf 2
+	aCnts = rowSums(mat, na.rm=TRUE)
+	aShare = aCnts/sum(c(mat), na.rm=TRUE)
+	herf_sen = sum(aShare^2)
 
   graph_avgDeg = mean(stat(sna::degree, sgrph))
   graph_globalTrans = stat(igraph::transitivity, grph)
@@ -179,7 +187,9 @@ out = lapply(1:length(gameList), function(turn){
 		graph_eff_krack = graph_eff_krack,
 		graph_centrz = graph_centrz,
 		graph_lubness = graph_lubness,
-		n_actors=n_actors, herf=herf,
+		n_actors=n_actors,
+		herf_gen=herf_gen,
+		herf_sen=herf_sen,
 		game=game, turn=turn
 		)
 })

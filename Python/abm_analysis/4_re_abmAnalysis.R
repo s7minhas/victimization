@@ -12,7 +12,7 @@ loadPkg(c('glmmTMB', 'foreach', 'doParallel'))
 ################################################
 
 # load in data #################################
-load(paste0(abmPath, 'netStats.rda'))
+load(paste0(abmPath, 'netStats_v2.rda'))
 ################################################
 
 ################################################
@@ -27,8 +27,8 @@ var(netStats$vic)
 netStats$game = factor(netStats$game)
 
 # choose vars to test
-vars = names(netStats)[c(1:11,13)]
-perfVars = vars[c(1,3,6,12)]
+vars = names(netStats)[c(1:11,13,14)]
+perfVars = vars[c(1,3,6,12,13)]
 
 # run in parallel
 cores = length(perfVars)

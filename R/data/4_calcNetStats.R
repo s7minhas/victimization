@@ -57,8 +57,8 @@ netStats <- foreach(
 		nEvents = sum(c(mat))/2
 
 		# herf index
-		aCnts = apply(mat, 1, sum)
-		aShare = aCnts/sum(c(mat))
+		aCnts = apply(mat, 1, sum, na.rm=TRUE)
+		aShare = aCnts/sum(c(mat), na.rm=TRUE)
 		herf = sum(aShare^2)
 
 		# net stats
