@@ -45,7 +45,11 @@ trim = function (x) { gsub("^\\s+|\\s+$", "", x) }
 pasteMult = function(x,y,sepZ){
 	apply(expand.grid(x,y), 1, paste, collapse=sepZ) }
 cname = function(x) {countrycode(x,'country.name','country.name')}
+
+# merge
 simpleMerge = function(toData, fromData, vars, toID, fromID, lagVars=TRUE){
+
+	# lag vars
 	if(lagVars){
 		fromData$yrForMerge = unlist(
 			lapply(strsplit(fromData[,fromID],'_'),function(x){x[2]}))
@@ -53,12 +57,15 @@ simpleMerge = function(toData, fromData, vars, toID, fromID, lagVars=TRUE){
 			lapply(strsplit(fromData[,fromID],'_'),function(x){x[1]}))
 		fromData$yrForMerge = num(fromData$yrForMerge) + 1
 		fromData[,fromID] = with(fromData,
-			paste0(unitForMerge, '_', yrForMerge))
-	}
-	for(v in vars){
-		toData$tmp = fromData[match(toData[,toID], fromData[,fromID]), v]
-		names(toData)[ncol(toData)] = v }
+			paste0(unitForMerge, '_', yrForMerge)) }
+
+	# merge
+	fromData = fromData[
+		match(toData[,toID], fromData[,fromID]),]
+	toData = cbind(toData, fromData[,vars])
 	return(toData) }
+
+# cat var
 addCat = function(baseVar, labs, breaks){
 	catVar = rep(labs[1], length(baseVar))
 	for(ii in 1:length(breaks)){

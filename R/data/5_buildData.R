@@ -124,11 +124,12 @@ rm(epr)
 
 ####
 # add kathman cmps peacekeeper
-# data at country-year level - 2012
-load(paste0(pathData, 'kathman/kath.rda'))
+# data at country-year level - originally 2012
+# https://kathmanundata.weebly.com/ # updated to 2019
+load(paste0(pathData, 'kathman/kath_v2.rda'))
 names(kath)[6] = 'totalPeacekeepers'
 kathVars = c(
-	'troop','police','militaryobservers', 'totalPeacekeepers'
+	'troop','police','militaryobservers', 'totalPeacekeepers', 'total2'
 	)
 data = simpleMerge(data, kath, kathVars, 'id', 'cnameYear')
 rm(kath)
@@ -137,19 +138,26 @@ rm(kath)
 for(v in kathVars){ data[is.na(data[,v]),v] = 0 }
 
 # create binary indicator for any intervention
+# using total or total2 here returns the same result
 data$anyPeaceKeeper = 0
 data$anyPeaceKeeper[data$totalPeacekeepers>0] = 1
 
-# set everything after 2013 to NA
-# (data ends at 2012, so as lag
-# last set of info we have is 2013)
-for(v in c(kathVars, 'anyPeaceKeeper')){
-		data[which(data$year>2013),v] = NA }
+# no longer need to do this chunk because kathman
+# updated the data to 2019
+# # set everything after 2013 to NA
+# # (data ends at 2012, so as lag
+# # last set of info we have is 2013)
+# for(v in c(kathVars, 'anyPeaceKeeper')){
+# 		data[which(data$year>2013),v] = NA }
 ####
 
 ####
 # add nsa data at country-year level - 2011
-load(paste0(pathData, 'nsa/nsa.rda'))
+# we replicate forward nsa data from 2011 to 2014
+# following the procedure from kathman and benson
+# https://journals.sagepub.com/doi/10.1177/0022002718817104
+# see footnote 12
+load(paste0(pathData, 'nsa/nsa_v2.rda'))
 nsaVars = names(nsa)[3:ncol(nsa)]
 data = simpleMerge(data, nsa, nsaVars, 'id', 'cnameYear')
 rm(nsa)
@@ -157,5 +165,5 @@ rm(nsa)
 
 ############################
 # save
-save(data, file=paste0(pathData, 'data.rda'))
+save(data, file=paste0(pathData, 'data_v2.rda'))
 ############################

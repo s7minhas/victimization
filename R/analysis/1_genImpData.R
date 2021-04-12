@@ -14,7 +14,7 @@ loadPkg(c('MASS', 'sbgcop'))
 
 ##########################
 # load data
-load(paste0(pathData, 'data.rda'))
+load(paste0(pathData, 'data_v2.rda'))
 ##########################
 
 ##########################
@@ -29,11 +29,10 @@ ivsBase = c(
 ivCnt1 = c(
 	'polity2', # -2019
 	'gdp', 'pop', 'gdpCap', 'gdpLog', 'popLog', 'gdpCapLog', # -2020
-	'exclpop' # -2018
+	'exclpop', 'anyPeaceKeeper' # -2018
 )
 ivCnt2 = c(
-	'anyPeaceKeeper', # -2013
-	'rebsStronger', 'rebSupportGov', 'govSupportGov' # -2012
+	'rebsStronger', 'rebSupportGov', 'govSupportGov' # -2015
 )
 
 # create subsets of data based on yr breaks
@@ -42,7 +41,7 @@ dataCnt1 = data[
 	which(data$year<=2018),
 	c(ids, dv, ivsBase, ivCnt1)]
 dataCnt2 = data[
-	which(data$year<=2012),
+	which(data$year<=2015),
 	c(ids, dv, ivsBase, ivCnt1, ivCnt2)]
 ##########################
 
@@ -106,13 +105,13 @@ getImps = function(data, remVars, fileName){
 }
 
 # run imp on cnt1
-getImps(dataCnt1, ids[1:2], 'modelDataCnt1_v2.rda')
+getImps(dataCnt1, ids[1:2], 'modelDataCnt1_v3.rda')
 
 # run imp on cnt2
-getImps(dataCnt2, ids[1:2], 'modelDataCnt2_v2.rda')
+getImps(dataCnt2, ids[1:2], 'modelDataCnt2_v3.rda')
 
 # save raw
 save(
 	dataBase, dataCnt1, dataCnt2,
-	file=paste0(pathData, 'rawModelData_v2.rda'))
+	file=paste0(pathData, 'rawModelData_v3.rda'))
 ##########################

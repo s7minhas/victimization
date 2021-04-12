@@ -5,25 +5,13 @@ source(paste0(pth, '/R/setup.R'))
 
 ############################
 # load data
-kath = foreign::read.dta(paste0(pathData, 'kathman/CMPS Mission Totals 1990-2011.dta'))
-############################
-
-cbind(names(kath), 1:ncol(kath))
-
-############################
-# agg to cyear
-kath = kath %>% group_by(missioncountry, year) %>%
-	summarize(
-		troop = sum(troop, na.rm=TRUE),
-		police = sum(police, na.rm=TRUE),
-		militaryobservers = sum(militaryobservers, na.rm=TRUE),
-		total = sum(total, na.rm=TRUE)
-		) %>% data.frame()
+# updated data from kathman
+# https://kathmanundata.weebly.com/uploads/1/2/9/6/129650971/kathman_cmps_2013.pdf
+kath = read.csv(paste0(pathData, 'kathman/mission-month_12-2019.csv'))[,-1]
 ############################
 
 ############################
-# Process kathman data
-
+# preprocessing
 # include only post 1993 observations
 kath = kath[kath$year >= 1993, ]
 
@@ -39,6 +27,24 @@ kath$cname=cname(kath$missioncountry)
 # clean countrynames
 kath$cname[kath$cname=='Yugoslavia'] = 'SERBIA'
 
+# remove missioncountry: Unknown and Various
+kath = kath[!is.na(kath$cname),]
+############################
+
+############################
+# agg to cyear
+kath = kath %>% group_by(cname, year) %>%
+	summarize(
+		troop = sum(troop, na.rm=TRUE),
+		police = sum(police, na.rm=TRUE),
+		militaryobservers = sum(militaryobservers, na.rm=TRUE),
+		total = sum(total, na.rm=TRUE),
+		total2 = sum(total2, na.rm=TRUE)
+		) %>% data.frame()
+############################
+
+############################
+# finish up processing
 # add in ccode
 kath$ccode=panel$ccode[match(kath$cname,panel$cname)]
 
@@ -56,5 +62,5 @@ kath = kath[which(kath$cname!='TIMOR-LESTE'),]
 
 ############################
 # save
-save(kath, file=paste0(pathData, 'kathman/kath.rda'))
+save(kath, file=paste0(pathData, 'kathman/kath_v2.rda'))
 ############################

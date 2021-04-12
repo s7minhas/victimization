@@ -1,15 +1,13 @@
 ####
-if(Sys.info()['user'] %in% c('s7m', 'janus829')){ 
-	source('~/Research/victimization/R/setup.R') }
-if(Sys.info()['user'] %in% c('cassydorff')){ 
-	source('~/ProjectsGit/victimization/R/setup.R') }
+require(here) ; pth = here::here()
+source(paste0(pth, '/R/setup.R'))
 ####
 
 ############################
 # load data
 if(!file.exists(paste0(pathData, 'nsa/nsaDirty.rda'))){
 	nsa = read.csv(
-		'http://privatewww.essex.ac.uk/~ksg/data/nsa_v3.4_21November2013.asc', 
+		'http://privatewww.essex.ac.uk/~ksg/data/nsa_v3.4_21November2013.asc',
 		sep='\t')
 	save(nsa, file=paste0(pathData, 'nsa/nsaDirty.rda'))
 }  ; load(paste0(pathData, 'nsa/nsaDirty.rda'))
@@ -107,7 +105,7 @@ vars = c(
 	'rebextpart','fightcap','rebstrength' )
 for(v in vars){ nsa[,v] = char(nsa[,v]) }
 
-# for each country, take the mean rebestimate 
+# for each country, take the mean rebestimate
 nsa <- nsa %>%
   mutate(
   	rebsMuchWeaker = ifelse(rebstrength=='much weaker', 1, 0),
@@ -115,12 +113,12 @@ nsa <- nsa %>%
   	rebsParity = ifelse(rebstrength=='parity', 1, 0),
   	rebsStronger = ifelse(rebstrength=='stronger', 1, 0),
   	rebsFightCapHigh = ifelse(fightcap=='stronger', 1, 0),
-  	rebsFightCapLow = ifelse(fightcap %in% c('low','no'), 1, 0),  	
+  	rebsFightCapLow = ifelse(fightcap %in% c('low','no'), 1, 0),
   	rebExplicitSupportGov = ifelse(rebel.support=='explicit', 1, 0),
   	rebSupportGov = ifelse(rebel.support %in% c('explicit','alleged'), 1, 0),
   	govExplicitSupportGov = ifelse(gov.support=='explicit', 1, 0),
-  	govSupportGov = ifelse(gov.support %in% c('explicit','alleged'), 1, 0),  
-  	rebMajorSupportNonGov = ifelse(rebextpart=='major', 1, 0),  	  		
+  	govSupportGov = ifelse(gov.support %in% c('explicit','alleged'), 1, 0),
+  	rebMajorSupportNonGov = ifelse(rebextpart=='major', 1, 0),
   	rebSupportNonGov = ifelse(rebextpart %in% c('alleged','major','minor'), 1, 0)
   	)
 
@@ -144,7 +142,19 @@ nsa[is.na(nsa)] = 0
 ############################
 
 ############################
+# we follow kathman and benson in extending forward nsa
+# data to 2014: https://journals.sagepub.com/doi/10.1177/0022002718817104
+# see footnote 12
+nsa11 = nsa[nsa$year==2011,]
+nsa12 = nsa11 ; nsa12$year = 2012
+nsa13 = nsa11 ; nsa13$year = 2013
+nsa14 = nsa11 ; nsa14$year = 2014
+nsa = rbind(
+	nsa, nsa12, nsa13, nsa14 )
+############################
+
+############################
 # Save cleaned nsa data
 nsa$cnameYear = with(nsa, paste0(cname, '_', year))
-save(nsa, file=paste0(pathData, 'nsa/nsa.rda'))
+save(nsa, file=paste0(pathData, 'nsa/nsa_v2.rda'))
 ############################

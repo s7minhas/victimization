@@ -17,13 +17,13 @@ loadPkg(c('MASS', 'glmmADMB', 'glmmTMB'))
 # data = unimputed data for cnt1
 # iData = list of imputed datasets
 # sbgData = imputation model results
-load(paste0(pathData, 'modelDataCnt1_v2.rda'))
+load(paste0(pathData, 'modelDataCnt1_v3.rda'))
 
 # set up spec
 dv = 'civVicCount'
 ivs = c(
   'herf', 'nConf', 'nActors',
-  'polity2', 'popLog', 'gdpCapLog', 'exclpop' )
+  'polity2', 'popLog', 'gdpCapLog', 'exclpop', 'anyPeaceKeeper' )
 p = length(ivs)
 feF = formula(paste0(
   dv, '~', paste(ivs, collapse='+'), '+factor(cname)-1'))
@@ -78,6 +78,6 @@ save(
   feModCnt1Coef, reModCnt1Coef,
   feModCnt1_imp, reModCnt1_imp,
   feModCnt1Coef_imp, reModCnt1Coef_imp,
-  file=paste0(pathResults, 'cnt1Mods_v2.rda')
+  file=paste0(pathResults, 'cnt1Mods_v3.rda')
 )
 ########################################################
