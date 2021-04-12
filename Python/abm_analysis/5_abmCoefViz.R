@@ -8,15 +8,15 @@ if(Sys.info()['user'] %in% c('s7m', 'janus829')){
 if(Sys.info()['user'] %in% c('maxgallop')){
 	source('~/Documents/victimization/R/setup.R') }
 ################################################
-
+est='fe'
 ################################################
 # load and process coef data
 cleanVars = c(
 	'Number of\nConflicts','Number of\nActors', 'Graph Density')
 coefData = lapply(c('fe','re'), function(est){
 	load(paste0(pathResults, 'abm_',est,'Coefs_v2.rda'))
-	if(est=='fe'){ coefs = coefs$herf_sen[1:3,]}
-	if(est=='re'){ coefs = coefs$herf_sen[-1,]}
+	if(est=='fe'){ coefs = coefs$herf_und[1:3,]}
+	if(est=='re'){ coefs = coefs$herf_und[-1,]}
 	coefs = data.frame(coefs, stringsAsFactors=FALSE)
 	coefs$var = rownames(coefs) ; rownames(coefs) = NULL
 	coefs$varName = cleanVars
