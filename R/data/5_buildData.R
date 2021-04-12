@@ -35,7 +35,8 @@ data$country = char(unlist(lapply(strsplit(data$id,'_'), function(x){x[1]})))
 data$year = num(unlist(lapply(strsplit(data$id,'_'), function(x){x[2]})))
 
 # check which countries get dropped
-setdiff(names(netStats), unique(data$country))
+# 'Botswana''Equatorial Guinea''eSwatini''Gabon'
+# setdiff(names(netStats), unique(data$country))
 ############################
 
 ############################
@@ -165,5 +166,5 @@ rm(nsa)
 
 ############################
 # save
-save(data, file=paste0(pathData, 'data_v2.rda'))
+save(data, file=paste0(pathData, 'data.rda'))
 ############################

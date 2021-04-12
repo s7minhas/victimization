@@ -14,7 +14,7 @@ loadPkg(c('MASS', 'sbgcop'))
 
 ##########################
 # load data
-load(paste0(pathData, 'data_v2.rda'))
+load(paste0(pathData, 'data.rda'))
 ##########################
 
 ##########################
@@ -105,13 +105,13 @@ getImps = function(data, remVars, fileName){
 }
 
 # run imp on cnt1
-getImps(dataCnt1, ids[1:2], 'modelDataCnt1_v3.rda')
+getImps(dataCnt1, ids[1:2], 'modelDataCnt1.rda')
 
 # run imp on cnt2
-getImps(dataCnt2, ids[1:2], 'modelDataCnt2_v3.rda')
+getImps(dataCnt2, ids[1:2], 'modelDataCnt2.rda')
 
 # save raw
 save(
 	dataBase, dataCnt1, dataCnt2,
-	file=paste0(pathData, 'rawModelData_v3.rda'))
+	file=paste0(pathData, 'rawModelData.rda'))
 ##########################
