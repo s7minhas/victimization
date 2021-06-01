@@ -39,6 +39,7 @@ if(Sys.info()['user'] %in% c('maxgallop')){
 
 ########
 # misc
+options(warn=-1)
 char = function(x){ as.character(x) }
 num = function(x){ as.numeric(char(x)) }
 trim = function (x) { gsub("^\\s+|\\s+$", "", x) }

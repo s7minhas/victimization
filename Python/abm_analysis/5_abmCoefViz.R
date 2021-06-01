@@ -12,7 +12,7 @@ est='fe'
 ################################################
 # load and process coef data
 cleanVars = c(
-	'Number of\nConflicts','Number of\nActors', 'Herfindahl Index')
+	'Number of\nConflicts','Number of\nActors', 'Network Competition')
 coefData = lapply(c('fe','re'), function(est){
 	load(paste0(pathResults, 'abm_',est,'Coefs_v2.rda'))
 	if(est=='fe'){ coefs = coefs$herf_und[1:3,]}
@@ -40,7 +40,7 @@ coefData$varName = factor(
 	levels=c(
 		'Number of\nActors',
 		'Number of\nConflicts',
-		'Herfindahl Index'))
+		'Network Competition'))
 coefData$title = factor(coefData$title)
 
 # viz

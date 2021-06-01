@@ -32,12 +32,12 @@ coefImpRE = list(
 ########################################################
 mLabs = c(
 	'Base ACLED Model',
-	'Base + Controls\n(1997-2018)', 'Base + Controls\n(1997-2012)' )
+	'Base + Controls\n(1997-2018)', 'Base + Controls\n(1997-2015)' )
 
 varKey = data.frame(
 	dirty=rownames(coefMissFE$'cnt2'), stringsAsFactors = FALSE )
 varKey$clean = c(
-	'Graph Density', 'Number of\nConflicts', 'Number of\nActors',
+	'Network Competition', 'Number of\nConflicts', 'Number of\nActors',
 	'Polity', 'Log(Population)', 'Log(GDP per Capita)',
 	'Excluded\nPopulation', 'Presence of\nPeacekeepers',
 	'Rebel(s) Stronger\nthan Govt.',

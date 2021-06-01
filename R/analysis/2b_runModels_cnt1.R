@@ -66,6 +66,11 @@ reModCnt1Coef_imp = lapply(reModCnt1_imp,
   do.call('rbind', .) %>% rubinCoef(.)
 ########################################################
 
+feModCnt1Coef
+reModCnt1Coef
+feModCnt1Coef_imp
+reModCnt1Coef_imp
+
 ########################################################
 # save
 save(
