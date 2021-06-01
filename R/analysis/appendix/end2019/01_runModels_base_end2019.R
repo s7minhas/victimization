@@ -18,7 +18,7 @@ load(paste0(pathData, 'rawModelData.rda'))
 
 # set up spec
 dv = 'civVicCount'
-ivs = c('graph_dens', 'nConf', 'nActors')
+ivs = c('herf', 'nConf', 'nActors')
 p = length(ivs)
 feF = formula(paste0(
   dv, '~', paste(ivs, collapse='+'), '+factor(cname)-1'))

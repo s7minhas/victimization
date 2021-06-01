@@ -8,7 +8,7 @@ if(Sys.info()['user'] %in% c('s7m', 'janus829')){
 if(Sys.info()['user'] %in% c('maxgallop')){
 	source('~/Documents/victimization/R/setup.R') }
 ################################################
-est='fe'
+
 ################################################
 # load and process coef data
 cleanVars = c(

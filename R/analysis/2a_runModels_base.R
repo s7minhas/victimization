@@ -36,9 +36,6 @@ feModBaseCoef = summary(feModBase)$'coefficients'[1:p,]
 reModBaseCoef = summary(reModBase)$'coefficients'$cond[1:(p+1),]
 ########################################################
 
-feModBaseCoef
-reModBaseCoef
-
 ########################################################
 # save
 save(

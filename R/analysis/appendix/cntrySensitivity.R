@@ -59,8 +59,8 @@ getSensData = function(
 titleLabs = c(
 	'Base ACLED Model',
 	'Base + Controls\n(1997-2018)',
-	'Base + Controls\n(1997-2012)' )
-bivs = c( 'graph_dens', 'nConf', 'nActors' )
+	'Base + Controls\n(1997-2015)' )
+bivs = c( 'herf', 'nConf', 'nActors' )
 gDensSensBase = getSensData(
 	modEst='FE', # AIC indicates FE is preferred to RE
 	ivs = bivs, dat=dataBase,
@@ -103,6 +103,9 @@ ggCoef = ggplot(gDensSens, aes(x=cntry, y=mean, color=sig)) +
 		strip.text.x = element_text(size = 9, color='white'),
 		strip.background = element_rect(
 			fill = "#525252", color='#525252'))
+
+ggCoef
+
 ggsave(ggCoef, width=8, height=6,
 	file=paste0(pathGraphics, 'gDensSens.pdf'),
 	device=cairo_pdf)
