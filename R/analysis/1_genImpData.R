@@ -98,8 +98,14 @@ getImps = function(data, remVars, fileName){
 		out$popLog = log(out$pop + 1)
 		out$gdpLog = log(out$gdp + 1)
 
+		# rescale herf var for interp purposes
+		out$herf = 1-out$herf
+
 		# return
 		return( out ) })
+
+	# rescale herf var for interp purposes
+	data$herf = 1-data$herf
 
 	save(iData, data, sbgData, file=paste0(pathData, fileName))
 }
@@ -109,6 +115,11 @@ getImps(dataCnt1, ids[1:2], 'modelDataCnt1.rda')
 
 # run imp on cnt2
 getImps(dataCnt2, ids[1:2], 'modelDataCnt2.rda')
+
+# rescale herf var for interp purposes
+dataBase$herf = 1-dataBase$herf
+dataCnt1$herf = 1-dataCnt1$herf
+dataCnt2$herf = 1-dataCnt2$herf
 
 # save raw
 save(
