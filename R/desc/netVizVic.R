@@ -1,15 +1,37 @@
 ####################################################
-if(Sys.info()['user'] %in% c('Owner','herme','S7M')){
-  source(paste0(
-    'C:/Users/',Sys.info()['user'],
-    '/Research/victimization/R/setup.R')) }
-if(Sys.info()['user'] %in% c('s7m', 'janus829')){
-  source('~/Research/victimization/R/setup.R') }
-if(Sys.info()['user'] %in% c('dorffc')){
-  source('~/ProjectsGit/victimization/R/setup.R') }
+source(paste0(here::here(), '/R/setup.R'))
 
 #libraries
 loadPkg(c('igraph','network'))
+####################################################
+
+####################################################
+# load adj lists for countries
+load(paste0(pathData, 'actorAdjList.rda'))
+
+
+som = yListAll[['Somalia']]
+
+stats = lapply(1:length(som), function(ii){
+
+    #
+    mat = som[[ii]]
+
+		# gen desc stats
+    nActors = nrow(mat)
+		nEvents = sum(c(mat))/2
+
+		# herf index
+		aCnts = apply(mat, 1, sum, na.rm=TRUE)
+		aShare = aCnts/sum(c(mat), na.rm=TRUE)
+		herf = 1-sum(aShare^2)
+
+    #
+    yr = num(names(som)[ii])
+    out = c(yr=yr, herf=herf, nActors=nActors, nEvents=nEvents)
+    return(out) })
+stats = do.call('rbind', stats)
+stats
 ####################################################
 
 ####################################################
@@ -17,7 +39,7 @@ loadPkg(c('igraph','network'))
 set.seed(123456)
 
 #low vic
-gFirst <- graph.formula(1-2, 1-4, 1-6,  8, 9)
+gFirst <- graph.formula(1-2, 1-4, 1-6,  1-8, 1-9)
 V(gFirst)$color <- "gray26"
 s = coords <- layout_with_fr(gFirst) #get this layout and use it elsewhere
 gFirst$layout <- coords
