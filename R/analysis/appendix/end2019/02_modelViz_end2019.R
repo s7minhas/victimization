@@ -21,7 +21,7 @@ coefMissRE = list(
 varKey = data.frame(
 	dirty=rownames(coefMissFE$'base'), stringsAsFactors = FALSE )
 varKey$clean = c(
-	'Network Competition', 'Number of\nConflicts', 'Number of\nActors')
+	'Conflict Competition', 'Number of\nConflicts', 'Number of\nActors')
 
 mLabs = 'Base ACLED Model'
 ggDataMissFE = coefProcess(coefMissFE)

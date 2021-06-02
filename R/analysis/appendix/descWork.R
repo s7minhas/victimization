@@ -58,18 +58,22 @@ print(xtable(cntriesTab),
 
 ########################################################
 # variables for desc analysis
-modVars = names(dataList[[3]])[-c(1:4,7,9,12:15)]
+modVars = names(dataList[[3]])[-c(1:4,6,7,9,13:16)]
 
 varKey = data.frame(
 	dirty=modVars, stringsAsFactors = FALSE )
 varKey$clean = c(
 	'Civ. Victimization',
-	'Graph Density', 'Num. Actors', 'Num. Conflicts',
+	'Num. Actors', 'Num. Conflicts',
+	'Conflict Competition',
 	'Polity', 'Log(Pop.)', 'Log(GDP Cap.)',
 	'Excl. Pop.', 'Peacekeepers',
 	'Reb. Stronger Govt.',
 	'Reb. Supp. by Foreign Govt.',
 	'Govt. Supp. by Foreign Govt.' )
+
+# reorder
+varKey = varKey[c(1,4,2:3,5:nrow(varKey)),]
 ########################################################
 
 ########################################################

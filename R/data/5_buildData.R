@@ -164,23 +164,6 @@ data = simpleMerge(data, nsa, nsaVars, 'id', 'cnameYear')
 rm(nsa)
 ############################
 
-cbind(head(names(data)))
-
-head(nsa)
-
-head(nsa)
-tmp = data[,c('cname', 'year', 'herf', nsaVars[-length(nsaVars)])]
-tmp = tmp[tmp$year<=2015,]
-tmp1 = tmp[!is.na(tmp[[nsaVars[1]]]),]
-tmp2 = tmp[is.na(tmp[[nsaVars[1]]]),]
-cbind(unique(tmp1$cname))
-cbind(unique(tmp2$cname))
-intersect(tmp1$cname, tmp2$cname)
-setdiff(tmp2$cname, tmp1$cname)
-
-head(tmp2)
-tmp[tmp$cname=='ANGOLA',]
-
 ############################
 # save
 save(data, file=paste0(pathData, 'data.rda'))

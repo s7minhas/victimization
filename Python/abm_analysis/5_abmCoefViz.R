@@ -12,7 +12,7 @@ if(Sys.info()['user'] %in% c('maxgallop')){
 ################################################
 # load and process coef data
 cleanVars = c(
-	'Number of\nConflicts','Number of\nActors', 'Network Competition')
+	'Number of\nConflicts','Number of\nActors', 'Conflict Competition')
 coefData = lapply(c('fe','re'), function(est){
 	load(paste0(pathResults, 'abm_',est,'Coefs_v2.rda'))
 	if(est=='fe'){ coefs = coefs$herf_und[1:3,]}
@@ -40,8 +40,19 @@ coefData$varName = factor(
 	levels=c(
 		'Number of\nActors',
 		'Number of\nConflicts',
-		'Network Competition'))
+		'Conflict Competition'))
 coefData$title = factor(coefData$title)
+
+# rescale herf for interp purposes
+# doing it here is equivalent to making
+# the change in the data since the
+# measures are perfectly, negatively correlated
+coefData[
+	coefData$var=='herf_und',c('mean','lo95','hi95','lo90','hi90')
+	] = -1*coefData[
+		coefData$var=='herf_und',c('mean','lo95','hi95','lo90','hi90')
+		]
+coefData$sig[coefData$var=='herf_und'] = 'Positive'
 
 # viz
 ggCoef = ggplot(

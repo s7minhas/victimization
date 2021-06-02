@@ -17,7 +17,7 @@ loadPkg(c('igraph','network'))
 set.seed(123456)
 
 #low vic
-gFirst <- graph.formula(1-2, 3-4, 5-6,  7-8, 8, 9, 8-10)
+gFirst <- graph.formula(1-2, 1-4, 1-6,  8, 9)
 V(gFirst)$color <- "gray26"
 s = coords <- layout_with_fr(gFirst) #get this layout and use it elsewhere
 gFirst$layout <- coords
@@ -25,7 +25,7 @@ eN = ecount(gFirst) ; wts = runif(eN) ; wts = wts/sum(wts)
 E(gFirst)$weight <-  8/eN + wts
 
 #med vic
-gSec <- graph.formula(2-4, 3-4, 4-5, 4-6, 5-4, 6-5, 7-5, 8-4, 9-4, 10-4)
+gSec <- graph.formula(1-4, 3-2, 2-1, 1-6, 1-5, 2-5, 1-4, 2-4, 10-4)
 V(gSec)$color <- "gray26"
 eN = ecount(gSec) ; wts = runif(eN) ; wts = wts/sum(wts)
 E(gSec)$weight <-  8/eN + wts
@@ -43,7 +43,11 @@ E(gLast)$weight <-  8/eN + wts
 lapply(list(gFirst, gSec, gLast), function(x){
   mat = data.matrix(
     as_adjacency_matrix(x, attr='weight'))
-  out = c( sum(c(mat)), mean(c(mat)), ecount(x) ) })
+	aCnts = apply(mat, 1, sum, na.rm=TRUE)
+	aShare = aCnts/sum(c(mat), na.rm=TRUE)
+	herf = sum(aShare^2)
+	iHerf = 1-herf
+  out = c( sum(c(mat)), mean(c(mat)), ecount(x), iHerf ) })
 ####################################################
 
 ####################################################

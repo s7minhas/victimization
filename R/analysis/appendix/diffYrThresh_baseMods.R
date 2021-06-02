@@ -15,6 +15,9 @@ loadPkg(c('MASS', 'glmmTMB'))
 ##########################
 # load data
 load(paste0(pathData, 'data.rda'))
+
+# rescale herf var for interp purposes
+data$herf = 1-data$herf
 ##########################
 
 ##########################
@@ -23,7 +26,7 @@ load(paste0(pathData, 'data.rda'))
 ids = c('id', 'cname', 'ccode', 'year')
 dv = 'civVicCount'
 ivsBase = c(
-	'graph_dens', 'graph_avgDeg',
+	'herf', 'graph_avgDeg',
 	'nActors', 'nEvents', 'nConf'
 )
 ivCnt1 = c(
@@ -33,7 +36,7 @@ ivCnt1 = c(
 )
 ivCnt2 = c(
 	'anyPeaceKeeper', # -2013
-	'rebsStronger', 'rebSupportGov', 'govSupportGov' # -2012
+	'rebsStronger', 'rebSupportGov', 'govSupportGov' # -2015
 )
 
 # create subsets of data based on yr breaks
@@ -42,7 +45,7 @@ dataCnt1 = data[
 	which(data$year<=2018),
 	c(ids, dv, ivsBase, ivCnt1)]
 dataCnt2 = data[
-	which(data$year<=2012),
+	which(data$year<=2015),
 	c(ids, dv, ivsBase, ivCnt1, ivCnt2)]
 ##########################
 
@@ -81,7 +84,7 @@ dataBase_fiveCut = dataList[[1]]
 ##########################
 # set up spec for baseMod
 dv = 'civVicCount'
-ivs = c('graph_dens', 'nConf', 'nActors')
+ivs = c('herf', 'nConf', 'nActors')
 p = length(ivs)
 feF = formula(paste0(
   dv, '~', paste(ivs, collapse='+'), '+factor(cname)-1'))
@@ -121,7 +124,7 @@ coefBase = list(
 varKey = data.frame(
 	dirty=rownames(coefBase[[1]]), stringsAsFactors = FALSE )
 varKey$clean = c(
-	'Graph Density', 'Number of\nConflicts', 'Number of\nActors')
+	'Conflict Competition', 'Number of\nConflicts', 'Number of\nActors')
 
 mLabs = c(
 	'Base ACLED Model\n(Fixed Effects, No Min.)',
