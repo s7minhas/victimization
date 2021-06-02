@@ -26,11 +26,6 @@ reF = formula(paste0(
   dv, '~', paste(ivs, collapse='+'), '+(1|cname)'))
 ########################################################
 
-head(dataBase)
-
-x = dataBase %>% group_by(cname) %>% summarize(val=range(herf)) %>% arrange(val)
-
-
 ########################################################
 # run base mods
 feModBase = glm.nb(feF, data=dataBase)

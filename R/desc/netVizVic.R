@@ -6,16 +6,29 @@ loadPkg(c('igraph','network'))
 ####################################################
 
 ####################################################
+load(paste0(pathData, 'rawModelData.rda'))
+x = dataBase %>% group_by(cname) %>%
+	summarize(
+		minH = min(herf),
+		maxH = max(herf) ) %>%
+	mutate(rangeH = maxH - minH) %>%
+	arrange(rangeH)
+####################################################
+
+####################################################
 # load adj lists for countries
 load(paste0(pathData, 'actorAdjList.rda'))
 
+cbind(names(yListAll))
 
-som = yListAll[['Somalia']]
+cList = yListAll[['Burkina Faso']]
+cList = cList[!unlist(lapply(cList, is.null))]
+lapply(cList, dim)
 
-stats = lapply(1:length(som), function(ii){
+stats = lapply(1:length(cList), function(ii){
 
     #
-    mat = som[[ii]]
+    mat = cList[[ii]]
 
 		# gen desc stats
     nActors = nrow(mat)
@@ -27,7 +40,7 @@ stats = lapply(1:length(som), function(ii){
 		herf = 1-sum(aShare^2)
 
     #
-    yr = num(names(som)[ii])
+    yr = num(names(cList)[ii])
     out = c(yr=yr, herf=herf, nActors=nActors, nEvents=nEvents)
     return(out) })
 stats = do.call('rbind', stats)
@@ -39,7 +52,7 @@ stats
 set.seed(123456)
 
 #low vic
-gFirst <- graph.formula(1-2, 1-4, 1-6,  1-8, 1-9)
+gFirst <- graph.formula(1-+2, 1-+4, 1-+6,  1-+8, 1-+9)
 V(gFirst)$color <- "gray26"
 s = coords <- layout_with_fr(gFirst) #get this layout and use it elsewhere
 gFirst$layout <- coords
