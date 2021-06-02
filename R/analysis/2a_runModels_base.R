@@ -5,7 +5,7 @@ if(Sys.info()['user'] %in% c('Owner','herme','S7M')){
 		'/Research/victimization/R/setup.R')) }
 if(Sys.info()['user'] %in% c('s7m', 'janus829')){
 	source('~/Research/victimization/R/setup.R') }
-if(Sys.info()['user'] %in% c('cassydorff')){
+if(Sys.info()['user'] %in% c('dorffc')){
 	source('~/ProjectsGit/victimization/R/setup.R') }
 
 # helpful pkgs
