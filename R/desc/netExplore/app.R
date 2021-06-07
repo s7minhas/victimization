@@ -48,14 +48,26 @@ yListAll = cleanListNames(yListAll)
 
 # acled net stats
 netStats = cleanListNames(netStats)
+str(netStats)
 
 # change herf for grepl
-names(netStats[[1]])
+# netStatsNew = lapply(netStats, function(x){
+  #names(x)[3] = "graph_herf"
+  #x
+#})
+
+netStats = lapply(netStats, function(x){  
+  nameToReplace = which(names(x)=='herf')
+  names(x)[nameToReplace] = 'graph_herf'
+  return(x)
+})
 
 # vector of graph stats from net stats
 # for use in table output
 graphStats = names(netStats[[1]])[
   grepl('graph_',names(netStats[[1]]))]
+
+graphStats = c(graphStats, 'herf')
 
 # when using acled graph_recip will equal one
 # change when modifying to choosing between acled/ucdp
