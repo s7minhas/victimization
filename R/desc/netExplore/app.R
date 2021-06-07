@@ -49,6 +49,9 @@ yListAll = cleanListNames(yListAll)
 # acled net stats
 netStats = cleanListNames(netStats)
 
+# change herf for grepl
+names(netStats[[1]])
+
 # vector of graph stats from net stats
 # for use in table output
 graphStats = names(netStats[[1]])[
