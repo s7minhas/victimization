@@ -50,17 +50,17 @@ yListAll = cleanListNames(yListAll)
 netStats = cleanListNames(netStats)
 str(netStats)
 
-# change herf for grepl
-# netStatsNew = lapply(netStats, function(x){
-  #names(x)[3] = "graph_herf"
-  #x
-#})
+# change herf 
+  # netStatsNew = lapply(netStats, function(x){
+   #names(x)[3] = "graph_herf"
+   #x
+  #})
 
-netStats = lapply(netStats, function(x){  
-  nameToReplace = which(names(x)=='herf')
-  names(x)[nameToReplace] = 'graph_herf'
-  return(x)
-})
+  # netStats = lapply(netStats, function(x){  
+  #   nameToReplace = which(names(x)=='herf')
+  #   names(x)[nameToReplace] = 'graph_herf'
+  #   return(x)
+  # })
 
 # vector of graph stats from net stats
 # for use in table output
@@ -71,7 +71,7 @@ graphStats = c(graphStats, 'herf')
 
 # when using acled graph_recip will equal one
 # change when modifying to choosing between acled/ucdp
-graphStats = graphStats[-length(graphStats)]
+# graphStats = graphStats[-length(graphStats)]
 
 # label of object for ui/server
 netList = yListAll
@@ -185,7 +185,7 @@ server <- function(input, output) {
 
       # pull in cntrylevel results (at the level of actor)
       actorStats = netStats[[input$cntry]]
-
+      
       # calculate number of actors for every year
       nVec = tapply(actorStats$actor, actorStats$year, length)
 
@@ -240,7 +240,7 @@ server <- function(input, output) {
 
     # adj data for plotting
     ggData = pivot_longer(vicData,
-      cols=civVicCount:graph_centrz,
+      cols=civVicCount:herf,
       names_to = 'graphMeasure',
       values_to = 'value'
       )
