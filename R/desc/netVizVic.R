@@ -6,78 +6,53 @@ loadPkg(c('igraph','network'))
 ####################################################
 
 ####################################################
-load(paste0(pathData, 'rawModelData.rda'))
-x = dataBase %>% group_by(cname) %>%
-	summarize(
-		minH = min(herf),
-		maxH = max(herf) ) %>%
-	mutate(rangeH = maxH - minH) %>%
-	arrange(rangeH)
-####################################################
-
-####################################################
-# load adj lists for countries
-load(paste0(pathData, 'actorAdjList.rda'))
-
-cbind(names(yListAll))
-
-cList = yListAll[['Burkina Faso']]
-cList = cList[!unlist(lapply(cList, is.null))]
-lapply(cList, dim)
-
-stats = lapply(1:length(cList), function(ii){
-
-    #
-    mat = cList[[ii]]
-
-		# gen desc stats
-    nActors = nrow(mat)
-		nEvents = sum(c(mat))/2
-
-		# herf index
-		aCnts = apply(mat, 1, sum, na.rm=TRUE)
-		aShare = aCnts/sum(c(mat), na.rm=TRUE)
-		herf = 1-sum(aShare^2)
-
-    #
-    yr = num(names(cList)[ii])
-    out = c(yr=yr, herf=herf, nActors=nActors, nEvents=nEvents)
-    return(out) })
-stats = do.call('rbind', stats)
-stats
-####################################################
-
-####################################################
 # gen nets
 set.seed(123456)
 
 #low vic
-gFirst <- graph.formula(1-+2, 1-+4, 1-+6,  1-+8, 1-+9)
+gFirst <- graph.formula(
+	1-+2, 1-+3, 1-+4,  1-+5, 1-+6
+)
+# gFirst <- graph.formula(
+# 	1-2, 1-3, 1-4, 1-5, 1-6, 1-7, 1-8, 1-9
+# )
 V(gFirst)$color <- "gray26"
 s = coords <- layout_with_fr(gFirst) #get this layout and use it elsewhere
 gFirst$layout <- coords
 eN = ecount(gFirst) ; wts = runif(eN) ; wts = wts/sum(wts)
-E(gFirst)$weight <-  8/eN + wts
+# E(gFirst)$weight <-  8/eN + wts
+
+mat=data.matrix(as_adj(gFirst))
 
 #med vic
-gSec <- graph.formula(1-4, 3-2, 2-1, 1-6, 1-5, 2-5, 1-4, 2-4, 10-4)
+gSec <- graph.formula(
+	1-2, 2-3, 1-3, 1-4, 1-5, 1-6
+)
 V(gSec)$color <- "gray26"
 eN = ecount(gSec) ; wts = runif(eN) ; wts = wts/sum(wts)
-E(gSec)$weight <-  8/eN + wts
+# E(gSec)$weight <-  8/eN + wts
 
 #high vic
+# gLast <- graph.formula(
+#   1-2, 1-3, 1-4,  1-5, 1-6,
+# 	2-3, 2-4,  2-5,
+# 	3-4,  3-5,
+# 	4-5,
+# )
 gLast <- graph.formula(
-  1-2, 3-4, 1-3, 1-4, 1-5, 2-3, 2-4, 2-5, 3-4, 3-5, 4-1,
-  2-4, 4-5, 4-6, 10-4, 8-4, 10-4, 1-8)
+  1-2, 1-4,  1-6,
+	2-3,  2-5,
+	3-4,  3-5
+)
 V(gLast)$color <- "gray26"
 eN = ecount(gLast) ; wts = runif(eN) ; wts = wts/sum(wts)
-E(gLast)$weight <-  8/eN + wts
+# E(gLast)$weight <-  8/eN + wts
 ####################################################
 
 ####################################################
 lapply(list(gFirst, gSec, gLast), function(x){
   mat = data.matrix(
-    as_adjacency_matrix(x, attr='weight'))
+    as_adjacency_matrix(x))
 	aCnts = apply(mat, 1, sum, na.rm=TRUE)
 	aShare = aCnts/sum(c(mat), na.rm=TRUE)
 	herf = sum(aShare^2)
@@ -86,21 +61,40 @@ lapply(list(gFirst, gSec, gLast), function(x){
 ####################################################
 
 ####################################################
-par(mfrow=c(1, 3), mar=c(0,0,1,0))
-#low vic
-plot.igraph(gFirst,
-            vertex.label=NA,
-            main="Low Expected Victimization",
-            edge.width=E(gFirst)$weight*3, layout=s, edge.curved=0.1)
+loadPkg(c('ggraph', 'tidygraph'))
 
-#med vic
-plot.igraph(gSec,
-            vertex.label=NA,
-            main="Moderate Expected Victimization",
-            layout=s, edge.width=E(gSec)$weight*2, edge.curved=0.1)
+# get edgelists from igraph objects
+nets = list(gFirst, gSec, gLast)
+labs = paste(
+	c('Low','Moderate','High'),
+	'Network Competition &\n',
+	# c('Low','Moderate','High'),
+	'Expected Victimization'
+)
+ggData = lapply(1:length(nets), function(ii){
+	edges = as_edgelist(nets[[ii]])
+	edges = data.frame(edges, stringsAsFactors=FALSE)
+	names(edges) = c('from', 'to')
+	edges$type = ii
+	return(edges) })
+ggData = do.call('rbind', ggData)
 
-#high vic
-plot.igraph(gLast, vertex.label=NA,
-            main="High Expected Victimization",
-            layout=s, edge.width=E(gLast)$weight, edge.curved=0.1)
+# size nodes
+ggGrph = as_tbl_graph(ggData)
+ggGrph = ggGrph %>%
+    mutate(Popularity = centrality_degree(mode = 'total'))
+####################################################
+
+####################################################
+feLab = function(labels) { list(g = labs) }
+
+ggraph(ggGrph, layout = 'kk') +
+    geom_edge_fan(aes(alpha = stat(index)), show.legend = FALSE) +
+		# geom_edge_link() +
+    geom_node_point(aes(size = Popularity)) +
+		geom_node_label(aes(label=name)) +
+    facet_edges(~type, labeller=feLab) +
+		theme(
+			legend.position='none'
+		)
 ####################################################
