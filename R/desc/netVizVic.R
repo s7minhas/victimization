@@ -11,7 +11,7 @@ set.seed(123456)
 
 #low vic
 gFirst <- graph.formula(
-	1-+2, 1-+3, 1-+4,  1-+5, 1-+6
+	1-+2, 1-+3, 1-+4,  1-+5, 1-+6, 1-+7
 )
 # gFirst <- graph.formula(
 # 	1-2, 1-3, 1-4, 1-5, 1-6, 1-7, 1-8, 1-9
@@ -26,7 +26,7 @@ mat=data.matrix(as_adj(gFirst))
 
 #med vic
 gSec <- graph.formula(
-	1-2, 2-3, 1-3, 1-4, 1-5, 1-6
+	1-2, 2-3, 1-3, 1-4, 1-5, 1-6, 1-7, 6-4
 )
 V(gSec)$color <- "gray26"
 eN = ecount(gSec) ; wts = runif(eN) ; wts = wts/sum(wts)
@@ -40,9 +40,10 @@ eN = ecount(gSec) ; wts = runif(eN) ; wts = wts/sum(wts)
 # 	4-5,
 # )
 gLast <- graph.formula(
-  1-2, 1-4,  1-6,
-	2-3,  2-5,
-	3-4,  3-5
+  1-2, 1-4,  1-6, 1-3,
+	2-3,  2-5, 2-6,
+	3-4,  3-5, 4-6, 4-2,
+	4-7, 7-3
 )
 V(gLast)$color <- "gray26"
 eN = ecount(gLast) ; wts = runif(eN) ; wts = wts/sum(wts)
@@ -88,13 +89,17 @@ ggGrph = ggGrph %>%
 ####################################################
 feLab = function(labels) { list(g = labs) }
 
-ggraph(ggGrph, layout = 'kk') +
-    geom_edge_fan(aes(alpha = stat(index)), show.legend = FALSE) +
-		# geom_edge_link() +
-    geom_node_point(aes(size = Popularity)) +
-		geom_node_label(aes(label=name)) +
-    facet_edges(~type, labeller=feLab) +
-		theme(
-			legend.position='none'
-		)
+set.seed(6886)
+gg = ggraph(ggGrph, layout = 'fr') +
+  geom_edge_fan(aes(alpha = stat(index)), show.legend = FALSE) +
+	# geom_edge_link() +
+  geom_node_point(aes(size = Popularity)) +
+	# geom_node_label(aes(label=name)) +
+  facet_edges(~type, labeller=feLab) +
+	theme(
+		legend.position='none' )
+ggsave(gg,
+	file=paste0(pathGraphics, 'hypNet.pdf'),
+	width=8, height=4
+)
 ####################################################
