@@ -12,7 +12,7 @@ if(Sys.info()['user'] %in% c('maxgallop')){
 ################################################
 # load and process coef data
 cleanVars = c(
-	'Number of\nConflicts','Number of\nActors', 'Conflict Competition')
+	'Number of\nConflicts','Number of\nActors', 'Network \nCompetition')
 coefData = lapply(c('fe','re'), function(est){
 	load(paste0(pathResults, 'abm_',est,'Coefs_v2.rda'))
 	if(est=='fe'){ coefs = coefs$herf_und[1:3,]}
@@ -40,7 +40,7 @@ coefData$varName = factor(
 	levels=c(
 		'Number of\nActors',
 		'Number of\nConflicts',
-		'Conflict Competition'))
+		'Network \nCompetition'))
 coefData$title = factor(coefData$title)
 
 # rescale herf for interp purposes

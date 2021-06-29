@@ -67,7 +67,7 @@ loadPkg(c('ggraph', 'tidygraph'))
 nets = list(gFirst, gSec, gLast)
 labs = paste(
 	c('Low','Moderate','High'),
-	'Network Competition &\n',
+	'Network Competition',
 	# c('Low','Moderate','High'),
 	'Expected Victimization'
 )

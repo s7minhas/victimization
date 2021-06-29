@@ -37,7 +37,7 @@ mLabs = c(
 varKey = data.frame(
 	dirty=rownames(coefMissFE$'cnt2'), stringsAsFactors = FALSE )
 varKey$clean = c(
-	'Conflict Competition', 'Number of\nConflicts', 'Number of\nActors',
+	'Network\nCompetition', 'Number of\nConflicts', 'Number of\nActors',
 	'Polity', 'Log(Population)', 'Log(GDP per Capita)',
 	'Excluded\nPopulation', 'Presence of\nPeacekeepers',
 	'Rebel(s) Stronger\nthan Govt.',
