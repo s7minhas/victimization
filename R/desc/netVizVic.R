@@ -9,7 +9,7 @@ loadPkg(c('igraph','network','ggraph','tidygraph'))
 # gen nets
 #low vic
 gFirst <- graph.formula(
-	1-+2, 1-+3, 1-+4,  1-+5, 1-+6, 1-+7
+	1-+2, 1-+3, 1-+4,  1-+5, 1-+6, 1-+7, 2-+1
 )
 V(gFirst)$color <- "gray26"
 s = coords <- layout_with_fr(gFirst)
@@ -17,18 +17,31 @@ gFirst$layout <- coords
 
 #med vic
 gSec <- graph.formula(
-	1-2, 2-3, 1-3, 1-4, 1-5, 1-6, 1-7, 6-4
+	# 1-2, 2-3, 1-3, 1-4, 1-5, 1-6, 1-7, 6-4
+	1-+2, 3-+4, 1-+5, 6-+7, 1-+6, 1-+7
 )
 V(gSec)$color <- "gray26"
 
 #high vic
 gLast <- graph.formula(
-  1-2, 1-4,  1-6, 1-3,
-	2-3,  2-5, 2-6,
-	3-4,  3-5, 4-6, 4-2,
-	4-7, 7-3
+  # 1-2, 1-4,  1-6, 1-3,
+	# 2-3,  2-5, 2-6,
+	# 3-4,  3-5, 4-6, 4-2,
+	# 4-7, 7-3
+	1-+2, 3-+4, 1-+5, 6-+7, 6-+4, 1-+7
 )
 V(gLast)$color <- "gray26"
+####################################################
+
+####################################################
+lapply(list(gFirst, gSec, gLast), function(x){
+  mat = data.matrix(
+    as_adjacency_matrix(x))
+	aCnts = apply(mat, 1, sum, na.rm=TRUE)
+	aShare = aCnts/sum(c(mat), na.rm=TRUE)
+	herf = sum(aShare^2)
+	iHerf = 1-herf
+  out = c( sum(c(mat)), mean(c(mat)), ecount(x), iHerf ) })
 ####################################################
 
 ####################################################
@@ -56,11 +69,16 @@ feLab = function(labels) { list(g = labs) }
 set.seed(6886)
 gg = ggraph(ggGrph, layout = 'fr') +
   geom_edge_fan(aes(alpha = stat(index)), show.legend = FALSE) +
-  geom_node_point(aes(size = Popularity)) +
+  geom_edge_fan(aes(alpha = after_stat(index)), show.legend = FALSE) +
+  geom_node_point(size=4) +
+	geom_node_label(aes(label=name)) +
   facet_edges(~type, labeller=feLab) +
 	theme(
 		legend.position='none' )
+
+gg
+
 ggsave(gg,
 	file=paste0(pathGraphics, 'hypNet.pdf'),
-	width=8, height=4 )
+	width=8, height=3 )
 ####################################################
