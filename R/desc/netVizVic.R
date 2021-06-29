@@ -73,12 +73,42 @@ gg = ggraph(ggGrph, layout = 'fr') +
 		panel.border=element_blank(),
 		strip.text.x = element_text(size = 9, color='white'),
 		strip.background = element_rect(
-			fill = "#525252", color='#525252')
-	 )
-
-gg
-
+			fill = "#525252", color='#525252') )
 ggsave(gg,
 	file=paste0(pathGraphics, 'hypNet.pdf'),
 	width=8, height=3, device=cairo_pdf )
+####################################################
+
+####################################################
+# checking to make sure somalia comment is true
+# from theory section in paper
+# load adj lists for countries
+load(paste0(pathData, 'actorAdjList.rda'))
+
+cbind(names(yListAll))
+
+cList = yListAll[['Somalia']]
+cList = cList[!unlist(lapply(cList, is.null))]
+lapply(cList, dim)
+
+stats = lapply(1:length(cList), function(ii){
+
+    #
+    mat = cList[[ii]]
+
+		# gen desc stats
+    nActors = nrow(mat)
+		nEvents = sum(c(mat))/2
+
+		# herf index
+		aCnts = apply(mat, 1, sum, na.rm=TRUE)
+		aShare = aCnts/sum(c(mat), na.rm=TRUE)
+		herf = 1-sum(aShare^2)
+
+    #
+    yr = num(names(cList)[ii])
+    out = c(yr=yr, herf=herf, nActors=nActors, nEvents=nEvents)
+    return(out) })
+stats = do.call('rbind', stats)
+stats
 ####################################################
