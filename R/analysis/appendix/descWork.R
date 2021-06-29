@@ -65,7 +65,7 @@ varKey = data.frame(
 varKey$clean = c(
 	'Civ. Victimization',
 	'Num. Actors', 'Num. Conflicts',
-	'Conflict Competition',
+	'Network Comp.',
 	'Polity', 'Log(Pop.)', 'Log(GDP Cap.)',
 	'Excl. Pop.', 'Peacekeepers',
 	'Reb. Stronger Govt.',

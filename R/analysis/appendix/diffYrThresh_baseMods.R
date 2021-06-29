@@ -124,7 +124,7 @@ coefBase = list(
 varKey = data.frame(
 	dirty=rownames(coefBase[[1]]), stringsAsFactors = FALSE )
 varKey$clean = c(
-	'Conflict Competition', 'Number of\nConflicts', 'Number of\nActors')
+	'Network\nCompetition', 'Number of\nConflicts', 'Number of\nActors')
 
 mLabs = c(
 	'Base ACLED Model\n(Fixed Effects, No Min.)',
