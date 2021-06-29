@@ -9,32 +9,23 @@ loadPkg(c('igraph','network','ggraph','tidygraph'))
 # gen nets
 #low vic
 gFirst <- graph.formula(
-	1-+2, 1-+3, 1-+4,  1-+5, 1-+6, 1-+7, 2-+1
+	1-+2, 1-+3, 1-+4, 1-+5,
+	1-+6, 1-+7, 2-+1, 6-+1
 )
 V(gFirst)$color <- "gray26"
 s = coords <- layout_with_fr(gFirst)
 gFirst$layout <- coords
 
-#med vic
-gSec <- graph.formula(
-	# 1-2, 2-3, 1-3, 1-4, 1-5, 1-6, 1-7, 6-4
-	1-+2, 3-+4, 1-+5, 6-+7, 1-+6, 1-+7
-)
-V(gSec)$color <- "gray26"
-
 #high vic
 gLast <- graph.formula(
-  # 1-2, 1-4,  1-6, 1-3,
-	# 2-3,  2-5, 2-6,
-	# 3-4,  3-5, 4-6, 4-2,
-	# 4-7, 7-3
-	1-+2, 3-+4, 1-+5, 6-+7, 6-+4, 1-+7
+	1-+2, 3-+4, 1-+5, 6-+7,
+	6-+4, 1-+6, 3-+6, 7-+5
 )
 V(gLast)$color <- "gray26"
 ####################################################
 
 ####################################################
-lapply(list(gFirst, gSec, gLast), function(x){
+lapply(list(gFirst, gLast), function(x){
   mat = data.matrix(
     as_adjacency_matrix(x))
 	aCnts = apply(mat, 1, sum, na.rm=TRUE)
@@ -46,9 +37,9 @@ lapply(list(gFirst, gSec, gLast), function(x){
 
 ####################################################
 # get edgelists from igraph objects
-nets = list(gFirst, gSec, gLast)
+nets = list(gFirst, gLast)
 labs = paste(
-	c('Low','Moderate','High'),
+	c('Low','High'),
 	'Network Competition' )
 ggData = lapply(1:length(nets), function(ii){
 	edges = as_edgelist(nets[[ii]])
@@ -71,14 +62,23 @@ gg = ggraph(ggGrph, layout = 'fr') +
   geom_edge_fan(aes(alpha = stat(index)), show.legend = FALSE) +
   geom_edge_fan(aes(alpha = after_stat(index)), show.legend = FALSE) +
   geom_node_point(size=4) +
-	geom_node_label(aes(label=name)) +
   facet_edges(~type, labeller=feLab) +
+	theme_light(base_family="Source Sans Pro") +
 	theme(
-		legend.position='none' )
+		axis.text = element_blank(),
+		axis.title=element_blank(),
+		axis.ticks=element_blank(),
+		panel.grid.minor=element_blank(),
+		legend.position='none',
+		panel.border=element_blank(),
+		strip.text.x = element_text(size = 9, color='white'),
+		strip.background = element_rect(
+			fill = "#525252", color='#525252')
+	 )
 
 gg
 
 ggsave(gg,
 	file=paste0(pathGraphics, 'hypNet.pdf'),
-	width=8, height=3 )
+	width=8, height=3, device=cairo_pdf )
 ####################################################
