@@ -6,6 +6,11 @@ Alfano, M.~Rosaria \harvardand\ A.~Laura Baraldi. 2015.
   economic growth? {E}vidence from {I}taly.'' {\em European Journal of Law and
   Economics} 39(2):263--285.
 
+\harvarditem{Anders}{2020}{anders:2020}
+Anders, Therese. 2020.
+\newblock ``Territorial control in civil wars: {T}heory and measurement using
+  machine learning.'' {\em Journal of Peace Research} 57(6):701--714.
+
 \harvarditem{Arjona}{2017}{arjona:2017}
 Arjona, Ana. 2017.
 \newblock ``Civilian Cooperation and Non-Cooperation with Non-State Armed
@@ -57,10 +62,11 @@ Fjelde, Hanne, Lisa Hultman \harvardand\ Desir{\'e}e Nilsson. 2019.
 \newblock ``Protection through presence: {UN} peacekeeping and the costs of
   targeting civilians.'' {\em International Organization} 73(1):103--131.
 
-\harvarditem{Gallop}{2017}{gallop:2017}
-Gallop, Max. 2017.
-\newblock ``More Dangerous than Dyads: {H}ow a Third Party Enables Rationalist
-  Explanations for War.'' {\em Journal of Theoretical Politics} 29(3):353--381.
+\harvarditem{Haass}{2021}{haass:2020}
+Haass, Felix. 2021.
+\newblock ``Insurgency and Ivory: {T}he Territorial Origins of Illicit Resource
+  Extraction in Civil Conflicts.'' {\em Comparative Political Studies}
+  54(8):1327--1361.
 
 \harvarditem[Hollenbach et~al.]{Hollenbach, Bojinov, Minhas, Metternich, Ward
   \harvardand\ Volfovsky}{2018}{hollenbach:etal:2018}
@@ -101,6 +107,12 @@ Kathman, Jacob \harvardand\ Michelle Benson. 2019.
   to negotiated settlements.'' {\em Journal of Conflict Resolution}
   63(7):1601--1629.
 
+\harvarditem{Kikuta}{2020}{kikuta_2020}
+Kikuta, Kyosuke. 2020.
+\newblock ``A new geography of civil war: {A} machine learning approach to
+  measuring the zones of armed conflicts.'' {\em Political Science Research and
+  Methods} p.~1–19.
+
 \harvarditem[Larson et~al.]{Larson, Nagler, Ronen \harvardand\
   Tucker}{2019}{larson:etal:2019}
 Larson, Jennifer~M, Jonathan Nagler, Jonathan Ronen \harvardand\ Joshua~A
@@ -108,12 +120,6 @@ Larson, Jennifer~M, Jonathan Nagler, Jonathan Ronen \harvardand\ Joshua~A
 \newblock ``Social networks and protest participation: Evidence from 130
   million Twitter users.'' {\em American Journal of Political Science}
   63(3):690--705.
-
-\harvarditem[Laver, De~Marchi \harvardand\ Mutlu]{Laver, De~Marchi \harvardand\
-  Mutlu}{2011}{laver:etal:2011}
-Laver, Michael, Scott De~Marchi \harvardand\ Hande Mutlu. 2011.
-\newblock ``Negotiation in legislatures over government formation.'' {\em
-  Public Choice} 147(3-4):285--304.
 
 \harvarditem{Lujala}{2010}{lujala:2010}
 Lujala, P. 2010.
@@ -137,12 +143,6 @@ Mampilly, Zachariah~Cherian. 2012.
 Marshall, Monty~G., Keith Jaggers \harvardand\ Ted~Robert Gurr. 2009.
 \newblock ``Polity {IV} Project: {P}olitical Regime Characteristics and
   Transition 1800-2007.'' CIDCM: {U}niversity of Maryland, MD.
-
-\harvarditem[Patty et~al.]{Patty, Snyder, Ting et~al.}{2009}{patty:etal:2009}
-Patty, John~W., James~M. Snyder, M. Ting et~al. 2009.
-\newblock ``Two's company, three's an equilibrium: {S}trategic voting and
-  multicandidate elections.'' {\em Quarterly Journal of Political Science}
-  4(3):251--278.
 
 \harvarditem[Raleigh et~al.]{Raleigh, Linke, Hegre \harvardand\
   Karlsen}{2010}{raleigh:etal:2010}
