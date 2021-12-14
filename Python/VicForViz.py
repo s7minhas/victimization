@@ -5,6 +5,7 @@ import operator
 import networkx as nx
 import copy
 from math import exp, floor
+
 ###Game Parameters, we Can Change These
 #How much less people like you when you kill your supporters
 VicPenalty = .05
@@ -124,42 +125,43 @@ class Territory(object):
             dist = max(self.country.dists[int(j.__repr__())][int(self.__repr__())] - 1, 0)
             res += delta**dist*j.resources
         rsrs[i] = res
-    #Transform to probability
-    probs = rsrs
-    denom = sum(rsrs.values())
-    for i in probs.keys():
-      probs[i] /= denom
-    #Who won?
-    outcome = sketchmultinom(probs.values())
-    winner = 0
-    #Winner takes the territory
-    for i in range(len(probs.keys())):
-      if outcome[i] == 1:
-        winner = list(probs.keys())[i]
-        old = copy.deepcopy(self.control)
-        if self.target == 1:
-          self.control = list(probs.keys())[i]
-        if self.control != old:
-          newsupp = 0
-          for i in self.country.armedactors:
-            i.territory = []
-          for i in self.country.provinces:
-            i.control.territory.append(i)
-          self.newterritory = 0 #cant victimize in the period you acquire a territory
-          for j in self.civilians:
-            newsupp += j.support == self.control
-    #People died, it sucks
-    self.target = 0 
-    self.attack.append(self)
-    for j in self.attack:
-      dmax = min(len(j.civilians), battledeaths)
-      for i in range(dmax):
-        shuffle(j.civilians)
-        j.civilians.pop()
-###Ok, battle over, people not fighting anymore
-    for i in self.attack:
-      i.attack = []
-    #All these people dying, who are we gonna mobilize next time?
+        #Transform to probability
+        probs = rsrs
+        denom = sum(rsrs.values())
+        denom = max([denom, .01])
+        for i in probs.keys():
+          probs[i] /= denom
+        #Who won?
+        outcome = sketchmultinom(probs.values())
+        winner = 0
+        #Winner takes the territory
+        for i in range(len(probs.keys())):
+          if outcome[i] == 1:
+            winner = list(probs.keys())[i]
+            old = copy.deepcopy(self.control)
+            if self.target == 1:
+              self.control = list(probs.keys())[i]
+            if self.control != old:
+              newsupp = 0
+              for i in self.country.armedactors:
+                i.territory = []
+              for i in self.country.provinces:
+                i.control.territory.append(i)
+              self.newterritory = 0 #cant victimize in the period you acquire a territory
+              for j in self.civilians:
+                newsupp += j.support == self.control
+        #People died, it sucks
+        self.target = 0
+        self.attack.append(self)
+        for j in self.attack:
+          dmax = min(len(j.civilians), battledeaths)
+          for i in range(dmax):
+            shuffle(j.civilians)
+            j.civilians.pop()
+    ###Ok, battle over, people not fighting anymore
+        for i in self.attack:
+          i.attack = []
+        #All these people dying, who are we gonna mobilize next time?
   def Growth(self,rate = .1):
       add = round(len(self.civilians)*rate)
       for i in range(add):
@@ -171,7 +173,7 @@ class Territory(object):
     if len(self.civilians) > 0:
       supps = []
       nosupp = []
-      number = 0 
+      number = 0
   ##List of supporters and opponents in the territory
       for i in self.civilians:
         if i.support == self.control:
@@ -226,9 +228,9 @@ class Territory(object):
       if self.newterritory == 0:
         return()
   ###What if this is interior territory
-      if self.borders == 0: 
+      if self.borders == 0:
   ###Number of supporters and non-supporters
-        suppnum = 0 
+        suppnum = 0
         for i in self.civilians:
           if i.support == 1:
             suppnum += 1
@@ -241,8 +243,8 @@ class Territory(object):
             supprange = ((suppnum -1)/(suppnum + nsuppnum - 1 ) + self.control.VioHist*VicPenalty)*2
             victUtility = selectprob*((2*VicPenalty/(1 - supprange)*nsuppnum)*(1 - CoerceMob) - CoerceMob) - (1 - selectprob)*(VicPenalty/supprange * suppnum * (1 - CoerceMob) - 1)
           if suppnum == 0:
-            victUtility = 2*VicPenalty*nsuppnum*(1 - CoerceMob) - CoerceMob         
-    ###Ok, how does victimization help our ability to mobilize in the future? 
+            victUtility = 2*VicPenalty*nsuppnum*(1 - CoerceMob) - CoerceMob
+    ###Ok, how does victimization help our ability to mobilize in the future?
     ###If its a good idea, do it
           if victUtility > 0:
             self.Victimize()
@@ -252,7 +254,7 @@ class Territory(object):
   ###Look at all the potential threats
         for j in self.neighbors:
           if j.ConsiderAttack(self):
-            suppnum = 0 
+            suppnum = 0
             for i in self.civilians:
               if i.support == 1:
                 suppnum += 1
@@ -276,16 +278,16 @@ class Territory(object):
               selectprob  = 1 - ((nsuppnum)*(suppnum))/(len(self.civilians)**2 + victimerror*suppnum/len(self.civilians))
     ###How victimization effects the resource balance
               if loyalzone == 0:
-                lossFunction = selectprob*nonloyal*VicPenalty*(1 + DisloyalPenalty) 
+                lossFunction = selectprob*nonloyal*VicPenalty*(1 + DisloyalPenalty)
               elif loyalzone == 1:
                 lossFunction = -1
               else:
                 lossFunction = selectprob*(nonloyal*VicPenalty/(1 - loyalzone)*(1 + DisloyalPenalty) + DisloyalPenalty) - (1 - selectprob)*(loyal*VicPenalty/(loyalzone)*(1 + DisloyalPenalty) - 1)
-    ###Do it if its a positive effect 
+    ###Do it if its a positive effect
               #print(lossFunction)
               if lossFunction > 0:
                 self.Victimize()
-                return("victimized")  
+                return("victimized")
   def __repr__(self):
     return self.name
 
@@ -376,7 +378,7 @@ class Civilian(object):
     #Compare that to your ideological distance
     if IncSupp/2 > abs(IncPref - self.preference) - self.territory.control.VioHist*VicPenalty:
       self.support = self.territory.control
-    else: 
+    else:
       self.support = 0
 ##Who will civilians support during a battle
   def BattleSupport(self):
@@ -407,7 +409,7 @@ class Civilian(object):
       utils[c]  = rsr[c]*(1 - abs(c.preference - self.preference) + c.VioHist*VicPenalty)
 ###Choose who to support
     max_key = max(utils, key=lambda k: utils[k])
-    max_value = max(utils.values()) 
+    max_value = max(utils.values())
     choices = [key for key, value in utils.items() if value == max_value]
     if len(choices) > 0:
       self.support = 0
@@ -474,7 +476,7 @@ class Country(object):
         terr[i].neighbors.append(terr[j])
     self.adj = adj
     ##Calculate distances using networkx
-    self.dists = nx.shortest_path_length(nx.from_numpy_matrix(self.adj))
+    self.dists = dict(nx.shortest_path_length(nx.from_numpy_matrix(self.adj)))
     self.provinces = terr
     ##Now lets generate armed actors, the last one will be the government, each actor controls one territory
     actrs = []
