@@ -1,9 +1,12 @@
 from VicForViz import *
 import csv
 
-with open('finalModelRun.csv', 'w') as csvfile:
+# with open('abmEpsilonLow.csv2', 'w') as csvfile:
+with open('python39Run.csv', 'w') as csvfile:
     abmwriter = csv.writer(csvfile, delimiter=',')
     for i in range(1000):
+        seed(i)
+        np.random.seed(i)
         actors = np.random.poisson(10)
         territory = max(np.random.poisson(13), actors + 1)
         conn = np.random.uniform(low = .2, high = .75)
