@@ -12,7 +12,7 @@ loadPkg(c('MASS', 'foreach', 'doParallel'))
 ################################################
 
 # load in data #################################
-load(paste0(abmPath, 'netStats_v2.rda'))
+load(paste0(abmPath, 'netStats_v2_py39.rda'))
 ################################################
 
 ################################################
@@ -43,10 +43,10 @@ names(res) = perfVars
 
 # save full models
 save(res,
-	file=paste0(pathResults, 'abm_feMods_v2.rda'))
+	file=paste0(pathResults, 'abm_feMods_v2_py39.rda'))
 
 # save just coefs
 coefs = lapply(res, function(x){summary(x)$'coefficients'})
 save(coefs,
-	file=paste0(pathResults, 'abm_feCoefs_v2.rda') )
+	file=paste0(pathResults, 'abm_feCoefs_v2_py39.rda') )
 ################################################

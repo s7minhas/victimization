@@ -10,10 +10,10 @@ if(Sys.info()['user'] %in% c('maxgallop')){
 ################################################
 
 # load in data #################################
-load(paste0(abmPath, 'abmData.rda'))
-load(paste0(abmPath, 'df_withVicCount.rda'))
-load(paste0(abmPath, 'dyadConf.rda'))
-load(paste0(abmPath, 'abmNetStats_v2.rda'))
+load(paste0(abmPath, 'abmData_py39.rda'))
+load(paste0(abmPath, 'df_withVicCount_py39.rda'))
+load(paste0(abmPath, 'dyadConf_py39.rda'))
+load(paste0(abmPath, 'abmNetStats_v2_py39.rda'))
 ################################################
 
 # create abm df for analysis ###################
@@ -37,5 +37,5 @@ netStats$numConf = dyadConf$numConf[match(netStats$id, dyadConf$id)]
 netStats$numConf[is.na(netStats$numConf)] = 0
 
 #
-save(netStats, file=paste0(abmPath, 'netStats_v2.rda'))
+save(netStats, file=paste0(abmPath, 'netStats_v2_py39.rda'))
 ################################################

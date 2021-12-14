@@ -25,8 +25,8 @@ cleaner = function(x){
 ################################################
 
 # load in data #################################
-load(paste0(abmPath, 'abmData.rda'))
-load(paste0(abmPath, 'df_withVicCount.rda'))
+load(paste0(abmPath, 'abmData_py39.rda'))
+load(paste0(abmPath, 'df_withVicCount_py39.rda'))
 ################################################
 
 # get dyad frame of battles ####################
@@ -82,7 +82,7 @@ dyadConf$senGov = 1*(dyadConf$senID %in% govActor$govID)
 dyadConf$recGov = 1*(dyadConf$recID %in% govActor$govID)
 
 #
-save(dyadConf, file=paste0(abmPath, 'dyadConf.rda'))
+save(dyadConf, file=paste0(abmPath, 'dyadConf_py39.rda'))
 ################################################
 
 # actor list to construct adj mats #############
@@ -207,5 +207,5 @@ stopCluster(cl)
 netStats = do.call('rbind', netStats)
 netStats[,"turn"] = netStats[,"turn"] + 1
 netStats = netStats[!is.nan(netStats[,"graph_dens"]),]
-save(netStats, file=paste0(abmPath, 'abmNetStats_v2.rda'))
+save(netStats, file=paste0(abmPath, 'abmNetStats_v2_py39.rda'))
 ################################################
