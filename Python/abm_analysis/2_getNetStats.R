@@ -9,7 +9,7 @@ if(Sys.info()['user'] %in% c('maxgallop')){
 	source('~/Documents/victimization/R/setup.R') }
 
 # pkgs
-loadPkg('stringr')
+loadPkg(c('stringr','reshape2'))
 
 # helpers
 cleaner = function(x){
@@ -22,6 +22,30 @@ cleaner = function(x){
 							gsub('{', '', x,
 								fixed=TRUE),fixed=TRUE)))),fixed=TRUE))
 	return(out) }
+
+# function to calculate cos sim score
+getCosSim = function(x,y){
+  c = sum(x*y) / (sqrt(sum(x*x)) * sqrt(sum(y*y)))
+  return(c) }
+
+# loop over matrix of positions and calculate cos sim for every pair
+cosSimMat = function(x) {
+  # org output object
+  m = matrix(NA,
+    nrow=ncol(x),ncol=ncol(x),
+    dimnames=list(colnames(x),colnames(x)))
+  cos = as.data.frame(m)
+
+  # loop through pairs and store in cos
+  for(i in 1:ncol(x)) {
+    for(j in i:ncol(x)) {
+      co_rate_1 = x[which(x[,i] & x[,j]),i]
+      co_rate_2 = x[which(x[,i] & x[,j]),j]
+      cos[i,j]= getCosSim(co_rate_1,co_rate_2)
+      cos[j,i]=cos[i,j] } }
+
+  # return cos
+  return(cos) }
 ################################################
 
 # load in data #################################
@@ -130,16 +154,63 @@ localTrans = function(x){
   igraph::transitivity(x, type='average')
 }
 
+game = 10
+
+
 #
-cores = detectCores()-4
-cl = makeCluster(cores)
-registerDoParallel(cl)
-netStats = foreach(
-	game = 1:length(actorSet),
-	.packages=c('sna','igraph','network')
-) %dopar% {
+# cores = detectCores()-4
+# cl = makeCluster(cores)
+# registerDoParallel(cl)
+# netStats = foreach(
+# 	game = 1:length(actorSet),
+# 	.packages=c('sna','igraph','network')
+# ) %dopar% {
 
 gameList = actorSet[[game]]
+
+# get game summary across turn
+gameSumm = Reduce('+', gameList)
+diag(gameSumm) = 0
+
+gameSumm[c('A','E'),c('A','E')] = 1
+
+# center and scale
+gameStdz = (gameSumm - mean(c(gameSumm)))/sd(c(gameSumm), na.rm=TRUE)
+
+# run decomp
+mod = svd(gameStdz)
+
+# get cosine similarity scores
+# and organize
+simRels = cosSimMat(t(mod$u[,1:2]))
+diag(simRels) = NA
+simRels = data.matrix(simRels)
+rownames(simRels) = colnames(simRels) = rownames(gameSumm)
+
+# require an actor to have at least one conflict event for them to really be involved in the system
+isos = which((rowSums(gameSumm) + colSums(gameSumm))==0)
+for(iso in isos){ simRels[iso,] = 0 ; simRels[,iso] = 0 }
+
+# actors cannot be allies if they have fought one another
+edges = melt(gameSumm)
+edges$Var1 = char(edges$Var1) ; edges$Var2 = char(edges$Var2)
+edges = edges[edges$value>0,]
+edges = edges[edges$Var1 != edges$Var2,]
+for(ii in 1:nrow(edges)){
+	simRels[edges$Var1[ii], edges$Var2[ii]] = 0
+	simRels[edges$Var2[ii], edges$Var1[ii]] = 0 }
+
+
+simRels
+tmp
+gameSumm
+
+sum(c(simRels)>.8, na.rm=TRUE)/( nrow(simRels)^2-nrow(simRels) )
+
+sum(c(tmp)>.8, na.rm=TRUE)/( nrow(tmp)^2-nrow(tmp) )
+
+# create full game summary
+
 out = lapply(1:length(gameList), function(turn){
 	mat = gameList[[turn]]
 	grph = graph_from_adjacency_matrix(mat,
@@ -181,6 +252,8 @@ out = lapply(1:length(gameList), function(turn){
 	graph_eff_krack = stat(sna::efficiency, sgrph)
 	graph_centrz = centr_degree(grph)$centralization
 	graph_lubness = stat(sna::lubness, sgrph)
+
+	# organize
 	out = c(
     graph_avgDeg = graph_avgDeg,
     graph_globalTrans = graph_globalTrans,
