@@ -507,6 +507,7 @@ class Country(object):
     self.turn = 0
     self.victimhist = {0:[]}
     self.attackhist = {0:[]}
+    self.terrcont = {}
   def ActiveActors(self):
       active = []
       for i in self.armedactors:
@@ -518,12 +519,14 @@ class Country(object):
       self.turn += 1
       self.victimhist[self.turn] = []
       self.attackhist[self.turn] = []
+      self.terrcont[self.turn] = []
       self.ActiveActors()
       self.actorlists[self.turn] = self.activeactors
       ###Beliefs about the strength of each actor in each location
       for i in self.provinces:
         i.newterritory = 1
         i.ExpectedStrength()
+        self.terrcont[self.turn].append((i.name, i.control.name))
       ###Actors go in a random order
       shuffle(self.armedactors)
       ###Each armed actor chooses who to attack

@@ -22,6 +22,6 @@ with open('python39Run.csv', 'w') as csvfile:
         govIdeo = 0
         abm = Country("abm", territory, conn, actors, civ)
         abm.Game()
-        abmwriter.writerow([actors, territory, conn, civ, VicPenalty, CoerceMob, delta, battledeaths, growthrate, victimerror, turnlimit, abm.victimhist, abm.attackhist, abm.actorlists])
+        abmwriter.writerow([actors, territory, conn, civ, VicPenalty, CoerceMob, delta, battledeaths, growthrate, victimerror, turnlimit, abm.victimhist, abm.attackhist, abm.actorlists, abm.adj, abm.terrcont])
         if i%100 == 0:
             print(i)
