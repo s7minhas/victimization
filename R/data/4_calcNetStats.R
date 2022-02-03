@@ -3,11 +3,18 @@ if(Sys.info()['user'] %in% c('Owner','herme','S7M')){
 	source(paste0(
 		'C:/Users/',Sys.info()['user'],
 		'/Research/victimization/R/setup.R')) }
-if(Sys.info()['user'] %in% c('s7m', 'janus829')){
-	source('~/Research/victimization/R/setup.R') }
 
 # load extra libs
 loadPkg(c('igraph', 'sna', 'network', 'doParallel', 'foreach'))
+
+# helpers to calc net stats
+stat = function(expr, object){
+	x=try(expr(object),TRUE)
+	if(class(x)=='try-error'){x=NA}
+	return(x) }
+
+localTrans = function(x){
+  igraph::transitivity(x, type='average') }
 ############################
 
 ###########################
@@ -25,22 +32,16 @@ yrs = names(yListAll[[1]])
 
 ############################
 # calc net stats
-stat = function(expr, object){
-	x=try(expr(object),TRUE)
-	if(class(x)=='try-error'){x=NA}
-	return(x) }
-
-localTrans = function(x){
-  igraph::transitivity(x, type='average') }
-cntry = names(yListAll)[1] ; t = yrs[1]
-
 cl = makeCluster(20)
 registerDoParallel(cl)
 netStats <- foreach(
-	cntry = names(yListAll),
+	cntry = cntries,
 	.packages=c('igraph','sna','network')
 	) %dopar% {
+
+	# iterate through time series for each country
 	cntryStats = lapply(yrs, function(t){
+
 		mat = yListAll[[cntry]][[char(t)]]
 		if(is.null(mat)){return(NULL)}
 
@@ -92,11 +93,14 @@ netStats <- foreach(
 		out$country = cntry ; out$actor = rownames(mat)
 		rownames(out) = NULL ; return(out) })
 	cntryDF = do.call('rbind', cntryStats)
-	return(cntryDF)
-}
-names(netStats) = names(yListAll)
-stopCluster(cl)
 
+	#
+	return(cntryDF) }
+names(netStats) = cntries
+stopCluster(cl)
+############################
+
+############################
 save(netStats,
 	file=paste0(pathData, 'netStats.rda'))
 ############################

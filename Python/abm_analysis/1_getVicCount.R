@@ -3,8 +3,6 @@ if(Sys.info()['user'] %in% c('Owner','herme','S7M')){
 	source(paste0(
 		'C:/Users/',Sys.info()['user'],
 		'/Research/victimization/R/setup.R')) }
-if(Sys.info()['user'] %in% c('s7m', 'janus829')){
-	source('~/Research/victimization/R/setup.R') }
 if(Sys.info()['user'] %in% c('maxgallop')){
 	source('~/Documents/victimization/R/setup.R') }
 

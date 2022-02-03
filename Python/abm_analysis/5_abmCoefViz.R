@@ -3,8 +3,6 @@ if(Sys.info()['user'] %in% c('Owner','herme','S7M')){
 	source(paste0(
 		'C:/Users/',Sys.info()['user'],
 		'/Research/victimization/R/setup.R')) }
-if(Sys.info()['user'] %in% c('s7m', 'janus829')){
-	source('~/Research/victimization/R/setup.R') }
 if(Sys.info()['user'] %in% c('maxgallop')){
 	source('~/Documents/victimization/R/setup.R') }
 ################################################
@@ -12,10 +10,10 @@ if(Sys.info()['user'] %in% c('maxgallop')){
 ################################################
 # load and process coef data
 cleanVars = c(
-	'Number of\nConflicts','Number of\nActors', 'Network \nCompetition')
+	'Number of\nConflicts','Number of\nActors', 'Ally\nProportion', 'Network \nCompetition')
 coefData = lapply(c('fe','re'), function(est){
-	load(paste0(pathResults, 'abm_',est,'Coefs_v2_py39.rda'))
-	if(est=='fe'){ coefs = coefs$herf_und[1:3,]}
+	load(paste0(pathResults, 'abm_',est,'Coefs_v3_py39.rda'))
+	if(est=='fe'){ coefs = coefs$herf_und[1:4,]}
 	if(est=='re'){ coefs = coefs$herf_und[-1,]}
 	coefs = data.frame(coefs, stringsAsFactors=FALSE)
 	coefs$var = rownames(coefs) ; rownames(coefs) = NULL
@@ -40,6 +38,7 @@ coefData$varName = factor(
 	levels=c(
 		'Number of\nActors',
 		'Number of\nConflicts',
+		'Ally\nProportion',
 		'Network \nCompetition'))
 coefData$title = factor(coefData$title)
 

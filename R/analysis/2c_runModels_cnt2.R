@@ -13,8 +13,8 @@ loadPkg(c('MASS', 'glmmADMB', 'glmmTMB'))
 ########################################################
 
 ########################################################
-# load imputed data for cnt1
-# data = unimputed data for cnt1
+# load imputed data for cnt2
+# data = unimputed data for cnt2
 # iData = list of imputed datasets
 # sbgData = imputation model results
 load(paste0(pathData, 'modelDataCnt2.rda'))
@@ -52,8 +52,6 @@ toSamp = sample(1:length(iData), 10, replace=FALSE)
 dataList = iData[toSamp]
 
 # iterate across imputed datasets
-# we do run into some estimation issues in the
-# fe estimation because of the wb vars
 feModCnt2_imp = lapply(dataList, function(dataImp){
   glmmadmb(feF, data=dataImp, family='nbinom') })
 reModCnt2_imp = lapply(dataList, function(dataImp){
