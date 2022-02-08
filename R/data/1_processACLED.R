@@ -9,6 +9,9 @@ if(Sys.info()['user'] %in% c('Owner','herme','S7M')){
 		'C:/Users/',Sys.info()['user'],
 		'/Research/victimization/R/setup.R')) }
 
+if(Sys.info()['user'] %in% c('dorffc')){
+	source('~/ProjectsGit/victimization/R/setup.R') }
+
 # load extra libs
 loadPkg(c('doParallel', 'foreach'))
 ############################
