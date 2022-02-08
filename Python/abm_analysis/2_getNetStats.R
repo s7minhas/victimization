@@ -23,8 +23,8 @@ localTrans = function(x){
 ################################################
 
 # load in data #################################
-load(paste0(abmPath, 'abmData_py39.rda'))
-load(paste0(abmPath, 'df_withVicCount_py39.rda'))
+load(paste0(abmPath, 'abmData.rda'))
+load(paste0(abmPath, 'df_withVicCount.rda'))
 ################################################
 
 # get dyad frame of battles ####################
@@ -80,7 +80,7 @@ dyadConf$senGov = 1*(dyadConf$senID %in% govActor$govID)
 dyadConf$recGov = 1*(dyadConf$recID %in% govActor$govID)
 
 #
-save(dyadConf, file=paste0(abmPath, 'dyadConf_py39.rda'))
+save(dyadConf, file=paste0(abmPath, 'dyadConf.rda'))
 ################################################
 
 # actor list to construct adj mats #############
@@ -194,7 +194,7 @@ out = lapply(1:length(gameList), function(turn){
 res = do.call('rbind', out)
 
 # add in alliances
-res = cbind(res, allyProp=getAllyProps(gameList))
+res = cbind(res, allyProp=stat(getAllyProps, gameList))
 
 #
 return(res) }
@@ -202,5 +202,5 @@ stopCluster(cl)
 
 netStats = do.call('rbind', netStats)
 netStats[,"turn"] = netStats[,"turn"] + 1
-save(netStats, file=paste0(abmPath, 'abmNetStats_v3_py39.rda'))
+save(netStats, file=paste0(abmPath, 'abmNetStats.rda'))
 ################################################

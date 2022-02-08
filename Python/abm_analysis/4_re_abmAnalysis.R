@@ -10,7 +10,7 @@ loadPkg(c('glmmTMB', 'foreach', 'doParallel'))
 ################################################
 
 # load in data #################################
-load(paste0(abmPath, 'netStats_v3_py39.rda'))
+load(paste0(abmPath, 'netStats.rda'))
 ################################################
 
 ################################################
@@ -58,7 +58,7 @@ mVars = c('game', 'vic', 'numConf', 'n_actors', perfVars)
 # netStats = netStats[netStats$game %in% toKeep,]
 # netStats$game = factor(netStats$game)
 v = 'herf_und'
-summary(mod)
+# summary(mod)
 
 ################################################
 # run base mods in parallel

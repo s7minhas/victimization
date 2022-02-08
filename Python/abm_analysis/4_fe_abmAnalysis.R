@@ -10,7 +10,7 @@ loadPkg(c('MASS', 'foreach', 'doParallel'))
 ################################################
 
 # load in data #################################
-load(paste0(abmPath, 'netStats_v3_py39.rda'))
+load(paste0(abmPath, 'netStats.rda'))
 ################################################
 
 ################################################
@@ -40,6 +40,9 @@ summary(netStats)
 return(mod) }
 stopCluster(cl)
 names(res) = perfVars
+
+coefs = lapply(res, function(x){summary(x)$'coefficients'})
+coefs
 
 # save full models
 save(res,

@@ -23,12 +23,8 @@ cleaner = function(x){
 ################################################
 
 # load in data #################################
-abmPyPath = paste0(pathGit, '/Python/')
-# # abmData = read.csv(paste0(abmPyPath, 'abmEpsilonLow.csv'), header = F)
-# save(abmData, file=paste0(abmPath, 'abmData.rda'))
-
-abmData = read.csv(paste0(abmPyPath, 'python39Run.csv'), header = F)
-save(abmData, file=paste0(abmPath, 'abmData_py39.rda'))
+abmData = read.csv(paste0(abmPath, 'python39Run.csv'))
+save(abmData, file=paste0(abmPath, 'abmData.rda'))
 ################################################
 
 # victimization info ###########################
@@ -57,5 +53,5 @@ for(i in 1:nrow(df)){
 				'(','',concatResult,fixed=TRUE),fixed=TRUE)
 		vicCount = nchar(concatResult) } else { vicCount=0 }
 	df$vicCount[i] = vicCount }
-save(df, file=paste0(abmPath, 'df_withVicCount_py39.rda'))
+save(df, file=paste0(abmPath, 'df_withVicCount.rda'))
 ################################################
