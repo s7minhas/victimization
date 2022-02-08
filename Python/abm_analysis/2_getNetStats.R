@@ -202,6 +202,5 @@ stopCluster(cl)
 
 netStats = do.call('rbind', netStats)
 netStats[,"turn"] = netStats[,"turn"] + 1
-netStats = netStats[!is.nan(netStats[,"graph_dens"]),]
 save(netStats, file=paste0(abmPath, 'abmNetStats_v3_py39.rda'))
 ################################################

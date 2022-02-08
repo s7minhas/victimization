@@ -79,7 +79,7 @@ coefProcess = function(coefList, labs=mLabs, vKey=varKey){
 
 ########
 # viz coefs
-coefViz = function(coefData, fName, path=pathGraphics){
+coefViz = function(coefData, fName=NULL, path=pathGraphics){
 	ggCoef = ggplot(coefData, aes(x=varName, y=mean, color=sig)) +
 		geom_hline(aes(yintercept=0), linetype=2, color = "black") +
 		geom_point(size=4) +
@@ -95,6 +95,10 @@ coefViz = function(coefData, fName, path=pathGraphics){
 			strip.text.x = element_text(size = 9, color='white'),
 			strip.background = element_rect(
 				fill = "#525252", color='#525252'))
+  #
+  if(is.null(fName)){
+    return(ggCoef)
+  } else {
 	ggsave(ggCoef, width=8, height=6,
-		file=paste0(path, fName), device=cairo_pdf) }
+		file=paste0(path, fName), device=cairo_pdf) } }
 ########

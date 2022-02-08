@@ -4,7 +4,7 @@ import csv
 # with open('abmEpsilonLow.csv2', 'w') as csvfile:
 with open('python39Run.csv', 'w') as csvfile:
     abmwriter = csv.writer(csvfile, delimiter=',')
-    for i in range(1000):
+    for i in range(10000):
         seed(i)
         np.random.seed(i)
         actors = np.random.poisson(10)

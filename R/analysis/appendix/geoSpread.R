@@ -83,3 +83,42 @@ reModCnt2 = glmmTMB(reF, data=dataCnt2, family='nbinom2')
 feModCnt2Coef = summary(feModCnt2)$'coefficients'[1:p,]
 reModCnt2Coef = summary(reModCnt2)$'coefficients'$cond[1:(p+1),]
 ########################################################
+
+############################
+# get viz
+
+# org coefs
+coefFE = list(
+	base=feModBaseCoef,
+	cnt1=feModCnt1Coef,
+	cnt2=feModCnt2Coef )
+
+coefRE = list(
+	base=reModBaseCoef,
+	cnt1=reModCnt1Coef,
+	cnt2=reModCnt2Coef )
+
+# add labels
+mLabs = c(
+	'Base ACLED Model',
+	'Base + Controls\n(1997-2018)', 'Base + Controls\n(1997-2015)' )
+
+varKey = data.frame(
+	dirty=rownames(coefFE$'cnt2'), stringsAsFactors = FALSE )
+varKey$clean = c(
+	'Geographic Spread',
+	'Network\nCompetition', 'Number of\nConflicts', 'Number of\nActors',
+	'Polity', 'Log(Population)', 'Log(GDP per Capita)',
+	'Excluded\nPopulation', 'Presence of\nPeacekeepers',
+	'Rebel(s) Stronger\nthan Govt.',
+	'Rebel(s) Supported\nby Foreign Govt.',
+	'Govt. Supported\nby Foreign Govt.' )
+
+# process coefs
+ggDataFE = coefProcess(coefFE)
+ggDataRE = coefProcess(coefRE)
+
+# create and save viz to pathGraphics
+coefViz(ggDataFE, 'coefPlot_FE_geoSpread.pdf')
+coefViz(ggDataRE, 'coefPlot_RE_geoSpread.pdf')
+############################

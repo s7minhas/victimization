@@ -10,10 +10,10 @@ if(Sys.info()['user'] %in% c('maxgallop')){
 ################################################
 # load and process coef data
 cleanVars = c(
-	'Number of\nConflicts','Number of\nActors', 'Ally\nProportion', 'Network \nCompetition')
+	'Number of\nConflicts','Number of\nActors', 'Network \nCompetition')
 coefData = lapply(c('fe','re'), function(est){
 	load(paste0(pathResults, 'abm_',est,'Coefs_v3_py39.rda'))
-	if(est=='fe'){ coefs = coefs$herf_und[1:4,]}
+	if(est=='fe'){ coefs = coefs$herf_und[1:3,]}
 	if(est=='re'){ coefs = coefs$herf_und[-1,]}
 	coefs = data.frame(coefs, stringsAsFactors=FALSE)
 	coefs$var = rownames(coefs) ; rownames(coefs) = NULL
@@ -38,14 +38,12 @@ coefData$varName = factor(
 	levels=c(
 		'Number of\nActors',
 		'Number of\nConflicts',
-		'Ally\nProportion',
 		'Network \nCompetition'))
 coefData$title = factor(coefData$title)
 
 # rescale herf for interp purposes
 # doing it here is equivalent to making
-# the change in the data since the
-# measures are perfectly, negatively correlated
+# the change in the data
 coefData[
 	coefData$var=='herf_und',c('mean','lo95','hi95','lo90','hi90')
 	] = -1*coefData[
@@ -79,6 +77,7 @@ ggCoef = ggplot(
 			size = 9, color='white'),
 		strip.background = element_rect(
 			fill = "#525252", color='#525252') )
+ggCoef
 ggsave(ggCoef,
 	width=7, height=4,
 	file=paste0(pathGraphics, 'abmCoefPlot_py39.pdf'),
