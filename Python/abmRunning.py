@@ -2,7 +2,7 @@ from VicForViz import *
 import csv
 
 # with open('abmEpsilonLow.csv2', 'w') as csvfile:
-with open('python39Run.csv', 'w') as csvfile:
+with open('C:/Users/S7M/Dropbox/Research/victimization/abm/python39Run.csv', 'w') as csvfile:
     abmwriter = csv.writer(csvfile, delimiter=',')
     for i in range(10000):
         seed(i)
