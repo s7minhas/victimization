@@ -23,7 +23,7 @@ cleaner = function(x){
 ################################################
 
 # load in data #################################
-abmData = read.csv(paste0(abmPath, 'python39Run.csv'))
+abmData = read.csv(paste0(abmPath, 'python39Run_tmp.csv'))
 save(abmData, file=paste0(abmPath, 'abmData.rda'))
 ################################################
 
