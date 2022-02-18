@@ -80,12 +80,17 @@ mod = glmmTMB(
 )
 summary(mod)$'coefficients'
 
-summary(lm(vic~numConf+n_actors+herf_und+factor(game)-1, data=netStats[netStats$govStrengthBin==0,]))$'coefficients'[1:5,]
-summary(lm(vic~numConf+n_actors+herf_und+factor(game)-1, data=netStats[netStats$govStrengthBin==1,]))$'coefficients'[1:5,]
+summary(lm(log(vic+1)~numConf+n_actors+herf_und+factor(game)-1, data=netStats[netStats$govStrengthBin==0,]))$'coefficients'[1:5,]
+summary(lm(log(vic+1)~numConf+n_actors+herf_und+factor(game)-1, data=netStats[netStats$govStrengthBin==1,]))$'coefficients'[1:5,]
 
 library(lme4)
-summary(lmer(vic~numConf+n_actors+herf_und+(1|game), data=netStats[netStats$govStrengthBin==0,]))$'coefficients'
-summary(lmer(vic~numConf+n_actors+herf_und+(1|game), data=netStats[netStats$govStrengthBin==1,]))$'coefficients'
+summary(lmer(log(vic+1)~numConf+n_actors+herf_und+(1|game), data=netStats[netStats$govStrengthBin==0,]))$'coefficients'
+summary(lmer(log(vic+1)~numConf+n_actors+herf_und+(1|game), data=netStats[netStats$govStrengthBin==1,]))$'coefficients'
+
+summary(lm(log(vic+1)~numConf+n_actors+herf_und+factor(game)-1, data=netStats))$'coefficients'[1:5,]
+summary(lmer(log(vic+1)~numConf+n_actors+herf_und+(1|game), data=netStats))$'coefficients'
+
+summary(lmer(log(vic+1)~numConf+n_actors+herf_und+govStrengthBin + (1|game), data=netStats))$'coefficients'
 
 return(mod) }
 stopCluster(cl)
