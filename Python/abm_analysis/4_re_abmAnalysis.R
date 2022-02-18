@@ -71,8 +71,21 @@ res = foreach(
 
 form=formula(paste0('vic~numConf+n_actors+', v, '+ (1|game)'))
 mod = glmmTMB(
-	form, data=netStats, family='nbinom2'
+	form, data=netStats[netStats$govStrengthBin==0,], family='nbinom2'
 )
+summary(mod)$'coefficients'
+
+mod = glmmTMB(
+	form, data=netStats[netStats$govStrengthBin==1,], family='nbinom2'
+)
+summary(mod)$'coefficients'
+
+summary(lm(vic~numConf+n_actors+herf_und+factor(game)-1, data=netStats[netStats$govStrengthBin==0,]))$'coefficients'[1:5,]
+summary(lm(vic~numConf+n_actors+herf_und+factor(game)-1, data=netStats[netStats$govStrengthBin==1,]))$'coefficients'[1:5,]
+
+library(lme4)
+summary(lmer(vic~numConf+n_actors+herf_und+(1|game), data=netStats[netStats$govStrengthBin==0,]))$'coefficients'
+summary(lmer(vic~numConf+n_actors+herf_und+(1|game), data=netStats[netStats$govStrengthBin==1,]))$'coefficients'
 
 return(mod) }
 stopCluster(cl)

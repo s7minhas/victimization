@@ -23,7 +23,7 @@ localTrans = function(x){
 ################################################
 
 # load in data #################################
-load(paste0(abmPath, 'abmData.rda'))
+load(paste0(abmPath, 'abmData_epsilonLow.rda'))
 load(paste0(abmPath, 'df_withVicCount.rda'))
 ################################################
 
@@ -202,5 +202,16 @@ stopCluster(cl)
 
 netStats = do.call('rbind', netStats)
 netStats[,"turn"] = netStats[,"turn"] + 1
+################################################
+
+################################################
+# add measure of gov strength
+netStats = cbind(netStats,
+	govStrength=df$govStrength[match(netStats[,'game'], df$gameID)])
+netStats = cbind(netStats,
+	govStrengthBin=netStats[,'govStrength'] > median(netStats[,'govStrength'], na.rm=TRUE))
+################################################
+
+################################################
 save(netStats, file=paste0(abmPath, 'abmNetStats.rda'))
 ################################################

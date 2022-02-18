@@ -23,8 +23,20 @@ cleaner = function(x){
 ################################################
 
 # load in data #################################
-abmData = read.csv(paste0(abmPath, 'python39Run_tmp.csv'))
+abmData = read.csv(paste0(abmPath, 'python39Run_tmp.csv'), header=FALSE, stringsAsFactors=FALSE)
 save(abmData, file=paste0(abmPath, 'abmData.rda'))
+
+# abmData = read.csv('https://raw.githubusercontent.com/s7minhas/victimization/a51b84a96a0283c4082c41cf09bfa630bdf91302/Python/abmEpsilonLow.csv?token=GHSAT0AAAAAABNPS7SHU773Q4MLH2ILRT3AYQY4KEQ', header=FALSE, stringsAsFactors=F)
+# save(abmData, file=paste0(abmPath, 'abmData_epsilonLow.rda'))
+# load(paste0(abmPath, 'abmData_epsilonLow.rda'))
+################################################
+
+################################################
+# calc gov strength
+nActors = abmData$V1
+nRegions = abmData$V2
+govStrength = nRegions - nActors + 1
+govStrength = data.frame(govStrength = govStrength, gameID = 1:nrow(abmData))
 ################################################
 
 # victimization info ###########################
@@ -53,5 +65,14 @@ for(i in 1:nrow(df)){
 				'(','',concatResult,fixed=TRUE),fixed=TRUE)
 		vicCount = nchar(concatResult) } else { vicCount=0 }
 	df$vicCount[i] = vicCount }
+################################################
+
+################################################
+# add in gov strength score
+df$govStrength = govStrength$govStrength[
+	match(df$gameID, govStrength$gameID)]
+################################################
+
+################################################
 save(df, file=paste0(abmPath, 'df_withVicCount.rda'))
 ################################################

@@ -26,6 +26,17 @@ vars = names(netStats)[c(1:11,13:15)]
 perfVars = vars[c(12,14)]
 ################################################
 
+library(plm)
+formals(phtest)
+
+form = 'vic ~ numConf + n_actors + herf_und'
+
+wi = plm(form, data=netStats, index = 'game', model='within')
+re = plm(form, data=netStats, index = 'game', model='random')
+phtest(wi, re)
+
+v = 'herf_und'
+
 ################################################
 # run base mod in parallel
 cores = length(perfVars)
@@ -34,9 +45,15 @@ registerDoParallel(cl)
 res = foreach(
 	v = perfVars,
 	.packages=c( 'MASS' ) ) %dopar% {
+
 form=formula(paste0('vic~numConf+n_actors+', v, '+ factor(game)-1'))
-mod = glm.nb(form, data=netStats)
-summary(netStats)
+mod = glm.nb(form, data=netStats[netStats$govStrengthBin==1,])
+summary(mod)$coefficients[1:5,]
+
+form=formula(paste0('vic~numConf+n_actors+', v, '+ factor(game)-1'))
+mod = glm.nb(form, data=netStats[netStats$govStrengthBin==0,])
+summary(mod)$coefficients[1:5,]
+
 return(mod) }
 stopCluster(cl)
 names(res) = perfVars
