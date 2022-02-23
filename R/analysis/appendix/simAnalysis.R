@@ -127,5 +127,5 @@ herfSimViz = ggplot(summPreds, aes(x=herf, y=mu)) +
 #
 ggsave(herfSimViz,
   file=paste0(pathGraphics, 'herfSimViz.pdf'),
-  width=8, height=5, device=cairo_pdf)
+  width=8, height=4, device=cairo_pdf)
 ########################################################

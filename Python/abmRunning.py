@@ -2,9 +2,9 @@ from VicForViz import *
 import csv
 
 # with open('abmEpsilonLow.csv2', 'w') as csvfile:
-with open('C:/Users/S7M/Dropbox/Research/victimization/abm/python39Run.csv', 'w') as csvfile:
+with open('C:/Users/Owner/Dropbox/Research/victimization/abm/python39Run.csv', 'w') as csvfile:
     abmwriter = csv.writer(csvfile, delimiter=',')
-    for i in range(10000):
+    for i in range(5000):
         seed(i)
         np.random.seed(i)
         actors = np.random.poisson(10)
