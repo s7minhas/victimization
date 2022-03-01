@@ -23,7 +23,7 @@ localTrans = function(x){
 ################################################
 
 # load in data #################################
-load(paste0(abmPath, 'abmData_epsilonLow.rda'))
+load(paste0(abmPath, 'abmData.rda'))
 load(paste0(abmPath, 'df_withVicCount.rda'))
 ################################################
 
