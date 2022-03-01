@@ -12,7 +12,7 @@ if(Sys.info()['user'] %in% c('maxgallop')){
 cleanVars = c(
 	'Number of\nConflicts','Number of\nActors', 'Network \nCompetition')
 coefData = lapply(c('fe','re'), function(est){
-	load(paste0(pathResults, 'abm_',est,'Coefs_v3_py39.rda'))
+	load(paste0(pathResults, 'abm_',est,'Coefs.rda'))
 	if(est=='fe'){ coefs = coefs$herf_und[1:3,]}
 	if(est=='re'){ coefs = coefs$herf_und[-1,]}
 	coefs = data.frame(coefs, stringsAsFactors=FALSE)
@@ -77,9 +77,8 @@ ggCoef = ggplot(
 			size = 9, color='white'),
 		strip.background = element_rect(
 			fill = "#525252", color='#525252') )
-ggCoef
 ggsave(ggCoef,
 	width=7, height=4,
-	file=paste0(pathGraphics, 'abmCoefPlot_py39.pdf'),
+	file=paste0(pathGraphics, 'abmCoefPlot.pdf'),
 	device=cairo_pdf )
 ################################################
