@@ -19,10 +19,12 @@ acled = suppressMessages( read_csv(
 
 # subset to just africa since
 # some of our IVs are only available for africa
-acled$continent = countrycode(
-	acled$country,
-	'country.name', 'continent' )
-acled = acled[acled$continent=='Africa',]
+cntryKey = data.frame(
+	cntry = unique(acled$country), stringsAsFactors=F )
+cntryKey$cont = countrycode(
+	cntryKey$cntry, 'country.name', 'continent')
+acled = acled[
+	acled$country %in% cntryKey$cntry[cntryKey$cont=='Africa'] ,]
 
 # subset to relev vars
 acled = acled[, c(
@@ -41,20 +43,78 @@ nVars = c('year', 'latitude', 'longitude', 'geo_precision')
 for(v in nVars){ dat[,v] = num(dat[,v]) }
 dat = dat[!is.na(dat$actor1),]
 
-# centroid positions by actor-country-year
-cent = dat %>%
-  group_by(actor1, country, year) %>%
-  summarize(
-    latMed=median(latitude),
-    longMed=median(longitude),
-    latMu=mean(latitude),
-    longMu=mean(longitude) ) %>%
-  ungroup() %>% data.frame(.,stringsAsFactors=F)
+# subset to events with town/region spatial precision
+# results are similar if we use geo_precision: 1:3 or just 1
+# for more details on acled spatial precision codes see:
+# https://www.acleddata.com/wp-content/uploads/dlm_uploads/2017/10/ACLED_Codebook_2019FINAL_pbl.pdf
+dat = dat[dat$geo_precision==1:2,]
 
-# calc'd both median and mu, correlated at
-# ~.999 so doesnt make much diff which we go with
-# cor(cent[,c('latMed', 'latMu')])
-# cor(cent[,c('longMed', 'longMu')])
+# # centroid positions by actor-country-year
+# cent = dat %>%
+#   group_by(actor1, country, year) %>%
+#   summarize(
+#     latMed=median(latitude),
+#     longMed=median(longitude),
+#     latMu=mean(latitude),
+#     longMu=mean(longitude) ) %>%
+#   ungroup() %>% data.frame(.,stringsAsFactors=F)
+# # calc'd both median and mu, correlated at
+# # ~.999 so doesnt make much diff which we go with
+# # cor(cent[,c('latMed', 'latMu')])
+# # cor(cent[,c('longMed', 'longMu')])
+
+
+# create actor-country-year ids and iterate through each
+# to get centroid
+dat$id = with(dat, paste(actor1, country, year, sep='_'))
+ids = unique(dat$id)
+cent2 = lapply(ids, function(id){
+
+	# subset to actor-country-year events
+	slice = dat[dat$id == id,,drop=FALSE]
+
+	# get number of unique lat longs
+	nLong = length(unique(slice$longitude))
+	nLat = length(unique(slice$latitude))
+	nPos = min(nLong, nLat)
+	# nPos = nrow(unique(slice[,c('longitude','latitude')]))
+
+	# if more than one event calculate centroid
+	if(nPos>3){
+		longLatMat = data.matrix(slice[,c('longitude','latitude')])
+		centLongLat = centroid( longLatMat )
+		out = slice[1,c('actor1','country','year')]
+		out$latMed = centLongLat[,'lat'] ; out$longMed = centLongLat[,'lon'] }
+
+	# if less than four events use median (mean produces highly correlated result)
+	if(nPos<=3){
+		out = slice[,c('actor1','country','year')]
+		out$latMed = median(slice$latitude, na.rm=TRUE)
+		out$longMed = median(slice$longitude, na.rm=TRUE) }
+
+	# add info on # events and unique events
+	out$nEvents = nrow(slice) ; out$nPos = nPos
+
+	#
+	return(out) })
+cent2 = do.call('rbind', cent2)
+cent = cent2
+# subset to actors with more than 3 events
+cent = cent[cent$nEvents>3,]
+
+summary(cent$latMed)
+summary(cent$longMed)
+summary(cent[cent$longMed < -360,'nPos'])
+
+cent[which(cent$longMed==max(cent$longMed,na.rm=TRUE)),]
+
+slice = dat[dat$actor1=='AMISOM: African Union Mission in Somalia (2007-) (Ethiopia)' & dat$country=='Somalia' & dat$year==2015,]
+median(slice$latitude)
+median(slice$longitude)
+dim(slice)
+centroid(slice[40:50,c('longitude','latitude')])
+summary(slice[,c('longitude','latitude')])
+
 
 # calc distances between actor pairs in every country-year
 # and use that info to generate a measure of how spread

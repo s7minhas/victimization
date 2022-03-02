@@ -120,7 +120,7 @@ cl = makeCluster(cores)
 registerDoParallel(cl)
 netStats = foreach(
 	game = 1:length(actorSet),
-	.packages=c('sna','igraph','network','reshape2')
+	.packages=c('igraph', 'reshape2')
 ) %dopar% {
 
 # choose a list of games from one sim
@@ -132,22 +132,15 @@ out = lapply(1:length(gameList), function(turn){
 	mat = gameList[[turn]]
 	grph = graph_from_adjacency_matrix(mat,
 		mode='directed', weighted=NULL )
-	sgrph = network::network(
-		mat, matrix.type="adjacency",directed=TRUE)
 
 	# gen desc stats
   n_actors = nrow(mat)
 
-	# herf index ... denom problem in this one
+	# herf index
 	aCnts = rowSums(mat, na.rm=TRUE) + colSums(mat, na.rm=TRUE)
 	aShare = aCnts/(sum(c(mat), na.rm=TRUE)*2)
 	herf_gen = sum(aShare^2)
 	# herf_gen = min(herf_gen, 1)
-
-	# herf 2
-	aCnts = rowSums(mat, na.rm=TRUE)
-	aShare = aCnts/sum(c(mat), na.rm=TRUE)
-	herf_sen = sum(aShare^2)
 
 	# herf 3
 	# create undirected version
@@ -158,34 +151,9 @@ out = lapply(1:length(gameList), function(turn){
 	aShare = aCnts/sum(c(umat), na.rm=TRUE)
 	herf_und = sum(aShare^2)
 
-  graph_avgDeg = mean(stat(sna::degree, sgrph))
-  graph_globalTrans = stat(igraph::transitivity, grph)
-  graph_localTrans = stat(localTrans, grph)
-  graph_meanDist = mean_distance(grph)
-	graph_recip = stat(sna::grecip, sgrph)
-	graph_dens = stat(sna::gden, sgrph)
-	graph_hier_krack = sna::hierarchy(sgrph, measure='krackhardt')
-	graph_conn_krack = stat(sna::connectedness, sgrph)
-	graph_eff_krack = stat(sna::efficiency, sgrph)
-	graph_centrz = centr_degree(grph)$centralization
-	graph_lubness = stat(sna::lubness, sgrph)
-
-	# organize
 	out = c(
-    graph_avgDeg = graph_avgDeg,
-    graph_globalTrans = graph_globalTrans,
-    graph_localTrans = graph_localTrans,
-    graph_meanDist = graph_meanDist,
-		graph_recip=graph_recip,
-		graph_dens=graph_dens,
-		graph_hier_krack = graph_hier_krack,
-		graph_conn_krack = graph_conn_krack,
-		graph_eff_krack = graph_eff_krack,
-		graph_centrz = graph_centrz,
-		graph_lubness = graph_lubness,
 		n_actors=n_actors,
 		herf_gen=herf_gen,
-		herf_sen=herf_sen,
 		herf_und=herf_und,
 		game=game, turn=turn
 		) })

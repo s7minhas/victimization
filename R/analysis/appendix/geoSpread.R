@@ -1,3 +1,6 @@
+#### geoSpread is calculated in the following dir:
+#### R/data/getData/getGeoSpread.R
+
 ########################################################
 if(Sys.info()['user'] %in% c('Owner','herme','S7M')){
 	source(paste0(
@@ -119,6 +122,9 @@ ggDataFE = coefProcess(coefFE)
 ggDataRE = coefProcess(coefRE)
 
 # create and save viz to pathGraphics
+
+pathGraphics = 'C:/Users/S7M/Desktop/'
+
 coefViz(ggDataFE, 'coefPlot_FE_geoSpread.pdf')
 coefViz(ggDataRE, 'coefPlot_RE_geoSpread.pdf')
 ############################

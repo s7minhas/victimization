@@ -1,3 +1,6 @@
+#### geoSpread is calculated in the following dir:
+#### R/data/getData/getAllyProp.R
+
 ########################################################
 if(Sys.info()['user'] %in% c('Owner','herme','S7M')){
 	source(paste0(

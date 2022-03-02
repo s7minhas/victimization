@@ -150,7 +150,7 @@ class Territory(object):
               self.newterritory = 0 #cant victimize in the period you acquire a territory
               for j in self.civilians:
                 newsupp += j.support == self.control
-        #People died, it sucks
+        #vic occurs
         self.target = 0
         self.attack.append(self)
         for j in self.attack:
@@ -158,17 +158,17 @@ class Territory(object):
           for i in range(dmax):
             shuffle(j.civilians)
             j.civilians.pop()
-    ###Ok, battle over, people not fighting anymore
+    ###battle ends
         for i in self.attack:
           i.attack = []
-        #All these people dying, who are we gonna mobilize next time?
+        #vic, q for who gets mobilized next
   def Growth(self,rate = .1):
       add = round(len(self.civilians)*rate)
       for i in range(add):
         newbie = Civilian(ascii_lowercase[int((len(self.civilians) + i + 1)/26/26)] + ascii_lowercase[int((len(self.civilians) + i + 1)/26)%26] + ascii_lowercase[(len(self.civilians) + i + 1)%26] + self.name, self)
         self.civilians.append(newbie)
         self.country.civilians.append(newbie)
-  ##Some people arent supporting you, that also sucks, maybe we can kill them?
+  ##do nonsupporters experience vic?
   def Victimize(self):
     if len(self.civilians) > 0:
       supps = []
@@ -185,12 +185,12 @@ class Territory(object):
     #Based on how many supporters, you get a probability of selective vs indiscriminate violence
         selectprob = 1 - (((len(self.civilians) - len(supps))*(len(supps)))/len(self.civilians)**2 + victimerror*len(supps)/len(self.civilians))
         selective = np.random.binomial(1, selectprob, 1)
-    ##If it works, you kill an opponent, everyone loves you!
+    ##If it works, you kill an opponent, and support doesnt go down
         if selective == 1:
           nosupp.pop()
           self.control.VioHist += 1
           self.exsupp -= (1 + VicPenalty*len(nosupp))
-    ##If it doesnt, you kill a supporter, man, supporting you seems like a bad idea
+    ##If it doesnt, supporter killed, and support goes down
         if selective == 0 and len(supps) > 0:
           supps.pop()
           self.control.VioHist -= 1
