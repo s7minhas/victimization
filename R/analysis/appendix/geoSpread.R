@@ -122,9 +122,6 @@ ggDataFE = coefProcess(coefFE)
 ggDataRE = coefProcess(coefRE)
 
 # create and save viz to pathGraphics
-
-pathGraphics = 'C:/Users/S7M/Desktop/'
-
 coefViz(ggDataFE, 'coefPlot_FE_geoSpread.pdf')
 coefViz(ggDataRE, 'coefPlot_RE_geoSpread.pdf')
 ############################
