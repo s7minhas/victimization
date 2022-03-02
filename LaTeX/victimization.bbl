@@ -50,12 +50,29 @@ Cunningham, David, Kristian~Skrede Gleditsch \harvardand\ Idean Salehyan. 2013.
 \newblock ``Non-State Actors in Civil Wars: {A} New Dataset.'' {\em Conflict
   Management and Peace Science} 30(5):516--531.
 
+\harvarditem{Dawkins}{2021}{dawkins:2021}
+Dawkins, Sophia. 2021.
+\newblock ``The problem of the missing dead.'' {\em Journal of Peace Research}
+  58(5):1098--1116.
+
+\harvarditem[Donnay et~al.]{Donnay, Dunford, McGrath, Backer \harvardand\
+  Cunningham}{2018}{donnay:etal:2018}
+Donnay, Karsten, Eric~T. Dunford, Erin~C. McGrath, David Backer \harvardand\
+  David~E. Cunningham. 2018.
+\newblock ``Integrating conflict event data.'' {\em Journal of Conflict
+  Resolution} .
+
 \harvarditem[Dorff, Gallop \harvardand\ Minhas]{Dorff, Gallop \harvardand\
   Minhas}{2021}{dorff:etal:2021}
 Dorff, Cassy, Max Gallop \harvardand\ Shahryar Minhas. 2021.
 \newblock ``{[W]hat Lies Beneath: Using Latent Networks to Improve Spatial
   Predictions}.'' {\em International Studies Quarterly} 66(1).
 \newline\harvardurl{https://doi.org/10.1093/isq/sqab086}
+
+\harvarditem{Eck}{2012}{eck:2012}
+Eck, Kristine. 2012.
+\newblock ``In data we trust? {A} comparison of UCDP GED and ACLED conflict
+  events datasets.'' {\em Cooperation and Conflict} 47(1):124--141.
 
 \harvarditem{Eck \harvardand\ Hultman}{2007}{eck:hultman:2007}
 Eck, Kristine \harvardand\ Lisa Hultman. 2007.
@@ -107,13 +124,6 @@ Hollenbach, Florian~M., Iavor Bojinov, Shahryar Minhas, Nils~W. Metternich,
 Honaker, James \harvardand\ Gary King. 2010.
 \newblock ``{What to Do About Missing Values in Time-Series Cross-Section
   Data}.'' {\em American Journal of Political Science} 54:561--581.
-
-\harvarditem[Huhe, Gallop \harvardand\ Minhas]{Huhe, Gallop \harvardand\
-  Minhas}{2021}{huhe:etal:2021}
-Huhe, Narisong, Max Gallop \harvardand\ Shahryar Minhas. 2021.
-\newblock ``Who are in charge, who do I work with, and who are my friends: A
-  latent space approach to understanding elite coappearances in China.'' {\em
-  Social Networks} 66:26--37.
 
 \harvarditem{Kalyvas}{2006}{kalyvas:2006}
 Kalyvas, Stathis. 2006.
