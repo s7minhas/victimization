@@ -113,9 +113,9 @@ herfSimViz = ggplot(summPreds, aes(x=herf, y=mu)) +
     x='Network Competition',
     y='Predicted Number of Civilian Fatalities'
   ) +
-  geom_rug(
-    data=herfData, aes(x=herf),
-    sides='b', alpha=.2, position='jitter') +
+  # geom_rug(
+  #   data=herfData, aes(x=herf),
+  #   sides='b', alpha=.2, position='jitter') +
   facet_wrap(~modLab, nrow=1, scales='free_y') +
   theme_light(base_family = "Source Sans Pro") +
   theme(
@@ -127,5 +127,5 @@ herfSimViz = ggplot(summPreds, aes(x=herf, y=mu)) +
 #
 ggsave(herfSimViz,
   file=paste0(pathGraphics, 'herfSimViz.pdf'),
-  width=8, height=4, device=cairo_pdf)
+  width=8, height=3, device=cairo_pdf)
 ########################################################
