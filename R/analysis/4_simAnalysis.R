@@ -6,42 +6,8 @@ if(Sys.info()['user'] %in% c('Owner','herme','S7M')){
 
 # load simhelper
 if(!'simHelper' %in% installed.packages()[,1]){
-  devtools::install_github('s7minhas/simHelper') }
+  devtools::install_github('s7minhas/simHelper', ref='vic') }
 library(simHelper)
-getPreds = function(
-  beta, varcov, scen,
-  link = "count", seed = 6886, sims = 100) {
-    set.seed(seed)
-    draws = mvtnorm::rmvnorm(sims, beta, varcov)
-    preds = lapply(scen$scen, function(s) {
-        xBeta = draws %*% t(s)
-        if (link == "logit") {
-            preds = 1/(1 + exp(-xBeta))
-        }
-        if (link == "probit") {
-            preds = pnorm(xBeta)
-        }
-				if (link == 'count') {
-					preds = exp(xBeta)
-				}
-        return(preds)
-    })
-    if (scen$scenType == "observed") {
-        preds = lapply(preds, function(pred) {
-            avgPred = matrix(apply(pred, 1, mean), ncol = 1)
-            return(avgPred)
-        })
-    }
-    preds = lapply(1:nrow(scen$treatCombo), function(ii) {
-        predT = preds[[ii]]
-        tVals = scen$treatCombo[ii, , drop = FALSE]
-        rownames(tVals) = NULL
-        predT = cbind(tVals, pred = predT)
-        return(predT)
-    })
-    preds = do.call("rbind", preds)
-    names(preds)[ncol(preds)] = "pred"
-    return(preds) }
 ########################################################
 
 ########################################################

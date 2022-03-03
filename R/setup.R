@@ -60,6 +60,10 @@ smTheme = theme(
   panel.border=element_blank()
 )
 
+#
+if(!'simHelper' %in% installed.packages()[,1]){
+  devtools::install_github('s7minhas/simHelper', ref='vic') }
+
 # warnings
 options(warn=-1)
 ########
