@@ -15,10 +15,11 @@ loadPkg(c('MASS', 'glmmTMB'))
 ########################################################
 # load raw model data (dataBase, dataCnt1, dataCnt2)
 load(paste0(pathData, 'rawModelData.rda'))
-cor(dataBase[,c(dv,ivs)])
+
 # set up spec
 dv = 'civVicCount'
 ivs = c('herf', 'nConf', 'nActors')
+
 p = length(ivs)
 feF = formula(paste0(
   dv, '~', paste(ivs, collapse='+'), '+factor(cname)-1'))
