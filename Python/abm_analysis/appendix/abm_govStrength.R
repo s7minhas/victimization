@@ -6,7 +6,12 @@ if(Sys.info()['user'] %in% c('Owner','herme','S7M')){
 if(Sys.info()['user'] %in% c('maxgallop')){
 	source('~/Documents/victimization/R/setup.R') }
 
-loadPkg(c('MASS', 'foreach', 'doParallel'))
+loadPkg(c('MASS', 'foreach', 'doParallel', 'glmmTMB'))
+
+# load simhelper
+if(!'simHelper' %in% installed.packages()[,1]){
+  devtools::install_github('s7minhas/simHelper', ref='vic') }
+library(simHelper)
 ################################################
 
 # load in data #################################
@@ -22,123 +27,72 @@ for(i in 1:ncol(parInfo)){ parInfo[,i] = char(parInfo[,i]) }
 ################################################
 
 ################################################
-# run base mod in parallel
-cores = nrow(parInfo)
-cl = makeCluster(cores)
-registerDoParallel(cl)
-res = foreach(
-	ii = 1:nrow(parInfo),
-	.packages=c( 'MASS', 'glmmTMB' ) ) %dopar% {
-
-# get govStrength val and mod type
-g = parInfo$gVal[ii]
-mType = parInfo$mod[ii]
-
-# slice data
-slice = netStats[netStats$govStrengthBin==g,]
-
-# run fe mod
-if(mType=='fe'){
-	form=formula(paste0('vic~numConf+n_actors+herf_und+ factor(game)-1'))
-	mod = glm.nb(form, data=slice)
-	out = summary(mod)$'coefficients' }
-
-# run re mods
-if(mType=='re'){
-	form=formula(paste0('vic~numConf+n_actors+herf_und+ (1|game)'))
-	mod = glmmTMB( form, data=slice, family='nbinom2' )
-	out = summary(mod)$'coefficients'$cond }
-
-return(out) }
-stopCluster(cl)
-names(res) = apply(parInfo, 1, paste, collapse='_')
-################################################
-
-################################################
-# load and process coef data
-cleanVars = c(
-	'Number of\nConflicts','Number of\nActors', 'Network \nCompetition')
-coefData = lapply(1:length(res), function(ii){
-	# pull out labels for mod
-	lab = names(res)[ii]
-	g = substring(lab, 1, 1)
-	mType = substring(lab, 3, nchar(lab))
-
-	# pull out relev mod
-	coefs = res[[ii]]
-
-	# subset to relev coefs
-	if(mType=='fe'){ coefs = coefs[1:3,]}
-	if(mType=='re'){ coefs = coefs[-1,]}
-
-	# org
-	coefs = data.frame(coefs, stringsAsFactors=FALSE)
-	coefs$var = rownames(coefs) ; rownames(coefs) = NULL
-	coefs$varName = cleanVars
-
-	# add govStrength labs
-	if(g=='1'){coefs$gLab = 'High Gov. Strength'}
-	if(g=='0'){coefs$gLab = 'Low Gov. Strength'}
-
-	# add mType labs
-	if(mType=='fe'){
-		coefs$title='ABM Simulation Model\n(Fixed Country Effects)'}
-	if(mType=='re'){
-		coefs$title='ABM Simulation Model\n(Random Country Effects)'}
-
-	#
-	return(coefs) })
-coefData = do.call("rbind", coefData)
-save(coefData,
-	file=paste0(pathResults, 'abmCoefs_govStrength.rda'))
-################################################
-
-################################################
 # rescale herf for interp purposes
-coefData$Estimate[
-	coefData$var=='herf_und'] = -1*coefData$Estimate[coefData$var=='herf_und']
+netStats$herf_und2 = 1-netStats$herf_und
+
+# run model
+form=formula(
+	paste0(
+		'vic~numConf+n_actors+herf_und2+govStrengthBin+
+		herf_und2*govStrengthBin+(1|game)'))
+mod = glmmTMB( form, data=netStats, family='nbinom2' )
+out = summary(mod)$'coefficients'$cond
+################################################
+
+################################################
+# sim analysis to understand interaction effect
+# org model results
+beta = summary(mod)$'coefficients'$cond[,1]
+varcov = vcov(mod, full=TRUE)[names(beta),names(beta)]
+
+# set up scen
+scen = scenBuild(
+		mData = mod$frame,
+		ivs = names(beta)[-c(1,6)],
+		ivStats = rep('mean', length(names(beta)[-c(1,6)])),
+		treatVar = c('herf_und2','govStrengthBin'),
+		treatCategorical=c(FALSE, TRUE) )
+
+# get predictions
+preds = getPreds(beta, varcov, scen, 'count', 6886, 1000)
+
+# summarize by scen
+summ = preds %>%
+	group_by(herf_und2, govStrengthBin) %>%
+	summarize(
+		mu = mean(pred),
+		hi95 = quantile(pred, 0.975),
+		hi90 = quantile(pred, 0.95),
+		lo95 = quantile(pred, 0.025),
+		lo90 = quantile(pred, 0.05) )
 
 # relabel
-names(coefData)[1:2] = c('mean', 'sd')
-coefData = coefData %>%
-		getCIVecs(.) %>% getSigVec(.)
+summ$govStrengthBin[summ$govStrengthBin==0] = 'Gov. Weaker'
+summ$govStrengthBin[summ$govStrengthBin==1] = 'Gov. Stronger'
 
-# org for plotting
-coefData$varName = factor(
-	coefData$varName,
-	levels=c(
-		'Number of\nActors',
-		'Number of\nConflicts',
-		'Network \nCompetition'))
-coefData$title = factor(coefData$title)
-
-# viz
-ggCoef = ggplot(
-		coefData,
-		aes(x=varName, y=mean, color=sig)) +
-	geom_hline(
-		aes(yintercept=0), linetype=2, color = "black") +
-	geom_point(size=4) +
-	geom_linerange(
-		aes(ymin=lo90, ymax=hi90),alpha = 1, size = 1) +
-	geom_linerange(
-		aes(ymin=lo95,ymax=hi95),alpha = 1, size = .5) +
-	scale_colour_manual(
-		values = coefp_colors, guide=FALSE) +
-	ylab('') + xlab('') +
-	facet_grid(gLab~title) +
-	coord_flip() +
-	theme_light(base_family="Source Sans Pro") +
+#
+simViz = ggplot(summ, aes(
+	x=herf_und2, y=mu,
+	color=factor(govStrengthBin),
+	group=factor(govStrengthBin),
+	fill=factor(govStrengthBin)) ) +
+	geom_line() +
+	geom_ribbon(aes(ymin=lo95, ymax=hi95), alpha=.5) +
+	geom_ribbon(aes(ymin=lo90, ymax=hi90), alpha=.7) +
+	scale_fill_manual(values=c('#969696', '#252525')) +
+	scale_color_manual(values=c('#969696', '#252525'))	+
+  labs(
+    x='Network Competition',
+    y='Predicted Number of Civilian Fatalities (ABM)',
+		color='', fill=''
+  ) +
+  theme_light(base_family = "Source Sans Pro") +
 	theme(
-		legend.position='top', legend.title=element_blank(),
-		panel.border=element_blank(),
-		axis.ticks=element_blank(),
-		axis.text.y=element_text(hjust=0),
-		strip.text.x = element_text(
-			size = 9, color='white'),
-		strip.background = element_rect(
-			fill = "#525252", color='#525252') )
-ggsave(ggCoef,
-	width=7, height=5,
+		legend.position='top',
+    axis.ticks=element_blank(),
+    panel.border=element_blank()	)
+
+ggsave(simViz,
+	width=7, height=5, device=cairo_pdf,
 	file=paste0(pathGraphics, 'abmCoefPlot_govStrength.pdf'))
 ################################################
