@@ -93,19 +93,15 @@ summ$rebsStronger = factor(
 
 # viz
 simViz= ggplot(summ, aes(
-	x=herf, y=mu,
-	color=factor(rebsStronger),
-	group=factor(rebsStronger),
-	fill=factor(rebsStronger)) ) +
+		x=herf, y=mu,
+		group=factor(rebsStronger) )) +
 	geom_line() +
 	geom_ribbon(aes(ymin=lo95, ymax=hi95), alpha=.5) +
 	geom_ribbon(aes(ymin=lo90, ymax=hi90), alpha=.7) +
 	facet_wrap(~factor(rebsStronger), scales='free') +
-	scale_fill_manual(values=c('#969696', '#252525')) +
-	scale_color_manual(values=c('#969696', '#252525'))	+
   labs(
     x='Network Competition',
-    y='Predicted Number of Civilian Fatalities',
+    y='Predicted Number\nof Civilian Fatalities',
 		color='', fill=''
   ) +
   theme_light(base_family = "Source Sans Pro") +

@@ -67,8 +67,11 @@ summ = preds %>%
 		lo90 = quantile(pred, 0.05) )
 
 # relabel
-summ$govStrengthBin[summ$govStrengthBin==0] = 'Gov. Weaker'
-summ$govStrengthBin[summ$govStrengthBin==1] = 'Gov. Stronger'
+summ$govStrengthBin[summ$govStrengthBin==0] = 'Rebels Stronger'
+summ$govStrengthBin[summ$govStrengthBin==1] = 'Rebels Weaker'
+summ$govStrengthBin = factor(
+	summ$govStrengthBin,
+	levels=rev(sort(unique(summ$govStrengthBin))) )
 
 #
 simViz = ggplot(summ, aes(
@@ -83,7 +86,7 @@ simViz = ggplot(summ, aes(
 	scale_color_manual(values=c('#969696', '#252525'))	+
   labs(
     x='Network Competition',
-    y='Predicted Number of Civilian Fatalities (ABM)',
+    y='Predicted Number\nof Civilian Fatalities (ABM)',
 		color='', fill=''
   ) +
   theme_light(base_family = "Source Sans Pro") +
@@ -93,6 +96,6 @@ simViz = ggplot(summ, aes(
     panel.border=element_blank()	)
 
 ggsave(simViz,
-	width=7, height=5, device=cairo_pdf,
+	width=7, height=3, device=cairo_pdf,
 	file=paste0(pathGraphics, 'abm_govStrengthSim.pdf'))
 ################################################
