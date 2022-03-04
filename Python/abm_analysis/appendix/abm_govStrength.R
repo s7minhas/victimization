@@ -94,5 +94,5 @@ simViz = ggplot(summ, aes(
 
 ggsave(simViz,
 	width=7, height=5, device=cairo_pdf,
-	file=paste0(pathGraphics, 'abmCoefPlot_govStrength.pdf'))
+	file=paste0(pathGraphics, 'abm_govStrengthSim.pdf'))
 ################################################

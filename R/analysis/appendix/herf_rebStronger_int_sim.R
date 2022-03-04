@@ -118,6 +118,6 @@ simViz= ggplot(summ, aes(
 
 #
 ggsave(simViz,
-  file=paste0(pathGraphics, 'emp_govStrength_sim.pdf'),
+  file=paste0(pathGraphics, 'emp_rebStrengthSim.pdf'),
   width=8, height=3, device=cairo_pdf)
 ########################################################
