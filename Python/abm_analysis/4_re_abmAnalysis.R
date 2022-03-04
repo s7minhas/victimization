@@ -19,7 +19,7 @@ load(paste0(abmPath, 'netStats.rda'))
 mean(netStats$vic, na.rm=TRUE)
 var(netStats$vic, na.rm=TRUE)
 ################################################
-slice = netStats[netStats$game %in% 1:500,]
+
 ################################################
 # run base mods in parallel
 perfVars = c('herf_gen', 'herf_und')
@@ -31,7 +31,7 @@ res = foreach(
 	.packages=c( 'glmmTMB' ) ) %dopar% {
 
 form=formula(paste0('vic~numConf+n_actors+', v, '+ (1|game)'))
-mod = glmmTMB( form, data=slice, family='nbinom2' )
+mod = glmmTMB( form, data=netStats, family='nbinom2' )
 
 return(mod) }
 stopCluster(cl)
