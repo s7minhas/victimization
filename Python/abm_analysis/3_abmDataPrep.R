@@ -5,6 +5,8 @@ if(Sys.info()['user'] %in% c('Owner','herme','S7M')){
 		'/Research/victimization/R/setup.R')) }
 if(Sys.info()['user'] %in% c('maxgallop')){
 	source('~/Documents/victimization/R/setup.R') }
+if(Sys.info()['user'] %in% c('maxgallop')){
+  source('C:/Users/pjb15180/Documents/GitHub/victimization/R/setup.R') }
 ################################################
 
 # load in data #################################
