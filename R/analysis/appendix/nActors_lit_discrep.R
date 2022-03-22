@@ -56,7 +56,7 @@ coefFE = lapply(1:length(forms), function(ii){
   return(feModCoef) })
 ########################################################
 
-############################
+########################################################
 # get viz
 
 # add labels
@@ -76,5 +76,5 @@ ggDataFE = coefProcess(coefFE)
 ggDataRE = coefProcess(coefRE)
 
 # create and save viz to pathGraphics
-coefViz(ggDataFE, fName='')
-############################
+coefViz(ggDataFE, fName='coefs_nActors_lit_discrep.pdf')
+########################################################
