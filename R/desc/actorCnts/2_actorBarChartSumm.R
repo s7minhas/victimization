@@ -21,9 +21,6 @@ actorCntsID$nCat3 = addCat(
 	c('4 or\nless','5-9','10 or\nmore'), c(5,10))
 ###########################################################
 
-actorCntsID %>% group_by(year) %>% summarize(cnt=length(unique(country)))
-
-actorCntsID %>% group_by(year) %>% summarize(mu = mean(nActors))
 ###########################################################
 # viz diff in # actors over time via cat variable
 actorCats = ggplot(actorCntsID,
