@@ -116,7 +116,7 @@ All of the scripts necessary to reproduce the figures in the appendix are locate
 
 #### R package build notes
 
-Below we provide the version of each of the libraries that our project relies on (each library was built using R 4.0.5). We use one package, `simHelper`, that is not available on CRAN and that needs to be installed using devtools, this can be done via executing the following R code: `devtools::install_github('s7minhas/simHelper', ref='vic')`. Version information for the other libraries used in the analysis are shown below:
+Below we provide the version of each of the libraries that our project relies on (each library was built using R 4.0.5). We use one package, `simHelper`, that is not available on CRAN and needs to be installed using devtools, this can be done via executing the following R code: `devtools::install_github('s7minhas/simHelper', ref='vic')`. Version information for the other libraries used in the analysis are shown below:
 
 |                |                   |                 |                  |
 |:---------------|:------------------|:----------------|:-----------------|

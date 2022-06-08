@@ -18,7 +18,7 @@ coefMissFE = list(
 
 coefMissRE = list(
 	base = reModBaseCoef,
- 	cnt1 = reModCnt1Coef, cnt2 = reModBaseCoef )
+ 	cnt1 = reModCnt1Coef, cnt2 = reModCnt2Coef )
 
 coefImpFE = list(
 	base = feModBaseCoef,
@@ -26,7 +26,7 @@ coefImpFE = list(
 
 coefImpRE = list(
 	base = reModBaseCoef,
- 	cnt1 = reModCnt1Coef_imp, cnt2 = reModBaseCoef_imp )
+ 	cnt1 = reModCnt1Coef_imp, cnt2 = reModCnt2Coef_imp )
 ########################################################
 
 ########################################################
