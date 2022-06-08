@@ -1,5 +1,7 @@
 ## Replication instructions for the paper
 
+Some of the underlying data files, such as raw UCDP and ACLED data, are too big to share via hte .zip on Git, so we have made a dropbox link to the files available here as well: https://www.dropbox.com/s/apvx1az731so4ml/replArchive.zip?dl=0. 
+
 The base directory of the replication archive contains all the figures and tables shown in the paper. There are three  subdirectories that contain the code necessary to produce these outputs (note that these files are also available on Github at [https://github/s7minhas/victimization](https://github.com/s7minhas/victimization)):
 
 - **compModelSim**: contains the code necessary for running the computational model, organizing the results, and conducting the regression analysis
