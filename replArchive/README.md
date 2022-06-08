@@ -2,10 +2,13 @@
 
 The base directory of the replication archive contains all the figures and tables shown in the paper. There are three  subdirectories that contain the code necessary to produce these outputs (note that these files are also available on Github at [https://github/s7minhas/victimization](https://github.com/s7minhas/victimization)):
 
-- **1_simulation**: contains the data files and scripts necessary to reproduce the simulation results in the paper and the appendix
-- **2_applications**: contains the data files and scripts necessary to reproduce the applications results in the paper and the appendix
-  - Within **2_applications/** each of the scripts correspond to a particular analysis
-  - **2_applications/application_data/[gibler, reiter_stam, weeks]**: contains the relevant .rda files that are inputted and outputted during the analysis of these various papers
+- **compModelSim**: contains the code necessary for running the computational model, organizing the results, and conducting the regression analysis
+- **acledAnalysis**: contains the code necessary for running the empirical analysis in the paper
+- **appendix**: contains the code necessary to reproduce all the figures in the Appendix
+- **graphics**: contains .pngs and .tex files for all the figures and tables in the manuscript and appendix
+- **data**: contains the data files used in the analysis
+- **results**: contains the results of model runs
+- **funcs**: contains a set of R scripts with helper functions used in the analysis
 
 Replicating the figures and tables in the **main** text will take only a few minutes on a standard laptop if the provided `.rda` files are used.
 
@@ -113,15 +116,17 @@ All of the scripts necessary to reproduce the figures in the appendix are locate
 
 #### R package build notes
 
-Below we provide the version of each of the libraries that our project relies on (each library was built using R 3.5.0). Additionally, please note that we use a tailored version of [Peter Hoff's AMEN package](http://pdhoff.github.io/amen/). Installing the version of AMEN that is used in this paper can be done  with the `devtools` package by running the following command in an R session: `devtools::install_github('s7minhas/amen', ref='pa2018_version')`.
+Below we provide the version of each of the libraries that our project relies on (each library was built using R 4.0.5). We use one package, `simHelper`, that is not available on CRAN and that needs to be installed using devtools, this can be done via executing the following R code: `devtools::install_github('s7minhas/simHelper', ref='vic')`. Version information for the other libraries used in the analysis are shown below:
 
-|                   |                    |                |                    |                |
-|:------------------|:-------------------|:---------------|:-------------------|:---------------|
-|amen: 1.4          |Cairo: 1.5-12       |caTools: 1.18.0 |countrycode: 0.16   |devtools: 2.3.0 |
-|doParallel: 1.0.15 |dplyr: 0.8.5        |extrafont: 0.17 |foreach: 1.5.0      |ggplot2: 3.3.0  |
-|ggrepel: 0.8.2     |grid: 4.0.3         |here: 1.0.0     |latex2exp: 0.4.0    |magrittr: 2.0.1 |
-|mvtnorm: 1.1-0     |png: 0.1-7          |PRROC: 1.3.1    |RColorBrewer: 1.1-2 |reshape2: 1.4.4 |
-|ROCR: 1.0-11       |separationplot: 1.3 |stringr: 1.4.0  |tidyr: 1.0.3        |xtable: 1.8-4   |
+|                |                   |                 |                  |
+|:---------------|:------------------|:----------------|:-----------------|
+|abind 1.4-5     |Cairo 1.5-12.2     |countrycode 0.16 |doParallel 1.0.16 |
+|dplyr 1.0.6     |extrafont 0.17     |foreach 1.5.1    |ggplot2 3.3.5     |
+|ggraph 2.0.5    |glmmADMB 0.8.3.3   |glmmTMB 1.0.2.1  |igraph 1.2.6      |
+|latex2exp 0.5.0 |magrittr 2.0.1     |MASS 7.3-54      |network 1.17.1    |
+|patchwork 1.1.1 |RColorBrewer 1.1-3 |readr 1.4.0      |reshape2 1.4.4    |
+|sbgcop 0.980    |sna 2.6            |stringr 1.4.0    |tidygraph 1.2.0   |
+|tidyr 1.1.3     |xtable 1.8-4       |                 |                  |
 
 
 If you find any errors or have any further questions, please address them to me via email at minhassh@msu.edu.

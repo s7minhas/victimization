@@ -80,3 +80,33 @@ source(paste0(funcPath, 'netSimHelpers.R'))
 source(paste0(funcPath, 'allyPropHelpers.R'))
 source(paste0(funcPath, 'modelSummaryHelpers.R'))
 ########
+
+
+# #### pkg version notes
+# pkgs = c(
+# 	'readr', 'abind', 'reshape2',
+# 	'dplyr', 'tidyr', 'magrittr',
+# 	'network', 'igraph',
+# 	'ggplot2', 'RColorBrewer', 'latex2exp',
+# 	'countrycode', 'extrafont', 'Cairo',
+# 	'igraph', 'ggraph', 'tidygraph',
+# 	'stringr', 'reshape2', 'sna',
+# 	'network', 'doParallel', 'foreach',
+# 	'MASS', 'glmmTMB', 'glmmADMB',
+# 	'patchwork', 'sbgcop', 'xtable'
+# 	)
+#
+# pkgs = sort(unique(pkgs))
+# pkgV = installed.packages()[pkgs,c('Version')]
+# pkgInfo = apply( cbind(pkgs, pkgV), 1, function(x){ paste(x[1], x[2], collapse=': ') } )
+# pkgMat = matrix(c(pkgInfo, '', ''), ncol=4, byrow=TRUE)
+# knitr::kable(pkgMat, format='markdown')
+# |                |                   |                 |                  |
+# |:---------------|:------------------|:----------------|:-----------------|
+# |abind 1.4-5     |Cairo 1.5-12.2     |countrycode 0.16 |doParallel 1.0.16 |
+# |dplyr 1.0.6     |extrafont 0.17     |foreach 1.5.1    |ggplot2 3.3.5     |
+# |ggraph 2.0.5    |glmmADMB 0.8.3.3   |glmmTMB 1.0.2.1  |igraph 1.2.6      |
+# |latex2exp 0.5.0 |magrittr 2.0.1     |MASS 7.3-54      |network 1.17.1    |
+# |patchwork 1.1.1 |RColorBrewer 1.1-3 |readr 1.4.0      |reshape2 1.4.4    |
+# |sbgcop 0.980    |sna 2.6            |stringr 1.4.0    |tidygraph 1.2.0   |
+# |tidyr 1.1.3     |xtable 1.8-4       |                 |                  |
