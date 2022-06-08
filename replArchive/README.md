@@ -67,14 +67,23 @@ $no_of_cores
 2.6.3
 ```
 
-#### Running the scripts
+#### Reproducing figures in the manuscript
 
-The `here` package is used to manage paths in this replication archive for R scripts. The .here file is stored in the top-most folder of the replication archive. Scripts are listed in order of the figures and tables in the manuscript.
+The `here` package is used to manage paths in this replication archive for R scripts. The .here file is stored in the top-most folder of the replication archive. Scripts are listed in order of the figures and tables in the manuscript. For python related scripts, the path will need to be set manually in one file: `compModelSim/abmRunning.py`.
 
-- **figure1.R**: Creates the hypothetical network used to show scenarios of low and high network competition. No inputs necessary. Output is stored in `graphics/figure1.png`.
+- **figure_1.R**: Creates the hypothetical network used to show scenarios of low and high network competition. No inputs necessary. Output is stored in `graphics/figure1.png`.
 - Figures 2 and 3 are constructed manually and are not based on any code.
 - Table 1 is constructed manually. The parameter listed in that table accord with the simulation parameters used in `compModelSim/abmRunning.py`.
-- 
+- **figure_4.R**: Summarizes the results of a regression analysis on the simulated data. The `figure_4.R` script just create a coefficient plot using two inputs: `results/abm_feCoefs.rda` and `results/abm_reCoefs.rda`. The output of this script is stored in `graphics/figure4.png`. Steps to reproduce these results from scratch involve running the computational model, processing the data, and conducting the regression analysis, each of the scripts necessary to perform these steps are in the `compModelSim` directory:
+  - `1_abmRunning.py`: Runs the computational model using the parameters specified in the paper, the code for the model itself is located in `0_VicForViz.py`.
+  - `2_getVicCount.R`: Calculates victimization counts from the game.
+  - `3_getNetStats.R`: Calculates network statistics from the game.
+  - `4_abmDataPrep.R`: Organizing the data for analysis.
+  - `5_fe_abmAnalysis.R`: Runs the fixed effects regression analysis.
+  - `5_re_abmAnalysis.R`: Runs the random effects regression analysis.
+- **figure_5.R**: Creates a descriptive visualization of how the number of actors in armed conflicts have changed over time as well as our key independent variable, network competition. The inputs for this script are: `data/rawModelData.rda` and `data/actorCntsID.rda`. The output of this script is stored in `graphics/figure5.png`.
+- Table 2 is constructed manually.
+- **figure_6_7.R**: Summarizes the results of a regression analysis on data from ACLED. The script requires three inputs: `results/baseMods.rda`, `results/cnt1Mods.rda`, and `results/cnt2Mods.rda`. The output of this script is stored in `graphics/figure6.png` and `graphics/figure7.png`.
 
 ##### Simulation: Manuscript
 
