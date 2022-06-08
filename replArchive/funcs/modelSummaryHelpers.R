@@ -100,5 +100,5 @@ coefViz = function(coefData, fName=NULL, path=pathGraphics){
     return(ggCoef)
   } else {
 	ggsave(ggCoef, width=8, height=6,
-		file=paste0(path, fName), device=cairo_pdf) } }
+		file=paste0(path, fName), dpi=600) } }
 ########

@@ -1,9 +1,6 @@
 ########################################################
-if(Sys.info()['user'] %in% c('Owner','herme','S7M')){
-	source(paste0(
-		'C:/Users/',Sys.info()['user'],
-		'/Research/victimization/R/setup.R')) }
-
+source(paste0(here::here(), '/setup.R'))
+library(devtools)
 # load simhelper
 if(!'simHelper' %in% installed.packages()[,1]){
   devtools::install_github('s7minhas/simHelper', ref='vic') }
@@ -92,6 +89,6 @@ herfSimViz = ggplot(summPreds, aes(x=herf, y=mu)) +
 
 #
 ggsave(herfSimViz,
-  file=paste0(pathGraphics, 'herfSimViz.pdf'),
-  width=8, height=3, device=cairo_pdf)
+  file=paste0(pathGraphics, 'figure8.png'),
+  width=8, height=3, dpi=600)
 ########################################################
