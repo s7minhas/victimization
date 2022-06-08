@@ -1,12 +1,5 @@
 ########################################################
-if(Sys.info()['user'] %in% c('Owner','herme','S7M')){
-	source(paste0(
-		'C:/Users/',Sys.info()['user'],
-		'/Research/victimization/R/setup.R')) }
-if(Sys.info()['user'] %in% c('s7m', 'janus829')){
-	source('~/Research/victimization/R/setup.R') }
-if(Sys.info()['user'] %in% c('dorffc')){
-	source('~/ProjectsGit/victimization/R/setup.R') }
+source(paste0(here::here(), '/setup.R'))
 
 # helpful pkgs
 loadPkg(c('MASS', 'glmmTMB'))
@@ -75,5 +68,5 @@ varKey = rbind(varKey, c('(Intercept)', 'Intercept'))
 ggDataFE = coefProcess(coefFE)
 
 # create and save viz to pathGraphics
-coefViz(ggDataFE, fName='coefs_nActors_lit_discrep.pdf')
+coefViz(ggDataFE, fName='appendix/figure_A14.png')
 ########################################################

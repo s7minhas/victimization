@@ -1,7 +1,7 @@
 ########################################################
 source(paste0(here::here(), '/setup.R'))
 ########################################################
-tmp=ls()
+
 ########################################################
 load(paste0(pathResults, 'baseMods.rda'))
 load(paste0(pathResults, 'cnt1Mods.rda'))
@@ -48,15 +48,13 @@ ggDataImpRE = coefProcess(coefImpRE)
 ########################################################
 
 ########################################################
-# comparison of base model: fe vs re
-baseFE = ggDataMissFE[ggDataMissFE$model=='Base ACLED Model',]
-baseRE = ggDataMissRE[ggDataMissRE$model=='Base ACLED Model',]
-baseFE$model = 'Base ACLED Model\n(Fixed Country Effects)'
-baseRE$model = 'Base ACLED Model\n(Random Country Effects)'
-ggDataBaseMod = rbind(baseFE, baseRE)
-coefViz(ggDataBaseMod, 'figure6.png')
-
 # re mods with cntrls
-cntImpRE = ggDataImpRE[ggDataImpRE$model!=mLabs[1],]
-coefViz(cntImpRE, 'figure7.png')
+cntMissRE = ggDataMissRE[ggDataMissRE$model!=mLabs[1],]
+coefViz(cntMissRE, 'appendix/figure_A3.png')
+
+# fe mods with cntrls
+cntImpFE = ggDataImpFE[ggDataImpFE$model!=mLabs[1],]
+cntMissFE = ggDataMissFE[ggDataMissFE$model!=mLabs[1],]
+coefViz(cntImpFE, 'appendix/figure_A2.png')
+coefViz(cntMissFE, 'appendix/figure_A4.png')
 ########################################################

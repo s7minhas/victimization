@@ -64,6 +64,6 @@ gg = ggraph(ggGrph, layout = 'fr') +
 		strip.background = element_rect(
 			fill = "#525252", color='#525252') )
 ggsave(gg,
-	file=paste0(pathGraphics, 'Figure1.png'),
+	file=paste0(pathGraphics, 'figure1.png'),
 	width=8, height=3, dpi=600 )
 ####################################################

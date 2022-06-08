@@ -75,11 +75,11 @@ The `here` package is used to manage paths in this replication archive for R scr
 - Figures 2 and 3 are constructed manually and are not based on any code.
 - Table 1 is constructed manually. The parameter listed in that table accord with the simulation parameters used in `compModelSim/abmRunning.py`.
 - **figure_4.R**: Summarizes the results of a regression analysis on the simulated data. The `figure_4.R` script just create a coefficient plot using two inputs: `results/abm_feCoefs.rda` and `results/abm_reCoefs.rda`. The output of this script is stored in `graphics/figure4.png`. Steps to reproduce these results from scratch involve running the computational model, processing the data, and conducting the regression analysis; each of the scripts necessary to perform these steps are in the `compModelSim` directory:
-  - `1_abmRunning.py`: Runs the computational model using the parameters specified in the paper, the code for the model itself is located in `0_VicForViz.py`.
+  - `1_abmRunning.py`: Runs the computational model using the parameters specified in the paper, the code for the model itself is located in `0_VicForViz.py` (This file takes several hours to run).
   - `2_getVicCount.R`: Calculates victimization counts from the game.
-  - `3_getNetStats.R`: Calculates network statistics from the game.
+  - `3_getNetStats.R`: Calculates network statistics from the game (This file utilizes parallelization, adjust number of cores in the script).
   - `4_abmDataPrep.R`: Organizing the data for analysis.
-  - `5_fe_abmAnalysis.R`: Runs the fixed effects regression analysis.
+  - `5_fe_abmAnalysis.R`: Runs the fixed effects regression analysis (This file takes several hours to run).
   - `5_re_abmAnalysis.R`: Runs the random effects regression analysis.
 - **figure_5.R**: Creates a descriptive visualization of how the number of actors in armed conflicts have changed over time as well as our key independent variable, network competition. The inputs for this script are: `data/rawModelData.rda` and `data/actorCntsID.rda`. The output of this script is stored in `graphics/figure5.png`.
 - Table 2 is constructed manually.
@@ -92,6 +92,23 @@ The `here` package is used to manage paths in this replication archive for R scr
 
 #### Reproducing figures in the appendix
 
+All of the scripts necessary to reproduce the figures in the appendix are located in the `appendix/` directory.
+
+- **01_tableA_1.R**: Generates Table A1 in the Appendix. Inputs: `data/rawModelData.rda`. Outputs: `graphics/appendix/table_A1.tex`.
+- **02_tableA_2_3_4.R**: Generates Tables A2-4 in the Appendix. Inputs: `data/rawModelData.rda`. Outputs: `graphics/appendix/table_A2.tex`, `graphics/appendix/table_A3.tex`, and `graphics/appendix/table_A4.tex`.
+- **03_figureA_1.R**: Generates Figure A1 in the Appendix. Inputs: `data/rawModelData.rda`. Outputs: `graphics/appendix/figure_A1.png`.
+- **04_figureA_2_3_4.R**: Generates Figures A2-4 in the Appendix. Inputs: `results/baseMods.rda`, `results/cnt1Mods.rda`, and `results/cnt2Mods.rda`. Outputs: `graphics/appendix/figure_A2.png`, `graphics/appendix/figure_A3.png`, and `graphics/appendix/figure_A4.png`.
+- **05_figureA_5_6.R**: Generates Figures A5-6 in the Appendix. Inputs: `data/rawModelData.rda`. Outputs: `graphics/appendix/figure_A5.png` and `graphics/appendix/figure_A6.png`.
+- **06_figureA_7_8.R**: Generates Figures A7-8 in the Appendix. Inputs: `data/rawModelData.rda` and `data/geoSpread_acled.rda`. Outputs: `graphics/appendix/figure_A7.png` and `graphics/appendix/figure_A8.png`.
+- **07_figureA_9.R**: Generates Figure A9 in the Appendix. Inputs: `results/abm_feCoefs_allyProp.rda` and `results/abm_reCoefs_allyProp.rda`. Outputs: `graphics/appendix/figure_A9.png`.
+- **08_figureA_10_11.R**: Generates Figures A10-11 in the Appendix. Inputs: `data/rawModelData.rda` and `data/allyProp_acled.rda`. Outputs: `graphics/appendix/figure_A10.png` and `graphics/appendix/figure_A11.png`.
+- **09_figureA_12.R**: Generates Figure A12 in the Appendix. Inputs: `data/netStats.rda`. Outputs: `graphics/appendix/figure_A12.png`.
+- **10_figureA_13.R**: Generates Figure A13 in the Appendix. Inputs: `data/modelDataCnt2.rda`. Outputs: `graphics/appendix/figure_A13.png`.
+- **11_figureA_14.R**: Generates Figure A14 in the Appendix. Inputs: `data/rawModelData.rda`. Outputs: `graphics/appendix/figure_A14.png`.
+- **12_figureA_15.R**: Generates Figure A15 in the Appendix. Inputs: `data/data.rda`. Outputs: `graphics/appendix/figure_A15.png`.
+- **13_figureA_16.R**: Generates Figure A16 in the Appendix. Inputs: `data/rawModelData.rda`. Outputs: `graphics/appendix/figure_A16.png`.
+- **14_figureA_17_18.R**: Generates Figure A17-18 in the Appendix. Inputs: `data/GEDEvent_v21_1.RData`, `data/rawModelData.rda`, and `data/modelDataCnt2.rda`. Outputs: `graphics/appendix/figure_A17.png` and `graphics/appendix/figure_A18.png`.
+- **15_figureA_19_20.R**: Generates Figure A19-20 in the Appendix. Inputs: `data/acled_1997-01-01-2020-07-02.csv` and `data/rawModelData.rda`. Outputs: `graphics/appendix/figure_A19.png` and `graphics/appendix/figure_A20.png`.
 
 
 #### R package build notes
