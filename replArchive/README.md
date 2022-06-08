@@ -1,6 +1,6 @@
 ## Replication instructions for the paper
 
-Some of the underlying data files, such as raw UCDP and ACLED data, are too big to share via hte .zip on Git, so we have made a dropbox link to the files available here as well: https://www.dropbox.com/s/apvx1az731so4ml/replArchive.zip?dl=0. 
+Some of the underlying data files, such as raw UCDP and ACLED data, are too big to share via hte .zip on Git, so we have made a dropbox link to the files available here as well: https://www.dropbox.com/s/apvx1az731so4ml/replArchive.zip?dl=0.
 
 The base directory of the replication archive contains all the figures and tables shown in the paper. There are three  subdirectories that contain the code necessary to produce these outputs (note that these files are also available on Github at [https://github/s7minhas/victimization](https://github.com/s7minhas/victimization)):
 
@@ -113,7 +113,7 @@ All of the scripts necessary to reproduce the figures in the appendix are locate
 - **12_figureA_15.R**: Generates Figure A15 in the Appendix. Inputs: `data/data.rda`. Outputs: `graphics/appendix/figure_A15.png`.
 - **13_figureA_16.R**: Generates Figure A16 in the Appendix. Inputs: `data/rawModelData.rda`. Outputs: `graphics/appendix/figure_A16.png`.
 - **14_figureA_17_18.R**: Generates Figure A17-18 in the Appendix. Inputs: `data/GEDEvent_v21_1.RData`, `data/rawModelData.rda`, and `data/modelDataCnt2.rda`. Outputs: `graphics/appendix/figure_A17.png` and `graphics/appendix/figure_A18.png`.
-- **15_figureA_19_20.R**: Generates Figure A19-20 in the Appendix. Inputs: `data/acled_1997-01-01-2020-07-02.csv` and `data/rawModelData.rda`. Outputs: `graphics/appendix/figure_A19.png` and `graphics/appendix/figure_A20.png`.
+- **15_figureA_19_20.R**: Generates Figure A19-20 in the Appendix. Inputs: `data/acledCiv.rda` and `data/rawModelData.rda`. Outputs: `graphics/appendix/figure_A19.png` and `graphics/appendix/figure_A20.png`.
 
 
 #### R package build notes

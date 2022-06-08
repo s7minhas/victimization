@@ -31,10 +31,6 @@ return(mod) }
 stopCluster(cl)
 names(res) = perfVars
 
-# save full models
-save(res,
-	file=paste0(pathResults, 'abm_feMods.rda'))
-
 # save just coefs
 coefs = lapply(res, function(x){summary(x)$'coefficients'})
 save(coefs,
@@ -55,10 +51,6 @@ summary(netStats)
 return(mod) }
 stopCluster(cl)
 names(res) = perfVars
-
-# save full models
-save(res,
-	file=paste0(pathResults, 'abm_feMods_allyProp.rda'))
 
 # save just coefs
 coefs = lapply(res, function(x){summary(x)$'coefficients'})

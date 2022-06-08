@@ -10,13 +10,14 @@ loadPkg(c('MASS', 'glmmTMB'))
 load(paste0(pathData, 'rawModelData.rda'))
 
 # read in acled data
-acledCiv = suppressMessages( read_csv( paste0( pathData,
-		"acled_1997-01-01-2020-07-02.csv"))) %>%
-		filter(event_type=='Violence against civilians') %>%
-		group_by(country, year) %>%
-    summarize(eventCnt = n())
-acledCiv$cname = cname(acledCiv$country)
-acledCiv$id = with(acledCiv, paste0(cname, '_', year))
+# acledCiv = suppressMessages( read_csv( paste0( pathData,
+# 		"acled_1997-01-01-2020-07-02.csv"))) %>%
+# 		filter(event_type=='Violence against civilians') %>%
+# 		group_by(country, year) %>%
+#     summarize(eventCnt = n())
+# acledCiv$cname = cname(acledCiv$country)
+# acledCiv$id = with(acledCiv, paste0(cname, '_', year))
+load(paste0(pathData, 'acledCiv.rda'))
 
 # merge
 dataBase$eventCnt = acledCiv$eventCnt[match(dataBase$id, acledCiv$id)]

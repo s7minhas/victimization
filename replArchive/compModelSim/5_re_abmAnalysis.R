@@ -31,10 +31,6 @@ return(mod) }
 stopCluster(cl)
 names(res) = perfVars
 
-# save full models
-save(res,
-	file=paste0(pathResults, 'abm_reMods.rda'))
-
 # save coefs
 coefs = lapply(res, function(x){summary(x)$'coefficients'$cond})
 save(coefs,
@@ -56,10 +52,6 @@ mod = glmmTMB(form, data=netStats, family='nbinom2')
 return(mod) }
 stopCluster(cl)
 names(res) = perfVars
-
-# save full models
-save(res,
-	file=paste0(pathResults, 'abm_reMods_allyProp.rda'))
 
 # save coefs
 coefs = lapply(res, function(x){summary(x)$'coefficients'$cond})
