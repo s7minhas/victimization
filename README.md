@@ -14,4 +14,4 @@ Follow instructions in replArchive directory. Any questions should be addressed 
 
 Publication Outlet
 ---
-Forthcoming in British Journal of Political Science
+British Journal of Political Science (2022)
